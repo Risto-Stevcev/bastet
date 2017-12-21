@@ -1,0 +1,22 @@
+{
+  "name": "bs-abstract",
+  "version": "0.1.0",
+  "refmt": 3,
+  "bsc-flags": ["-bs-super-errors"],
+  "warnings": { "number": "-102" },
+  "sources": [{
+    "dir": "src",
+    "subdirs": true
+  }, {
+    "dir": "test",
+    "type": "dev"
+  }],
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": false
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+      "bs-jsverify"
+  ]
+}

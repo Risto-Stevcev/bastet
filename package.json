@@ -1,0 +1,21 @@
+{
+  "name": "bs-abstract",
+  "version": "0.1.0",
+  "scripts": {
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w"
+  },
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "Risto Stevcev",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "bs-platform": "^2.1.0",
+    "mocha": "^4.0.1"
+  },
+  "dependencies": {
+    "bs-jsverify": "^0.2.0"
+  }
+}
