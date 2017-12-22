@@ -35,3 +35,17 @@ module Monad: MONAD with type t('a) = list('a) = {
   let flat_map = (x, f) =>
     ListLabels.fold_left(~f=(acc, a) => ListLabels.append(acc, f(a)), ~init=[], x);
 };
+
+module Foldable: FOLDABLE with type t('a) = list('a) = {
+  type t('a) = list('a);
+  let fold_left = (f, init) => ListLabels.fold_left(~f, ~init);
+  let fold_right = (f, init) => ListLabels.fold_right(~f, ~init);
+  module Fold_Map = (M: MONOID) => {
+    module I = Infix.Monoid(M);
+    let fold_map = (f, x) => I.(fold_left((acc, x) => acc <:> f(x), M.empty, x));
+  };
+  module Fold_Map_Any = (M: MONOID_ANY) => {
+    module I = Infix.Monoid_Any(M);
+    let fold_map = (f, x) => I.(fold_left((acc, x) => acc <:> f(x), M.empty, x));
+  };
+};

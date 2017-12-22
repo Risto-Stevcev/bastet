@@ -43,6 +43,29 @@ module type MONAD = {
   let flat_map: (t('a), 'a => t('b)) => t('b);
 };
 
+module type FOLDABLE = {
+  type t('a);
+  let fold_left: (('a, 'b) => 'a, 'a, t('b)) => 'a;
+  let fold_right: (('b, 'a) => 'a, 'a, t('b)) => 'a;
+
+  module Fold_Map: (M: MONOID) => {
+    let fold_map: ('a => M.t, t('a)) => M.t;
+  };
+
+  module Fold_Map_Any: (M: MONOID_ANY) => {
+    let fold_map: ('a => M.t('a), t('a)) => M.t('a);
+  };
+};
+
+module type TRAVERSABLE = (A: APPLICATIVE) => {
+  type t('a);
+  include FUNCTOR with type t('a) := t('a);
+  include FOLDABLE with type t('a) := t('a);
+
+  let traverse: ('a => A.t('a), t('a)) => A.t(t('a));
+  let sequence: t(A.t('a)) => A.t(t('a));
+};
+
 module type SEMIGROUPOID = {
   type t('a, 'b);
   let compose: (t('b, 'c), t('a, 'b)) => t('a, 'c);

@@ -137,6 +137,28 @@ describe("Array", () => Fn.({
       "should satisfy right identity", arb_array(arb_nat), V.right_identity
     );
   });
+
+  describe("Foldable", () => Array.Foldable.({
+    it("should do a left fold", () => {
+      expect(fold_left((+), 0, [|1,2,3,4,5|])).to_be(15);
+      expect(fold_left((-), 10, [|3,2,1|])).to_be(4);
+    });
+    it("should do a right fold", () => {
+      expect(fold_right((-), 10, [|3,2,1|])).to_be(-8);
+    });
+  }));
+
+  describe("Fold_Map", () => {
+    it("should do a map fold (int)", () => {
+      module F = Array.Foldable.Fold_Map(Int.Additive.Monoid);
+      expect(F.fold_map(Function.Category.id, [|1,2,3|])).to_be(6);
+    });
+
+    it("should do a map fold (list)", () => {
+      module F = Array.Foldable.Fold_Map_Any(List.Monoid);
+      expect(F.fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])).to_be([[1,2,3],[4,5]]);
+    });
+  });
 }));
 
 describe("List", () => Fn.({
@@ -199,6 +221,28 @@ describe("List", () => Fn.({
     property1(
       "should satisfy right identity", arb_array(arb_nat), V.right_identity << to_list
     );
+  });
+
+  describe("Foldable", () => List.Foldable.({
+    it("should do a left fold", () => {
+      expect(fold_left((+), 0, [1,2,3,4,5])).to_be(15);
+      expect(fold_left((-), 10, [3,2,1])).to_be(4);
+    });
+    it("should do a right fold", () => {
+      expect(fold_right((-), 10, [3,2,1])).to_be(-8);
+    });
+  }));
+
+  describe("Fold_Map", () => {
+    it("should do a map fold (int)", () => {
+      module F = List.Foldable.Fold_Map(Int.Additive.Monoid);
+      expect(F.fold_map(Function.Category.id, [1,2,3])).to_be(6);
+    });
+
+    it("should do a map fold (list)", () => {
+      module F = List.Foldable.Fold_Map_Any(List.Monoid);
+      expect(F.fold_map(List.Applicative.pure, [[1,2,3],[4,5]])).to_be([[1,2,3],[4,5]]);
+    });
   });
 }));
 
