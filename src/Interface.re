@@ -51,20 +51,22 @@ module type FOLDABLE = {
   module Fold_Map: (M: MONOID) => {
     let fold_map: ('a => M.t, t('a)) => M.t;
   };
-
   module Fold_Map_Any: (M: MONOID_ANY) => {
     let fold_map: ('a => M.t('a), t('a)) => M.t('a);
   };
 };
 
-module type TRAVERSABLE = (A: APPLICATIVE) => {
-  type t('a);
-  include FUNCTOR with type t('a) := t('a);
+module type TRAVERSABLE = {
+  include FUNCTOR;
   include FOLDABLE with type t('a) := t('a);
+  type applicative_t('a);
 
-  let traverse: ('a => A.t('a), t('a)) => A.t(t('a));
-  let sequence: t(A.t('a)) => A.t(t('a));
+  let traverse: ('a => applicative_t('a), t('a)) => applicative_t(t('a));
+  let sequence: t(applicative_t('a)) => applicative_t(t('a));
 };
+
+module type TRAVERSABLE_F = (A: APPLICATIVE) => TRAVERSABLE
+  with type applicative_t('a) = A.t('a);
 
 module type SEMIGROUPOID = {
   type t('a, 'b);
