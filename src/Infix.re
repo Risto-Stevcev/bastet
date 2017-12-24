@@ -23,6 +23,7 @@ module Monoid_Any = (M: MONOID_ANY) => {
 module Functor = (F: FUNCTOR) => {
   include F;
   let (<$>) = map;
+  let (<#>) = (f, x) => map(x, f);
 };
 
 module Apply = (A: APPLY) => {
@@ -30,9 +31,15 @@ module Apply = (A: APPLY) => {
   let (<*>) = apply;
 };
 
+module Applicative = (A: APPLICATIVE) => {
+  include A;
+  let (<*>) = apply;
+};
+
 module Monad = (M: MONAD) => {
   include M;
   let (>>=) = flat_map;
+  let (=<<) = (ma, f) => flat_map(f, ma);
 };
 
 module Alt = (A: ALT) => {
@@ -53,4 +60,5 @@ module Semigroupoid = (S: SEMIGROUPOID) => {
 module Category = (C: CATEGORY) => {
   include C;
   let (<<) = compose;
+  let (>>) = (g, f) => compose(f, g);
 };
