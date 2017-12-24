@@ -39,3 +39,8 @@ module Semigroupoid = (S: SEMIGROUPOID) => {
   include S;
   let (<<) = compose;
 };
+
+module Category = (C: CATEGORY) => {
+  include C;
+  let (<<) = compose;
+};

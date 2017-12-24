@@ -9,3 +9,7 @@ module Category: CATEGORY with type t('a, 'b) = 'a => 'b = {
   include Semigroupoid;
   let id = (a) => a;
 };
+
+let flip: (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b);
+
+let const: ('a, 'b) => 'a = (a, _) => a;

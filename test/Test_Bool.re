@@ -82,6 +82,37 @@ describe("Bool", () => {
 });
 
 describe("Array", () => Fn.({
+  describe("Default", () => {
+    module Foldable: Interface.FOLDABLE with type t('a) = array('a) = {
+      type t('a) = array('a);
+
+      module FM: Default.FOLD_MAP with type t('a) = array('a) = {
+        type t('a) = array('a);
+        module Fold_Map_Any = (M: Interface.MONOID_ANY) => {
+          let fold_map = (f, x) =>
+            ArrayLabels.fold_left(~f=(acc, x) => M.append(acc, f(x)), ~init=M.empty, x);
+        };
+      };
+
+      module Fold_Map = Array.Foldable.Fold_Map;
+      module Fold_Map_Any = FM.Fold_Map_Any;
+      module F = Default.Fold(FM);
+
+      let fold_left = F.fold_left;
+      let fold_right = F.fold_right;
+    };
+
+    describe("Foldable", () => Foldable.({
+      it("should do a left fold", () => {
+        expect(fold_left((+), 0, [|1,2,3,4,5|])).to_be(15);
+        expect(fold_left((-), 10, [|3,2,1|])).to_be(4);
+      });
+      it("should do a right fold", () => {
+        expect(fold_right((-), 10, [|3,2,1|])).to_be(-8);
+      });
+    }));
+  });
+
   describe("Semigroup", () => {
     module V = Verify.Semigroup_Any(Array.Semigroup);
     property3(
