@@ -3,6 +3,76 @@ open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 module Fn = Infix.Semigroupoid(Function.Semigroupoid);
 
+describe("Default", () => {
+  module Foldable: Interface.FOLDABLE with type t('a) = list('a) = {
+    type t('a) = list('a);
+
+    module FM: Default.FOLD_MAP with type t('a) = list('a) = {
+      type t('a) = list('a);
+      module Fold_Map_Any = (M: Interface.MONOID_ANY) => {
+        let fold_map = (f, x) =>
+          ListLabels.fold_left(~f=(acc, x) => M.append(acc, f(x)), ~init=M.empty, x);
+      };
+    };
+
+    module Fold_Map = List.Foldable.Fold_Map;
+    module Fold_Map_Any = FM.Fold_Map_Any;
+    module F = Default.Fold(FM);
+
+    let fold_left = F.fold_left_default;
+    let fold_right = F.fold_right_default;
+  };
+
+  module Traversable: List.TRAVERSABLE_F = (A: Interface.APPLICATIVE) => {
+    type t('a) = list('a);
+    type applicative_t('a) = A.t('a);
+    include (List.Functor: Interface.FUNCTOR with type t('a) := t('a));
+    include (List.Foldable: Interface.FOLDABLE with type t('a) := t('a));
+
+    module I = Infix.Apply(A);
+    let sequence = (xs) => I.({
+      ListLabels.fold_right(
+        ~f=(acc, x) => A.pure((y, ys) => [y, ...ys]) <*> acc <*> x,
+        ~init=A.pure([]),
+        xs
+      )
+    });
+
+    module D = Default.Traverse({
+      type t('a) = list('a);
+      type applicative_t('a) = A.t('a);
+      include (List.Functor: Interface.FUNCTOR with type t('a) := t('a));
+      let sequence = sequence;
+    });
+    let traverse = D.traverse_default;
+  };
+
+  describe("Foldable", () => Foldable.({
+    it("should do a left fold", () => {
+      expect(fold_left((+), 0, [1,2,3,4,5])).to_be(15);
+      expect(fold_left((-), 10, [3,2,1])).to_be(4);
+    });
+    it("should do a right fold", () => {
+      expect(fold_right((-), 10, [3,2,1])).to_be(-8);
+    });
+  }));
+
+  describe("Traversable", () => {
+    module T = Traversable(Option.Applicative);
+
+    it("should traverse the list", () => T.({
+      let positive_int = (x) => x >= 0 ? Some(x) : None;
+      expect(traverse(positive_int, [1,2,3])).to_be(Some([1,2,3]));
+      expect(traverse(positive_int, [1,2,-3])).to_be(None);
+    }));
+
+    it("should sequence the list", () => T.({
+      expect(sequence([Some(3), Some(4), Some(5)])).to_be(Some([3,4,5]));
+      expect(sequence([Some(3), Some(4), None])).to_be(None);
+    }));
+  });
+});
+
 describe("Int", () => {
   let arb_int' = arb_int(-10000, 10000);
 
@@ -82,37 +152,6 @@ describe("Bool", () => {
 });
 
 describe("Array", () => Fn.({
-  describe("Default", () => {
-    module Foldable: Interface.FOLDABLE with type t('a) = array('a) = {
-      type t('a) = array('a);
-
-      module FM: Default.FOLD_MAP with type t('a) = array('a) = {
-        type t('a) = array('a);
-        module Fold_Map_Any = (M: Interface.MONOID_ANY) => {
-          let fold_map = (f, x) =>
-            ArrayLabels.fold_left(~f=(acc, x) => M.append(acc, f(x)), ~init=M.empty, x);
-        };
-      };
-
-      module Fold_Map = Array.Foldable.Fold_Map;
-      module Fold_Map_Any = FM.Fold_Map_Any;
-      module F = Default.Fold(FM);
-
-      let fold_left = F.fold_left_default;
-      let fold_right = F.fold_right_default;
-    };
-
-    describe("Foldable", () => Foldable.({
-      it("should do a left fold", () => {
-        expect(fold_left((+), 0, [|1,2,3,4,5|])).to_be(15);
-        expect(fold_left((-), 10, [|3,2,1|])).to_be(4);
-      });
-      it("should do a right fold", () => {
-        expect(fold_right((-), 10, [|3,2,1|])).to_be(-8);
-      });
-    }));
-  });
-
   describe("Semigroup", () => {
     module V = Verify.Semigroup_Any(Array.Semigroup);
     property3(
@@ -174,12 +213,11 @@ describe("Array", () => Fn.({
       expect(fold_left((+), 0, [|1,2,3,4,5|])).to_be(15);
       expect(fold_left((-), 10, [|3,2,1|])).to_be(4);
     });
+
     it("should do a right fold", () => {
       expect(fold_right((-), 10, [|3,2,1|])).to_be(-8);
     });
-  }));
 
-  describe("Fold_Map", () => {
     it("should do a map fold (int)", () => {
       module F = Array.Foldable.Fold_Map(Int.Additive.Monoid);
       expect(F.fold_map(Function.Category.id, [|1,2,3|])).to_be(6);
@@ -189,8 +227,24 @@ describe("Array", () => Fn.({
       module F = Array.Foldable.Fold_Map_Any(List.Monoid);
       expect(F.fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])).to_be([[1,2,3],[4,5]]);
     });
+  }));
+
+  describe("Traversable", () => {
+    module T = Array.Traversable(Option.Applicative);
+
+    it("should traverse the array", () => T.({
+      let positive_int = (x) => x >= 0 ? Some(x) : None;
+      expect(traverse(positive_int, [|1,2,3|])).to_be(Some([|1,2,3|]));
+      expect(traverse(positive_int, [|1,2,-3|])).to_be(None);
+    }));
+
+    it("should sequence the array", () => T.({
+      expect(sequence([|Some(3), Some(4), Some(5)|])).to_be(Some([|3,4,5|]));
+      expect(sequence([|Some(3), Some(4), None|])).to_be(None);
+    }));
   });
 }));
+
 
 describe("List", () => Fn.({
   let to_list = ArrayLabels.to_list;
@@ -201,9 +255,10 @@ describe("List", () => Fn.({
       "should satisfy associativity",
       arb_array(arb_nat), arb_array(arb_nat), arb_array(arb_nat),
       (a, b, c) => {
-      let (a', b', c') = (to_list(a), to_list(b), to_list(c));
-      V.associativity(a', b', c')
-    })
+        let (a', b', c') = (to_list(a), to_list(b), to_list(c));
+        V.associativity(a', b', c')
+      }
+    )
   });
 
   describe("Monoid", () => {
@@ -259,12 +314,11 @@ describe("List", () => Fn.({
       expect(fold_left((+), 0, [1,2,3,4,5])).to_be(15);
       expect(fold_left((-), 10, [3,2,1])).to_be(4);
     });
+
     it("should do a right fold", () => {
       expect(fold_right((-), 10, [3,2,1])).to_be(-8);
     });
-  }));
 
-  describe("Fold_Map", () => {
     it("should do a map fold (int)", () => {
       module F = List.Foldable.Fold_Map(Int.Additive.Monoid);
       expect(F.fold_map(Function.Category.id, [1,2,3])).to_be(6);
@@ -274,6 +328,21 @@ describe("List", () => Fn.({
       module F = List.Foldable.Fold_Map_Any(List.Monoid);
       expect(F.fold_map(List.Applicative.pure, [[1,2,3],[4,5]])).to_be([[1,2,3],[4,5]]);
     });
+  }));
+
+  describe("Traversable", () => {
+    module T = List.Traversable(Option.Applicative);
+
+    it("should traverse the list", () => T.({
+      let positive_int = (x) => x >= 0 ? Some(x) : None;
+      expect(traverse(positive_int, [1,2,3])).to_be(Some([1,2,3]));
+      expect(traverse(positive_int, [1,2,-3])).to_be(None);
+    }));
+
+    it("should sequence the list", () => T.({
+      expect(sequence([Some(3), Some(4), Some(5)])).to_be(Some([3,4,5]));
+      expect(sequence([Some(3), Some(4), None])).to_be(None);
+    }));
   });
 }));
 
@@ -375,4 +444,51 @@ describe("Option", () => Fn.({
       V.right_identity << option_from_tuple
     );
   });
+
+  describe("Foldable", () => Option.Foldable.({
+    it("should do a left fold", () => {
+      expect(fold_left((+), 0, Some(1))).to_be(1);
+    });
+
+    it("should do a right fold", () => {
+      expect(fold_right((+), 0, Some(1))).to_be(1);
+      expect(fold_right((+), 0, None)).to_be(0);
+    });
+
+    it("should do a map fold (int)", () => {
+      module F = Option.Foldable.Fold_Map(Int.Additive.Monoid);
+      expect(F.fold_map((*)(2), Some(3))).to_be(6);
+      expect(F.fold_map((+)(1), None)).to_be(Int.Additive.Monoid.empty);
+    });
+
+    it("should do a map fold (list)", () => {
+      module F = Option.Foldable.Fold_Map_Any(List.Monoid);
+      expect(F.fold_map(List.Applicative.pure, Some(123))).to_be([123]);
+    });
+  }));
+
+  describe("Traversable", () => {
+    module T = Option.Traversable(List.Applicative);
+
+    it("should traverse the list", () => T.({
+      let positive_int = (x) => x >= 0 ? [x] : [];
+      expect(traverse(positive_int, Some(123))).to_be([Some(123)]);
+      expect(traverse(positive_int, Some(-123))).to_be([]);
+    }));
+
+    it("should sequence the list", () => T.({
+      expect(sequence(Some([3, 4, 5]))).to_be([Some(3), Some(4), Some(5)]);
+      expect(sequence(None)).to_be([None]);
+    }));
+  });
 }));
+
+
+describe("Endo", () => {
+  ()
+});
+
+
+describe("Dual", () => {
+  ()
+});

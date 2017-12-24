@@ -71,3 +71,29 @@ module Foldable: FOLDABLE with type t('a) = array('a) = {
     let fold_map = D.fold_map_default_left;
   };
 };
+
+
+module type TRAVERSABLE_F = (A: APPLICATIVE) => TRAVERSABLE
+  with type applicative_t('a) = A.t('a) and type t('a) = array('a);
+
+module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
+  type t('a) = array('a);
+  type applicative_t('a) = A.t('a);
+  include (Functor: FUNCTOR with type t('a) := t('a));
+  include (Foldable: FOLDABLE with type t('a) := t('a));
+
+  module I = Infix.Apply(A);
+  let traverse = (f) => I.({
+    ArrayLabels.fold_left(
+      ~f=(x, acc) => A.pure(Js.Array.append) <*> f(acc) <*> x,
+      ~init=A.pure([||])
+    )
+  });
+
+  module D = Default.Sequence({
+    type t('a) = array('a);
+    type applicative_t('a) = A.t('a);
+    let traverse = traverse;
+  });
+  let sequence = D.sequence_default;
+};

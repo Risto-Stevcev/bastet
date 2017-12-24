@@ -51,3 +51,26 @@ module Fold = (F: FOLD_MAP) => {
     r(init);
   });
 };
+
+
+
+module type TRAVERSE = {
+  type t('a);
+  type applicative_t('a);
+  let traverse: ('a => applicative_t('b), t('a)) => applicative_t(t('b));
+};
+
+module type SEQUENCE = {
+  type t('a);
+  type applicative_t('a);
+  include Interface.FUNCTOR with type t('a) := t('a);
+  let sequence: t(applicative_t('a)) => applicative_t(t('a));
+};
+
+module Sequence = (T: TRAVERSE) => {
+  let sequence_default = (xs) => T.traverse(Function.Category.id, xs);
+};
+
+module Traverse = (S: SEQUENCE) => {
+  let traverse_default = (f, xs) => S.sequence(S.map(f, xs));
+};

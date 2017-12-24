@@ -61,7 +61,7 @@ module type TRAVERSABLE = {
   include FOLDABLE with type t('a) := t('a);
   type applicative_t('a);
 
-  let traverse: ('a => applicative_t('a), t('a)) => applicative_t(t('a));
+  let traverse: ('a => applicative_t('b), t('a)) => applicative_t(t('b));
   let sequence: t(applicative_t('a)) => applicative_t(t('a));
 };
 
