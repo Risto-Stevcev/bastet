@@ -98,8 +98,8 @@ describe("Array", () => Fn.({
       module Fold_Map_Any = FM.Fold_Map_Any;
       module F = Default.Fold(FM);
 
-      let fold_left = F.fold_left;
-      let fold_right = F.fold_right;
+      let fold_left = F.fold_left_default;
+      let fold_right = F.fold_right_default;
     };
 
     describe("Foldable", () => Foldable.({

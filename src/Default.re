@@ -41,12 +41,12 @@ module Fold = (F: FOLD_MAP) => {
   module Dual_Fold_Map = F.Fold_Map_Any(Dual_Endo.Monoid_Any);
   module Endo_Fold_Map = F.Fold_Map_Any(Endo.Monoid);
 
-  let fold_left: (('a, 'b) => 'a, 'a, F.t('b)) => 'a = (f, init, xs) => C.({
+  let fold_left_default = (f, init, xs) => C.({
     let Dual.Dual(Endo.Endo(r)) =
       Dual_Fold_Map.fold_map(((x) => Dual.Dual(Endo.Endo(x))) << Function.flip(f), xs);
     r(init);
   });
-  let fold_right: (('b, 'a) => 'a, 'a, F.t('b)) => 'a = (f, init, xs) => C.({
+  let fold_right_default = (f, init, xs) => C.({
     let Endo.Endo(r) = Endo_Fold_Map.fold_map(((x) => Endo.Endo(x)) << f, xs);
     r(init);
   });
