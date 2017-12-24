@@ -64,6 +64,32 @@ module Monad = (A: Interface.MONAD) => {
   let right_identity: A.t('a) => bool = (x) => I.(x >>= pure == x);
 };
 
+module Alt = (A: Interface.ALT) => {
+  module I = Infix.Alt(A);
+  let associativity: (A.t('a), A.t('a), A.t('a)) => bool =
+    (a, b, c) => I.(a <|> (b <|> c) == (a <|> (b <|> c)));
+  let distributivity: ('a => 'b, A.t('a), A.t('a)) => bool =
+    (f, a, b) => I.(A.map(f, a <|> b) == (A.map(f, a) <|> A.map(f, b)));
+};
+
+module Plus = (P: Interface.PLUS) => {
+  module I = Infix.Plus(P);
+  let annihalation: ('a => 'b) => bool = (f) => P.map(f, P.empty) == P.empty;
+  let left_identity: P.t('a) => bool = (a) => I.(P.empty <|> a == a);
+  let right_identity: P.t('a) => bool = (a) => I.(a <|> P.empty == a);
+};
+
+module Alternative = (A: Interface.ALTERNATIVE) => {
+  module I = {
+    include Infix.Alt(A);
+    include (Infix.Apply(A): (module type of Infix.Apply(A)) with type t('a) := t('a));
+  };
+
+  let distributivity: (A.t('a => 'b), A.t('a => 'b), A.t('a)) => bool =
+    (f, g, x) => I.((f <|> g) <*> x == ((f <*> x) <|> (g <*> x)));
+  let annihalation: A.t('a => 'b) => bool = (f) => I.(A.empty <*> f == A.empty);
+};
+
 module Semigroupoid = (S: Interface.SEMIGROUPOID) => {
   module I = Infix.Semigroupoid(S);
   let associativity: (S.t('c, 'd), S.t('b, 'c), S.t('a, 'b)) => bool =

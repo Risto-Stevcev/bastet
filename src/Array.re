@@ -46,6 +46,24 @@ module Monad: MONAD with type t('a) = array('a) = {
 };
 
 
+module Alt: ALT with type t('a) = array('a) = {
+  include Functor;
+  let alt = Js.Array.concat;
+};
+
+
+module Plus: PLUS with type t('a) = array('a) = {
+  include Alt;
+  let empty = [||];
+};
+
+
+module Alternative: ALTERNATIVE with type t('a) = array('a) = {
+  include Applicative;
+  include (Plus: PLUS with type t('a) := t('a));
+};
+
+
 module Foldable: FOLDABLE with type t('a) = array('a) = {
   type t('a) = array('a);
   let fold_left = (f, init) => ArrayLabels.fold_left(~f, ~init);

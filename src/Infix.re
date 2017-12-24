@@ -35,6 +35,16 @@ module Monad = (M: MONAD) => {
   let (>>=) = flat_map;
 };
 
+module Alt = (A: ALT) => {
+  include A;
+  let (<|>) = alt;
+};
+
+module Plus = (P: PLUS) => {
+  include P;
+  let (<|>) = alt;
+};
+
 module Semigroupoid = (S: SEMIGROUPOID) => {
   include S;
   let (<<) = compose;

@@ -208,6 +208,43 @@ describe("Array", () => Fn.({
     );
   });
 
+
+  describe("Alt", () => {
+    module V = Verify.Alt(Array.Alt);
+    property3(
+      "should satisfy associativity",
+      arb_array(arb_nat), arb_array(arb_nat), arb_array(arb_nat),
+      V.associativity
+    );
+    property2(
+      "should satisfy distributivity",
+      arb_array(arb_nat), arb_array(arb_nat),
+      V.distributivity(string_of_int)
+    );
+  });
+
+  describe("Plus", () => {
+    module V = Verify.Plus(Array.Plus);
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(string_of_int)).to_be(true);
+    });
+    property1("should satisfy left identity", arb_array(arb_nat), V.left_identity);
+    property1("should satisfy right identity", arb_array(arb_nat), V.right_identity);
+  });
+
+  describe("Alternative", () => {
+    module V = Verify.Alternative(Array.Alternative);
+    let (pure) = Array.Applicative.((pure));
+    property1(
+      "should satisfy distributivity",
+      arb_array(arb_nat),
+      V.distributivity(pure((*)(3)), pure((+)(4)))
+    );
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(Array.Applicative.pure(string_of_int))).to_be(true);
+    });
+  });
+
   describe("Foldable", () => Array.Foldable.({
     it("should do a left fold", () => {
       expect(fold_left((+), 0, [|1,2,3,4,5|])).to_be(15);
@@ -295,7 +332,7 @@ describe("List", () => Fn.({
 
   describe("Monad", () => {
     module V = Verify.Monad(List.Monad);
-    open List.Applicative;
+    let (pure) = List.Applicative.((pure));
     property1(
       "should satisfy associativity",
       arb_array(arb_nat),
@@ -307,6 +344,49 @@ describe("List", () => Fn.({
     property1(
       "should satisfy right identity", arb_array(arb_nat), V.right_identity << to_list
     );
+  });
+
+  describe("Alt", () => {
+    module V = Verify.Alt(List.Alt);
+    property3(
+      "should satisfy associativity",
+      arb_array(arb_nat), arb_array(arb_nat), arb_array(arb_nat),
+      (a, b, c) => {
+        let (a', b', c') = (to_list(a), to_list(b), to_list(c));
+        V.associativity(a', b', c')
+      }
+    );
+    property2(
+      "should satisfy distributivity",
+      arb_array(arb_nat), arb_array(arb_nat),
+      (a, b) => V.distributivity(string_of_int, to_list(a), to_list(b))
+    );
+  });
+
+  describe("Plus", () => {
+    module V = Verify.Plus(List.Plus);
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(string_of_int)).to_be(true);
+    });
+    property1(
+      "should satisfy left identity", arb_array(arb_nat), V.left_identity << to_list
+    );
+    property1(
+      "should satisfy right identity", arb_array(arb_nat), V.right_identity << to_list
+    );
+  });
+
+  describe("Alternative", () => {
+    module V = Verify.Alternative(List.Alternative);
+    let (pure) = List.Applicative.((pure));
+    property1(
+      "should satisfy distributivity",
+      arb_array(arb_nat),
+      V.distributivity(pure((*)(3)), pure((+)(4))) << to_list
+    );
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(List.Applicative.pure(string_of_int))).to_be(true);
+    });
   });
 
   describe("Foldable", () => List.Foldable.({

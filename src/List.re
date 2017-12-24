@@ -42,6 +42,24 @@ module Monad: MONAD with type t('a) = list('a) = {
 };
 
 
+module Alt: ALT with type t('a) = list('a) = {
+  include Functor;
+  let alt = ListLabels.append;
+};
+
+
+module Plus: PLUS with type t('a) = list('a) = {
+  include Alt;
+  let empty = [];
+};
+
+
+module Alternative: ALTERNATIVE with type t('a) = list('a) = {
+  include Applicative;
+  include (Plus: PLUS with type t('a) := t('a));
+};
+
+
 module Foldable: FOLDABLE with type t('a) = list('a) = {
   type t('a) = list('a);
   let fold_left = (f, init) => ListLabels.fold_left(~f, ~init);

@@ -43,6 +43,21 @@ module type MONAD = {
   let flat_map: (t('a), 'a => t('b)) => t('b);
 };
 
+module type ALT = {
+  include FUNCTOR;
+  let alt: (t('a), t('a)) => t('a);
+};
+
+module type PLUS = {
+  include ALT;
+  let empty: t('a);
+};
+
+module type ALTERNATIVE = {
+  include APPLICATIVE;
+  include PLUS with type t('a) := t('a);
+};
+
 module type FOLDABLE = {
   type t('a);
   let fold_left: (('a, 'b) => 'a, 'a, t('b)) => 'a;
