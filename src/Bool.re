@@ -21,3 +21,8 @@ module Disjunctive = {
     let empty = false;
   };
 };
+
+module Eq: EQ with type t = bool = {
+  type t = bool;
+  let eq = (==);
+};

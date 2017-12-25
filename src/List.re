@@ -111,3 +111,17 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
   });
   let sequence = D.sequence_default;
 };
+
+
+
+module type EQ1_F = (E: EQ) => EQ1 with type t('a) = list(E.t);
+
+module Eq: EQ1_F = (E: EQ) => {
+  type t('a) = list(E.t);
+  let eq = (xs, ys) => {
+    ListLabels.length(xs) == ListLabels.length(ys) &&
+    ListLabels.fold_left(
+      ~f=(acc, (a, b)) => acc && E.eq(a, b), ~init=true, ListLabels.combine(xs, ys)
+    )
+  };
+};

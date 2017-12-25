@@ -79,7 +79,9 @@ describe("Int", () => {
   describe("Additive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Int.Additive.Semigroup);
-      property3("should satisfy associativity", arb_int', arb_int', arb_int', V.associativity)
+      property3(
+        "should satisfy associativity", arb_int', arb_int', arb_int', V.associativity
+      )
     });
 
     describe("Monoid", () => {
@@ -91,14 +93,23 @@ describe("Int", () => {
   describe("Multiplicative", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Int.Multiplicative.Semigroup);
-      property3("should satisfy associativity", arb_int', arb_int', arb_int', V.associativity)
+      property3(
+        "should satisfy associativity", arb_int', arb_int', arb_int', V.associativity
+      )
     });
 
     describe("Monoid", () => {
       module V = Verify.Monoid(Int.Multiplicative.Monoid);
       property1("should satisfy neutrality", arb_int', V.neutral)
     });
-  })
+  });
+
+  describe("Eq", () => {
+    module V = Verify.Eq(Int.Eq);
+    property1("should satisfy reflexivity", arb_int', V.reflexivity);
+    property2("should satisfy symmetry", arb_int', arb_int', V.symmetry);
+    property3("should satisfy transitivity", arb_int', arb_int', arb_int', V.transitivity);
+  });
 });
 
 
@@ -114,44 +125,86 @@ describe("String", () => {
     module V = Verify.Monoid(String.Monoid);
     property1("should satisfy neutrality", arb_string, V.neutral)
   });
+
+  describe("Eq", () => {
+    module V = Verify.Eq(String.Eq);
+    property1("should satisfy reflexivity", arb_string, V.reflexivity);
+    property2("should satisfy symmetry", arb_string, arb_string, V.symmetry);
+    property3(
+      "should satisfy transitivity", arb_string, arb_string, arb_string, V.transitivity
+    );
+  });
 });
 
 
-describe("Bool", () => {
+describe("Bool", () => Fn.({
   describe("Conjunctive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Conjunctive.Semigroup);
-
-      property3("should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-        let (a', b', c') = (a |> Js.to_bool, b |> Js.to_bool, c |> Js.to_bool);
-        V.associativity(a', b', c')
-      })
+      property3(
+        "should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
+          let (a', b', c') = (a |> Js.to_bool, b |> Js.to_bool, c |> Js.to_bool);
+          V.associativity(a', b', c')
+        }
+      );
     });
 
-    describe("Monoid", () => Fn.({
+    describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Conjunctive.Monoid);
       property1("should satisfy neutrality", arb_bool, V.neutral << Js.to_bool)
-    }));
+    });
   });
 
   describe("Disjunctive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Disjunctive.Semigroup);
 
-      property3("should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
+      property3(
+        "should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
         let (a', b', c') = (a |> Js.to_bool, b |> Js.to_bool, c |> Js.to_bool);
         V.associativity(a', b', c')
       })
     });
 
-    describe("Monoid", () => Fn.({
+    describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Disjunctive.Monoid);
       property1("should satisfy neutrality", arb_bool, V.neutral << Js.to_bool)
-    }));
+    });
   });
-});
+
+  describe("Eq", () => {
+    module V = Verify.Eq(Bool.Eq);
+    property1("should satisfy reflexivity", arb_bool, V.reflexivity << Js.to_bool);
+    property2("should satisfy symmetry", arb_bool, arb_bool, (a, b) => {
+      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
+      V.symmetry(a', b');
+    });
+    property3("should satisfy transitivity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
+      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
+      V.transitivity(a', b', c');
+    })
+  });
+}));
 
 describe("Array", () => Fn.({
+  describe("Functions", () => {
+    describe("zip_with", () => {
+      it("should zip two arrays", () => {
+        expect(Array.zip_with((a, b) => (a, b), [|1,2,3|], [|"a","b","c"|]))
+          .to_be([|(1,"a"), (2, "b"), (3, "c")|]);
+
+        expect(Array.zip_with((*), [|1,2,3|], [|4,5,6|])).to_be([|4,10,18|]);
+      })
+    });
+
+    describe("zip", () => {
+      it("should zip two arrays", () => {
+        expect(Array.zip([|1,2,3|], [|"a","b","c"|]))
+          .to_be([|(1,"a"), (2, "b"), (3, "c")|]);
+      })
+    });
+  });
+
   describe("Semigroup", () => {
     module V = Verify.Semigroup_Any(Array.Semigroup);
     property3(
@@ -279,6 +332,21 @@ describe("Array", () => Fn.({
       expect(sequence([|Some(3), Some(4), Some(5)|])).to_be(Some([|3,4,5|]));
       expect(sequence([|Some(3), Some(4), None|])).to_be(None);
     }));
+  });
+
+  describe("Eq", () => {
+    let arb_int' = arb_int(-10000, 10000);
+    module Array_Int_Eq = Array.Eq(Int.Eq);
+    module V = Verify.Eq1(Array_Int_Eq);
+    property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity);
+    property2(
+      "should satisfy symmetry", arb_array(arb_int'), arb_array(arb_int'), V.symmetry
+    );
+    property3(
+      "should satisfy transitivity",
+      arb_array(arb_int'), arb_array(arb_int'), arb_array(arb_int'),
+      V.transitivity
+    );
   });
 }));
 
@@ -424,6 +492,23 @@ describe("List", () => Fn.({
       expect(sequence([Some(3), Some(4), None])).to_be(None);
     }));
   });
+
+  describe("Eq", () => {
+    let arb_int' = arb_int(-10000, 10000);
+    module List_Int_Eq = List.Eq(Int.Eq);
+    module V = Verify.Eq1(List_Int_Eq);
+    property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity << to_list);
+    property2(
+      "should satisfy symmetry",
+      arb_array(arb_int'), arb_array(arb_int'),
+      (a, b) => V.symmetry(to_list(a), to_list(b))
+    );
+    property3(
+      "should satisfy transitivity",
+      arb_array(arb_int'), arb_array(arb_int'), arb_array(arb_int'),
+      (a, b, c) => V.transitivity(to_list(a), to_list(b), to_list(c))
+    );
+  });
 }));
 
 describe("Function", () => Fn.({
@@ -560,6 +645,32 @@ describe("Option", () => Fn.({
       expect(sequence(Some([3, 4, 5]))).to_be([Some(3), Some(4), Some(5)]);
       expect(sequence(None)).to_be([None]);
     }));
+  });
+
+  describe("Eq", () => {
+    module Option_Int_Eq = Option.Eq(Int.Eq);
+    module V = Verify.Eq1(Option_Int_Eq);
+
+    property1(
+      "should satisfy reflexivity",
+      arb_tuple((arb_nat, arb_bool)),
+      V.reflexivity << option_from_tuple
+    );
+    property2(
+      "should satisfy symmetry",
+      arb_tuple((arb_nat, arb_bool)),
+      arb_tuple((arb_nat, arb_bool)),
+      (a, b) =>
+        V.symmetry(option_from_tuple(a), option_from_tuple(b))
+    );
+    property3(
+      "should satisfy transitivity",
+      arb_tuple((arb_nat, arb_bool)),
+      arb_tuple((arb_nat, arb_bool)),
+      arb_tuple((arb_nat, arb_bool)),
+      (a, b, c) =>
+        V.transitivity(option_from_tuple(a), option_from_tuple(b), option_from_tuple(c))
+    );
   });
 }));
 

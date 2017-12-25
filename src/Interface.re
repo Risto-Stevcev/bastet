@@ -92,3 +92,16 @@ module type CATEGORY = {
   include SEMIGROUPOID;
   let id: t('a, 'a);
 };
+
+
+module type EQ = {
+  type t;
+  let eq: (t, t) => bool;
+};
+
+module type EQ1 {
+  type t('a);
+  let eq: (t('a), t('a)) => bool;
+};
+
+module type EQ1_F = (E: EQ) => EQ1;

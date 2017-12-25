@@ -21,3 +21,8 @@ module Multiplicative = {
     let empty = 1;
   };
 };
+
+module Eq: EQ with type t = int = {
+  type t = int;
+  let eq = (==);
+};

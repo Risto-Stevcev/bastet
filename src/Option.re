@@ -98,3 +98,15 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
     | None => A.pure(None)
   });
 };
+
+
+module type EQ1_F = (E: EQ) => EQ1 with type t('a) = option(E.t);
+
+module Eq: EQ1_F = (E: EQ) => {
+  type t('a) = option(E.t);
+  let eq = (xs, ys) => switch (xs, ys) {
+    | (Some(a), Some(b)) => E.eq(a, b)
+    | (None, None) => true
+    | _ => false
+    };
+};

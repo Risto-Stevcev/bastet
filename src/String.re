@@ -9,3 +9,8 @@ module Monoid: MONOID with type t = string = {
   include Semigroup;
   let empty = "";
 };
+
+module Eq: EQ with type t = string = {
+  type t = string;
+  let eq = (==);
+};

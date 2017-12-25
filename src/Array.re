@@ -1,5 +1,17 @@
 open Interface;
 
+let zip_with: (('a, 'b) => 'c, array('a), array('b)) => array('c) = (f, xs, ys) => {
+  let (get, length) = ArrayLabels.((get, length));
+  let l = length(xs) < length(ys) ? length(xs) : length(ys);
+  let result = [||];
+  for (i in 0 to (l - 1)) { Js.Array.push(f(get(xs, i), get(ys, i)), result) |> ignore };
+  result;
+};
+
+let zip: (array('a), array('b)) => array('c) =
+  (xs, ys) => zip_with((a, b) => (a, b), xs, ys);
+
+
 module Semigroup: SEMIGROUP_ANY with type t('a) = array('a) = {
   type t('a) = array('a);
   let append = Js.Array.concat
@@ -114,4 +126,15 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
     let traverse = traverse;
   });
   let sequence = D.sequence_default;
+};
+
+
+module type EQ1_F = (E: EQ) => EQ1 with type t('a) = array(E.t);
+
+module Eq: EQ1_F = (E: EQ) => {
+  type t('a) = array(E.t);
+  let eq = (xs, ys) => {
+    Js.Array.length(xs) == Js.Array.length(ys) &&
+    Js.Array.every(((a, b)) => E.eq(a, b), zip(xs, ys))
+  };
 };
