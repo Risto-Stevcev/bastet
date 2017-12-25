@@ -102,8 +102,8 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
 
   module I = Infix.Apply(A);
   let traverse = (f) => I.({
-    ArrayLabels.fold_left(
-      ~f=(x, acc) => A.pure(Js.Array.append) <*> f(acc) <*> x,
+    ArrayLabels.fold_right(
+      ~f=(acc, x) => A.pure((x, y) => ArrayLabels.append([|x|], y)) <*> f(acc) <*> x,
       ~init=A.pure([||])
     )
   });
