@@ -7,23 +7,6 @@ module Fn = Infix.Semigroupoid(Function.Semigroupoid);
 describe("List", () => Fn.({
   let to_list = ArrayLabels.to_list;
 
-  describe("Semigroup", () => {
-    module V = Verify.Semigroup_Any(List.Semigroup);
-    property3(
-      "should satisfy associativity",
-      arb_array(arb_nat), arb_array(arb_nat), arb_array(arb_nat),
-      (a, b, c) => {
-        let (a', b', c') = (to_list(a), to_list(b), to_list(c));
-        V.associativity(a', b', c')
-      }
-    )
-  });
-
-  describe("Monoid", () => {
-    module V = Verify.Monoid_Any(List.Monoid);
-    property1("should satisfy neutrality", arb_array(arb_nat), V.neutral << to_list)
-  });
-
   describe("Functor", () => {
     module V = Verify.Functor(List.Functor);
 
@@ -126,7 +109,7 @@ describe("List", () => Fn.({
     });
 
     it("should do a map fold (list)", () => {
-      module F = List.Foldable.Fold_Map_Any(List.Monoid);
+      module F = List.Foldable.Fold_Map_Plus(List.Plus);
       expect(F.fold_map(List.Applicative.pure, [[1,2,3],[4,5]])).to_be([[1,2,3],[4,5]]);
     });
   }));

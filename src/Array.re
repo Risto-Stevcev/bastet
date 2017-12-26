@@ -12,18 +12,6 @@ let zip: (array('a), array('b)) => array('c) =
   (xs, ys) => zip_with((a, b) => (a, b), xs, ys);
 
 
-module Semigroup: SEMIGROUP_ANY with type t('a) = array('a) = {
-  type t('a) = array('a);
-  let append = Js.Array.concat
-};
-
-
-module Monoid: MONOID_ANY with type t('a) = array('a) = {
-  include Semigroup;
-  let empty = [||]
-};
-
-
 module Functor: FUNCTOR with type t('a) = array('a) = {
   type t('a) = array('a);
   let map = (f) => ArrayLabels.map(~f)
@@ -84,20 +72,22 @@ module Foldable: FOLDABLE with type t('a) = array('a) = {
   module Fold_Map = (M: MONOID) => {
      module D = Default.Fold_Map(M, {
       type t('a) = array('a);
-      let fold_left = fold_left;
-      let fold_right = fold_right;
+      let (fold_left, fold_right) = (fold_left, fold_right);
     });
-
     let fold_map = D.fold_map_default_left;
   };
-
   module Fold_Map_Any = (M: MONOID_ANY) => {
     module D = Default.Fold_Map_Any(M, {
       type t('a) = array('a);
-      let fold_left = fold_left;
-      let fold_right = fold_right;
+      let (fold_left, fold_right) = (fold_left, fold_right);
     });
-
+    let fold_map = D.fold_map_default_left;
+  };
+  module Fold_Map_Plus = (P: PLUS) => {
+    module D = Default.Fold_Map_Plus(P, {
+      type t('a) = array('a);
+      let (fold_left, fold_right) = (fold_left, fold_right);
+    });
     let fold_map = D.fold_map_default_left;
   };
 };
@@ -119,7 +109,6 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
       ~init=A.pure([||])
     )
   });
-
   module D = Default.Sequence({
     type t('a) = array('a);
     type applicative_t('a) = A.t('a);

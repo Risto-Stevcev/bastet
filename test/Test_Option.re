@@ -14,7 +14,7 @@ describe("Option", () => Fn.({
   };
 
   describe("Semigroup", () => {
-    module V = Verify.Semigroup_Any(Option_Semigroup);
+    module V = Verify.Semigroup(Option_Semigroup);
 
     property3(
       "should satisfy associativity",
@@ -27,7 +27,7 @@ describe("Option", () => Fn.({
   });
 
   describe("Monoid", () => {
-    module V = Verify.Monoid_Any(Option_Monoid);
+    module V = Verify.Monoid(Option_Monoid);
     property1(
       "should satisfy neutrality",
       arb_tuple((arb_nat, arb_bool)),
@@ -87,6 +87,59 @@ describe("Option", () => Fn.({
     );
   });
 
+  describe("Alt", () => {
+    module V = Verify.Alt(Option.Alt);
+
+    property3(
+      "should satisfy associativity",
+      arb_tuple((arb_nat, arb_bool)),
+      arb_tuple((arb_nat, arb_bool)),
+      arb_tuple((arb_nat, arb_bool)),
+      (a, b, c) =>
+        V.associativity(option_from_tuple(a), option_from_tuple(b), option_from_tuple(c))
+    );
+
+    property2(
+      "should satisfy distributivity",
+      arb_tuple((arb_nat, arb_bool)),
+      arb_tuple((arb_nat, arb_bool)),
+      (a, b) =>
+        V.distributivity(string_of_int, option_from_tuple(a), option_from_tuple(b))
+    )
+  });
+
+  describe("Plus", () => {
+    module V = Verify.Plus(Option.Plus);
+
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(string_of_int)).to_be(true);
+    });
+    property1(
+      "should satisfy left identity",
+      arb_tuple((arb_nat, arb_bool)),
+      V.left_identity << option_from_tuple
+    );
+    property1(
+      "should satisfy right identity",
+      arb_tuple((arb_nat, arb_bool)),
+      V.right_identity << option_from_tuple
+    );
+  });
+
+  describe("Alternative", () => Option.Alternative.({
+    module V = Verify.Alternative(Option.Alternative);
+
+    property1(
+      "should satisfy distributivity",
+      arb_tuple((arb_nat, arb_bool)),
+      V.distributivity(pure((*)(2)), pure((+)(3))) << option_from_tuple
+    );
+
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(string_of_int |> pure)).to_be(true)
+    })
+  }));
+
   describe("Foldable", () => Option.Foldable.({
     it("should do a left fold", () => {
       expect(fold_left((+), 0, Some(1))).to_be(1);
@@ -104,7 +157,7 @@ describe("Option", () => Fn.({
     });
 
     it("should do a map fold (list)", () => {
-      module F = Option.Foldable.Fold_Map_Any(List.Monoid);
+      module F = Option.Foldable.Fold_Map_Plus(List.Plus);
       expect(F.fold_map(List.Applicative.pure, Some(123))).to_be([123]);
     });
   }));

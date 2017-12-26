@@ -12,14 +12,17 @@ describe("Default", () => {
         let fold_map = (f, x) =>
           ListLabels.fold_left(~f=(acc, x) => M.append(acc, f(x)), ~init=M.empty, x);
       };
+      module Fold_Map_Plus = (P: Interface.PLUS) => {
+        let fold_map = (f, x) =>
+          ListLabels.fold_left(~f=(acc, x) => P.alt(acc, f(x)), ~init=P.empty, x);
+      };
     };
-
     module Fold_Map = List.Foldable.Fold_Map;
     module Fold_Map_Any = FM.Fold_Map_Any;
+    module Fold_Map_Plus = FM.Fold_Map_Plus;
     module F = Default.Fold(FM);
 
-    let fold_left = F.fold_left_default;
-    let fold_right = F.fold_right_default;
+    let (fold_left, fold_right) = (F.fold_left_default, F.fold_right_default);
   };
 
   module Traversable: List.TRAVERSABLE_F = (A: Interface.APPLICATIVE) => {

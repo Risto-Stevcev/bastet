@@ -69,6 +69,9 @@ module type FOLDABLE = {
   module Fold_Map_Any: (M: MONOID_ANY) => {
     let fold_map: ('a => M.t('a), t('a)) => M.t('a);
   };
+  module Fold_Map_Plus: (P: PLUS) => {
+    let fold_map: ('a => P.t('a), t('a)) => P.t('a);
+  };
 };
 
 module type TRAVERSABLE = {

@@ -23,20 +23,6 @@ describe("Array", () => Fn.({
     });
   });
 
-  describe("Semigroup", () => {
-    module V = Verify.Semigroup_Any(Array.Semigroup);
-    property3(
-      "should satisfy associativity",
-      arb_array(arb_nat), arb_array(arb_nat), arb_array(arb_nat),
-      V.associativity
-    )
-  });
-
-  describe("Monoid", () => {
-    module V = Verify.Monoid_Any(Array.Monoid);
-    property1("should satisfy neutrality", arb_array(arb_nat), V.neutral)
-  });
-
   describe("Functor", () => {
     module V = Verify.Functor(Array.Functor);
     property1("should satisfy identity", arb_array(arb_nat), V.identity);
@@ -78,7 +64,6 @@ describe("Array", () => Fn.({
       "should satisfy right identity", arb_array(arb_nat), V.right_identity
     );
   });
-
 
   describe("Alt", () => {
     module V = Verify.Alt(Array.Alt);
@@ -132,7 +117,7 @@ describe("Array", () => Fn.({
     });
 
     it("should do a map fold (list)", () => {
-      module F = Array.Foldable.Fold_Map_Any(List.Monoid);
+      module F = Array.Foldable.Fold_Map_Plus(List.Plus);
       expect(F.fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])).to_be([[1,2,3],[4,5]]);
     });
   }));
