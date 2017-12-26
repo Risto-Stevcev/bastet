@@ -2,7 +2,7 @@ open Interface;
 
 let (const, flip) = Function.((const, flip));
 let (id) = Function.Category.(id);
-let ((<<)) = Function.Infix.Semigroupoid.((<<));
+let (<.) = Function.Infix.(<.);
 
 module Monoid = (M : MONOID) => {
   module I = Infix.Monoid(M);
@@ -122,7 +122,7 @@ module Foldable = (F: FOLDABLE) => {
   module Applicative = (A: APPLICATIVE) => {
     module Fn = Apply(A);
     let traverse': ('a => A.t('b), F.t('a)) => A.t(unit) =
-      (f, fa) => F.fold_right(Fn.apply_second << f, A.pure(), fa);
+      (f, fa) => F.fold_right(Fn.apply_second <. f, A.pure(), fa);
     let sequence': F.t(A.t('a)) => A.t(unit) = (fa) => traverse'(id, fa);
   };
 

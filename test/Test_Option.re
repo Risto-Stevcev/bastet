@@ -2,7 +2,7 @@ open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
-let ((<<)) = Function.Infix.Semigroupoid.((<<));
+let ((<.)) = Function.Infix.((<.));
 
 
 describe("Option", () => {
@@ -28,7 +28,7 @@ describe("Option", () => {
     property1(
       "should satisfy neutrality",
       arb_tuple((arb_nat, arb_bool)),
-      V.neutral << option_from_tuple
+      V.neutral <. option_from_tuple
     )
   });
 
@@ -37,12 +37,12 @@ describe("Option", () => {
     property1(
       "should satisfy identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.identity << option_from_tuple
+      V.identity <. option_from_tuple
     );
     property1(
       "should satisfy composition",
       arb_tuple((arb_nat, arb_bool)),
-      V.composition((++)("!"), string_of_int) << option_from_tuple
+      V.composition((++)("!"), string_of_int) <. option_from_tuple
     );
   });
 
@@ -51,7 +51,7 @@ describe("Option", () => {
     property1(
       "should satisfy associative composition",
       arb_tuple((arb_nat, arb_bool)),
-      V.associative_composition(Some((++)("!")), Some(string_of_int)) << option_from_tuple
+      V.associative_composition(Some((++)("!")), Some(string_of_int)) <. option_from_tuple
     )
   });
 
@@ -60,7 +60,7 @@ describe("Option", () => {
     property1(
       "should satisfy identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.identity << option_from_tuple
+      V.identity <. option_from_tuple
     );
     property1("should satisfy homomorphism", arb_nat, V.homomorphism(string_of_int));
     property1("should satisfy interchange", arb_nat, V.interchange(Some(string_of_int)));
@@ -73,15 +73,15 @@ describe("Option", () => {
     property1(
       "should satisfy associativity",
       arb_tuple((arb_nat, arb_bool)),
-      V.associativity(pure << string_of_int, pure << (++)("!")) << option_from_tuple
+      V.associativity(pure <. string_of_int, pure <. (++)("!")) <. option_from_tuple
     );
     property1(
-      "should satisfy left identity", arb_nat, V.left_identity(pure << string_of_int)
+      "should satisfy left identity", arb_nat, V.left_identity(pure <. string_of_int)
     );
     property1(
       "should satisfy right identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.right_identity << option_from_tuple
+      V.right_identity <. option_from_tuple
     );
   });
 
@@ -115,12 +115,12 @@ describe("Option", () => {
     property1(
       "should satisfy left identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.left_identity << option_from_tuple
+      V.left_identity <. option_from_tuple
     );
     property1(
       "should satisfy right identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.right_identity << option_from_tuple
+      V.right_identity <. option_from_tuple
     );
   });
 
@@ -130,7 +130,7 @@ describe("Option", () => {
     property1(
       "should satisfy distributivity",
       arb_tuple((arb_nat, arb_bool)),
-      V.distributivity(pure((*)(2)), pure((+)(3))) << option_from_tuple
+      V.distributivity(pure((*)(2)), pure((+)(3))) <. option_from_tuple
     );
 
     it("should satisfy annihalation", () => {
@@ -179,7 +179,7 @@ describe("Option", () => {
     property1(
       "should satisfy reflexivity",
       arb_tuple((arb_nat, arb_bool)),
-      V.reflexivity << option_from_tuple
+      V.reflexivity <. option_from_tuple
     );
     property2(
       "should satisfy symmetry",

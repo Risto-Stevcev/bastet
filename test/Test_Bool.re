@@ -1,7 +1,7 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-let (<<) = Function.Infix.(<<);
+let (<.) = Function.Infix.(<.);
 
 
 describe("Bool", () => {
@@ -18,7 +18,7 @@ describe("Bool", () => {
 
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Conjunctive.Monoid);
-      property1("should satisfy neutrality", arb_bool, V.neutral << Js.to_bool)
+      property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool)
     });
   });
 
@@ -34,13 +34,13 @@ describe("Bool", () => {
 
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Disjunctive.Monoid);
-      property1("should satisfy neutrality", arb_bool, V.neutral << Js.to_bool)
+      property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool)
     });
   });
 
   describe("Eq", () => {
     module V = Verify.Eq(Bool.Eq);
-    property1("should satisfy reflexivity", arb_bool, V.reflexivity << Js.to_bool);
+    property1("should satisfy reflexivity", arb_bool, V.reflexivity <. Js.to_bool);
     property2("should satisfy symmetry", arb_bool, arb_bool, (a, b) => {
       let (a', b') = (Js.to_bool(a), Js.to_bool(b));
       V.symmetry(a', b');

@@ -2,7 +2,7 @@ open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
-let (<<) = Function.Infix.(<<);
+let (<.) = Function.Infix.(<.);
 
 
 describe("Array", () => {
@@ -56,10 +56,10 @@ describe("Array", () => {
     property1(
       "should satisfy associativity",
       arb_array(arb_nat),
-      V.associativity(pure << string_of_int, pure << (++)("!"))
+      V.associativity(pure <. string_of_int, pure <. (++)("!"))
     );
     property1(
-      "should satisfy left identity", arb_nat, V.left_identity(pure << string_of_int)
+      "should satisfy left identity", arb_nat, V.left_identity(pure <. string_of_int)
     );
     property1(
       "should satisfy right identity", arb_array(arb_nat), V.right_identity

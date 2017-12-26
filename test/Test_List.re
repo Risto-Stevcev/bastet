@@ -2,7 +2,7 @@ open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
-let (<<) = Function.Infix.(<<);
+let (<.) = Function.Infix.(<.);
 
 
 describe("List", () => {
@@ -10,7 +10,7 @@ describe("List", () => {
 
   describe("Functor", () => {
     module V = Verify.Functor(List.Functor);
-    property1("should satisfy identity", arb_array(arb_nat), V.identity << to_list);
+    property1("should satisfy identity", arb_array(arb_nat), V.identity <. to_list);
     property1("should satisfy composition", arb_array(arb_nat), (a) => {
       V.composition((++)("!"), string_of_int, to_list(a))
     })
@@ -25,11 +25,11 @@ describe("List", () => {
 
   describe("Applicative", () => {
     module V = Verify.Applicative(List.Applicative);
-    property1("should satisfy identity", arb_array(arb_nat), V.identity << to_list);
+    property1("should satisfy identity", arb_array(arb_nat), V.identity <. to_list);
     property1(
       "should satisfy homomorphism",
       arb_array(arb_nat),
-      V.homomorphism(List.Functor.map(string_of_int)) << to_list
+      V.homomorphism(List.Functor.map(string_of_int)) <. to_list
     );
     property1("should satisfy interchange", arb_nat, V.interchange([string_of_int]));
   });
@@ -40,13 +40,13 @@ describe("List", () => {
     property1(
       "should satisfy associativity",
       arb_array(arb_nat),
-      V.associativity(pure << string_of_int, pure << (++)("!")) << to_list
+      V.associativity(pure <. string_of_int, pure <. (++)("!")) <. to_list
     );
     property1(
-      "should satisfy left identity", arb_nat, V.left_identity(pure << string_of_int)
+      "should satisfy left identity", arb_nat, V.left_identity(pure <. string_of_int)
     );
     property1(
-      "should satisfy right identity", arb_array(arb_nat), V.right_identity << to_list
+      "should satisfy right identity", arb_array(arb_nat), V.right_identity <. to_list
     );
   });
 
@@ -73,10 +73,10 @@ describe("List", () => {
       expect(V.annihalation(string_of_int)).to_be(true);
     });
     property1(
-      "should satisfy left identity", arb_array(arb_nat), V.left_identity << to_list
+      "should satisfy left identity", arb_array(arb_nat), V.left_identity <. to_list
     );
     property1(
-      "should satisfy right identity", arb_array(arb_nat), V.right_identity << to_list
+      "should satisfy right identity", arb_array(arb_nat), V.right_identity <. to_list
     );
   });
 
@@ -86,7 +86,7 @@ describe("List", () => {
     property1(
       "should satisfy distributivity",
       arb_array(arb_nat),
-      V.distributivity(pure((*)(3)), pure((+)(4))) << to_list
+      V.distributivity(pure((*)(3)), pure((+)(4))) <. to_list
     );
     it("should satisfy annihalation", () => {
       expect(V.annihalation(List.Applicative.pure(string_of_int))).to_be(true);
@@ -132,7 +132,7 @@ describe("List", () => {
     module V = Verify.Eq1(ListF.Int.Eq);
     let arb_int' = arb_int(-10000, 10000);
 
-    property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity << to_list);
+    property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity <. to_list);
     property2(
       "should satisfy symmetry",
       arb_array(arb_int'), arb_array(arb_int'),

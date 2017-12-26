@@ -1,5 +1,5 @@
 open Mocha;
-let (<<) = Function.Infix.(<<);
+let (<.) = Function.Infix.(<.);
 
 
 describe("Dual", () => {

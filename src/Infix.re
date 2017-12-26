@@ -43,8 +43,8 @@ module Alt = (A: ALT) => {
 };
 
 module Semigroupoid = (S: SEMIGROUPOID) => {
-  let (<<) = S.compose;
-  let (>>) = (g, f) => S.compose(f, g);
+  let (<.) = S.compose;
+  let (>.) = (g, f) => S.compose(f, g);
 };
 
 module Eq = (E: EQ) => {

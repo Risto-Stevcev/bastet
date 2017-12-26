@@ -1,6 +1,5 @@
 open Interface;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
-let (<<) = Fn.(<<);
+let (<.) = Function.Infix.(<.);
 
 
 let maybe: (~f:'a => 'b, ~default:'b, option('a)) => 'b =
@@ -114,7 +113,7 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
   include (Functor: FUNCTOR with type t('a) := t('a));
   include (Foldable: FOLDABLE with type t('a) := t('a));
 
-  let traverse = (f, x) => maybe(~f=A.map(a => Some(a)) << f, ~default=A.pure(None), x);
+  let traverse = (f, x) => maybe(~f=A.map(a => Some(a)) <. f, ~default=A.pure(None), x);
   let sequence = (x) => maybe(~f=A.map(a => Some(a)), ~default=A.pure(None), x);
 };
 

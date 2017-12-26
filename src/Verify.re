@@ -1,5 +1,3 @@
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
-
 module Semigroup = (S: Interface.SEMIGROUP) => {
   module I = Infix.Semigroup(S);
   let associativity: (S.t, S.t, S.t) => bool =
@@ -23,9 +21,10 @@ module Monoid_Any = (M: Interface.MONOID_ANY) => {
 };
 
 module Functor = (F: Interface.FUNCTOR) => {
+  let (<.) = Function.Infix.(<.);
   let identity: F.t('a) => bool = (a) => F.map(Function.Category.id, a) == a;
   let composition: ('b => 'c, 'a => 'b, F.t('a)) => bool =
-    (f, g, a) => Fn.(F.map(f << g, a) == (F.map(f) << F.map(g))(a));
+    (f, g, a) => F.map(f <. g, a) == (F.map(f) <. F.map(g))(a);
 };
 
 module Apply = (A: Interface.APPLY) => {
@@ -93,12 +92,12 @@ module Alternative = (A: Interface.ALTERNATIVE) => {
 module Semigroupoid = (S: Interface.SEMIGROUPOID) => {
   module I = Infix.Semigroupoid(S);
   let associativity: (S.t('c, 'd), S.t('b, 'c), S.t('a, 'b)) => bool =
-    (a, b, c) => I.(a << b << c == (a << (b << c)));
+    (a, b, c) => I.(a <. b <. c == (a <. (b <. c)));
 };
 
 module Category = (C: Interface.CATEGORY) => {
   module I = Infix.Semigroupoid(C);
-  let identity: C.t('a, 'b) => bool = (a) => I.(C.id << a == a && a << C.id == a);
+  let identity: C.t('a, 'b) => bool = (a) => I.(C.id <. a == a && a <. C.id == a);
 };
 
 module Eq = (E: Interface.EQ) => {
