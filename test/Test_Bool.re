@@ -1,16 +1,16 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+let (<<) = Function.Infix.(<<);
 
 
-describe("Bool", () => Fn.({
+describe("Bool", () => {
   describe("Conjunctive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Conjunctive.Semigroup);
       property3(
         "should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-          let (a', b', c') = (a |> Js.to_bool, b |> Js.to_bool, c |> Js.to_bool);
+          let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
           V.associativity(a', b', c')
         }
       );
@@ -25,10 +25,9 @@ describe("Bool", () => Fn.({
   describe("Disjunctive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Disjunctive.Semigroup);
-
       property3(
         "should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-        let (a', b', c') = (a |> Js.to_bool, b |> Js.to_bool, c |> Js.to_bool);
+        let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
         V.associativity(a', b', c')
       })
     });
@@ -51,4 +50,4 @@ describe("Bool", () => Fn.({
       V.transitivity(a', b', c');
     })
   });
-}));
+});

@@ -1,5 +1,5 @@
 open Mocha;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+let (<<) = Function.Infix.(<<);
 
 
 describe("Dual", () => {

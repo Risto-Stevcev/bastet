@@ -73,7 +73,7 @@ module Alt = (A: Interface.ALT) => {
 };
 
 module Plus = (P: Interface.PLUS) => {
-  module I = Infix.Plus(P);
+  module I = Infix.Alt(P);
   let annihalation: ('a => 'b) => bool = (f) => P.map(f, P.empty) == P.empty;
   let left_identity: P.t('a) => bool = (a) => I.(P.empty <|> a == a);
   let right_identity: P.t('a) => bool = (a) => I.(a <|> P.empty == a);

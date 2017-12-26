@@ -1,10 +1,10 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+let (<<) = Function.Infix.(<<);
 
 
-describe("Function", () => Fn.({
+describe("Function", () => {
   describe("Semigroupoid", () => {
     property1("should satisfy associativity", arb_nat, (n) => {
       let (a, b, c) = ((==)("123!"), (++)("!"), string_of_int);
@@ -18,4 +18,4 @@ describe("Function", () => Fn.({
       (string_of_int << Function.Category.id)(n) == string_of_int(n)
     });
   });
-}));
+});

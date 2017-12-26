@@ -31,11 +31,6 @@ module Apply = (A: APPLY) => {
   let (<*>) = apply;
 };
 
-module Applicative = (A: APPLICATIVE) => {
-  include A;
-  let (<*>) = apply;
-};
-
 module Monad = (M: MONAD) => {
   include M;
   let (>>=) = flat_map;
@@ -47,20 +42,9 @@ module Alt = (A: ALT) => {
   let (<|>) = alt;
 };
 
-module Plus = (P: PLUS) => {
-  include P;
-  let (<|>) = alt;
-};
-
 module Semigroupoid = (S: SEMIGROUPOID) => {
-  include S;
-  let (<<) = compose;
-};
-
-module Category = (C: CATEGORY) => {
-  include C;
-  let (<<) = compose;
-  let (>>) = (g, f) => compose(f, g);
+  let (<<) = S.compose;
+  let (>>) = (g, f) => S.compose(f, g);
 };
 
 module Eq = (E: EQ) => {

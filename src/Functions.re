@@ -2,7 +2,7 @@ open Interface;
 
 let (const, flip) = Function.((const, flip));
 let (id) = Function.Category.(id);
-let ((<<)) = Function.Infix.((<<));
+let ((<<)) = Function.Infix.Semigroupoid.((<<));
 
 module Monoid = (M : MONOID) => {
   module I = Infix.Monoid(M);
@@ -58,8 +58,8 @@ module Apply = (A: APPLY) => {
 };
 
 module Applicative = (A: APPLICATIVE) => {
-  module I = Infix.Applicative(A);
-  let liftA1: (('a => 'b), A.t('a)) => A.t('b) = (f, fa) => I.(pure(f) <*> fa);
+  module I = Infix.Apply(A);
+  let liftA1: (('a => 'b), A.t('a)) => A.t('b) = (f, fa) => I.(A.pure(f) <*> fa);
   let when_: (bool, A.t(unit)) => A.t(unit) = (p, fa) => p ? fa : A.pure();
   let unless: (bool, A.t(unit)) => A.t(unit) = (p, fa) => !p ? fa : A.pure();
 };

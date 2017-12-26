@@ -1,7 +1,6 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
 
 
 describe("String", () => {

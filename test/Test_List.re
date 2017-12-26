@@ -1,15 +1,15 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+open Functors;
+let (<<) = Function.Infix.(<<);
 
 
-describe("List", () => Fn.({
+describe("List", () => {
   let to_list = ArrayLabels.to_list;
 
   describe("Functor", () => {
     module V = Verify.Functor(List.Functor);
-
     property1("should satisfy identity", arb_array(arb_nat), V.identity << to_list);
     property1("should satisfy composition", arb_array(arb_nat), (a) => {
       V.composition((++)("!"), string_of_int, to_list(a))
@@ -104,13 +104,13 @@ describe("List", () => Fn.({
     });
 
     it("should do a map fold (int)", () => {
-      module F = List.Foldable.Fold_Map(Int.Additive.Monoid);
-      expect(F.fold_map(Function.Category.id, [1,2,3])).to_be(6);
+      let fold_map = ListF.Int.Additive.Fold_Map.fold_map;
+      expect(fold_map(Function.Category.id, [1,2,3])).to_be(6);
     });
 
     it("should do a map fold (list)", () => {
-      module F = List.Foldable.Fold_Map_Plus(List.Plus);
-      expect(F.fold_map(List.Applicative.pure, [[1,2,3],[4,5]])).to_be([[1,2,3],[4,5]]);
+      let fold_map = ListF.List.Fold_Map_Plus.fold_map;
+      expect(fold_map(List.Applicative.pure, [[1,2,3],[4,5]])).to_be([[1,2,3],[4,5]]);
     });
   }));
 
@@ -122,7 +122,6 @@ describe("List", () => Fn.({
       expect(traverse(positive_int, [1,2,3])).to_be(Some([1,2,3]));
       expect(traverse(positive_int, [1,2,-3])).to_be(None);
     }));
-
     it("should sequence the list", () => T.({
       expect(sequence([Some(3), Some(4), Some(5)])).to_be(Some([3,4,5]));
       expect(sequence([Some(3), Some(4), None])).to_be(None);
@@ -130,9 +129,9 @@ describe("List", () => Fn.({
   });
 
   describe("Eq", () => {
+    module V = Verify.Eq1(ListF.Int.Eq);
     let arb_int' = arb_int(-10000, 10000);
-    module List_Int_Eq = List.Eq(Int.Eq);
-    module V = Verify.Eq1(List_Int_Eq);
+
     property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity << to_list);
     property2(
       "should satisfy symmetry",
@@ -145,4 +144,4 @@ describe("List", () => Fn.({
       (a, b, c) => V.transitivity(to_list(a), to_list(b), to_list(c))
     );
   });
-}));
+});

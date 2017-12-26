@@ -1,21 +1,18 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+open Functors;
+let ((<<)) = Function.Infix.Semigroupoid.((<<));
 
 
-describe("Option", () => Fn.({
-  module Option_Semigroup = Option.Semigroup(Int.Additive.Semigroup);
-  module Option_Monoid = Option.Monoid(Int.Additive.Semigroup);
-
+describe("Option", () => {
   let option_from_tuple: (('a, Js.boolean)) => option('a) = (a) => {
     let (v, b) = a;
     b == Js.true_ ? Some(v) : None;
   };
 
   describe("Semigroup", () => {
-    module V = Verify.Semigroup(Option_Semigroup);
-
+    module V = Verify.Semigroup(OptionF.Int.Additive.Semigroup);
     property3(
       "should satisfy associativity",
       arb_tuple((arb_nat, arb_bool)),
@@ -27,7 +24,7 @@ describe("Option", () => Fn.({
   });
 
   describe("Monoid", () => {
-    module V = Verify.Monoid(Option_Monoid);
+    module V = Verify.Monoid(OptionF.Int.Additive.Monoid);
     property1(
       "should satisfy neutrality",
       arb_tuple((arb_nat, arb_bool)),
@@ -71,7 +68,8 @@ describe("Option", () => Fn.({
 
   describe("Monad", () => {
     module V = Verify.Monad(Option.Monad);
-    open Option.Applicative;
+    let (pure) = Option.Applicative.(pure);
+
     property1(
       "should satisfy associativity",
       arb_tuple((arb_nat, arb_bool)),
@@ -140,46 +138,43 @@ describe("Option", () => Fn.({
     })
   }));
 
-  describe("Foldable", () => Option.Foldable.({
+  describe("Foldable", () => {
+    let (fold_left, fold_right) = Option.Foldable.(fold_left, fold_right);
+
     it("should do a left fold", () => {
       expect(fold_left((+), 0, Some(1))).to_be(1);
     });
-
     it("should do a right fold", () => {
       expect(fold_right((+), 0, Some(1))).to_be(1);
       expect(fold_right((+), 0, None)).to_be(0);
     });
-
     it("should do a map fold (int)", () => {
-      module F = Option.Foldable.Fold_Map(Int.Additive.Monoid);
-      expect(F.fold_map((*)(2), Some(3))).to_be(6);
-      expect(F.fold_map((+)(1), None)).to_be(Int.Additive.Monoid.empty);
+      let fold_map = OptionF.Int.Additive.Fold_Map.(fold_map);
+      expect(fold_map((*)(2), Some(3))).to_be(6);
+      expect(fold_map((+)(1), None)).to_be(Int.Additive.Monoid.empty);
     });
-
     it("should do a map fold (list)", () => {
-      module F = Option.Foldable.Fold_Map_Plus(List.Plus);
-      expect(F.fold_map(List.Applicative.pure, Some(123))).to_be([123]);
+      let fold_map = OptionF.List.Fold_Map_Plus.(fold_map);
+      expect(fold_map(List.Applicative.pure, Some(123))).to_be([123]);
     });
-  }));
+  });
 
   describe("Traversable", () => {
-    module T = Option.Traversable(List.Applicative);
+    let (traverse, sequence) = OptionF.List.Traversable.(traverse, sequence);
 
-    it("should traverse the list", () => T.({
+    it("should traverse the list", () => {
       let positive_int = (x) => x >= 0 ? [x] : [];
       expect(traverse(positive_int, Some(123))).to_be([Some(123)]);
       expect(traverse(positive_int, Some(-123))).to_be([]);
-    }));
-
-    it("should sequence the list", () => T.({
+    });
+    it("should sequence the list", () => {
       expect(sequence(Some([3, 4, 5]))).to_be([Some(3), Some(4), Some(5)]);
       expect(sequence(None)).to_be([None]);
-    }));
+    });
   });
 
   describe("Eq", () => {
-    module Option_Int_Eq = Option.Eq(Int.Eq);
-    module V = Verify.Eq1(Option_Int_Eq);
+    module V = Verify.Eq1(OptionF.Int.Eq);
 
     property1(
       "should satisfy reflexivity",
@@ -202,4 +197,4 @@ describe("Option", () => Fn.({
         V.transitivity(option_from_tuple(a), option_from_tuple(b), option_from_tuple(c))
     );
   });
-}));
+});

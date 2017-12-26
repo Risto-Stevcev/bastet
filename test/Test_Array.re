@@ -1,10 +1,11 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+open Functors;
+let (<<) = Function.Infix.(<<);
 
 
-describe("Array", () => Fn.({
+describe("Array", () => {
   describe("Functions", () => {
     describe("zip_with", () => {
       it("should zip two arrays", () => {
@@ -51,7 +52,7 @@ describe("Array", () => Fn.({
 
   describe("Monad", () => {
     module V = Verify.Monad(Array.Monad);
-    open Array.Applicative;
+    let pure = Array.Applicative.pure;
     property1(
       "should satisfy associativity",
       arb_array(arb_nat),
@@ -90,14 +91,14 @@ describe("Array", () => Fn.({
 
   describe("Alternative", () => {
     module V = Verify.Alternative(Array.Alternative);
-    let (pure) = Array.Applicative.((pure));
+    let pure = Array.Applicative.pure;
     property1(
       "should satisfy distributivity",
       arb_array(arb_nat),
       V.distributivity(pure((*)(3)), pure((+)(4)))
     );
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(Array.Applicative.pure(string_of_int))).to_be(true);
+      expect(V.annihalation(pure(string_of_int))).to_be(true);
     });
   });
 
@@ -112,35 +113,32 @@ describe("Array", () => Fn.({
     });
 
     it("should do a map fold (int)", () => {
-      module F = Array.Foldable.Fold_Map(Int.Additive.Monoid);
-      expect(F.fold_map(Function.Category.id, [|1,2,3|])).to_be(6);
+      let fold_map = ArrayF.Int.Additive.Fold_Map.fold_map;
+      expect(fold_map(Function.Category.id, [|1,2,3|])).to_be(6);
     });
 
     it("should do a map fold (list)", () => {
-      module F = Array.Foldable.Fold_Map_Plus(List.Plus);
-      expect(F.fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])).to_be([[1,2,3],[4,5]]);
+      let fold_map = ArrayF.List.Fold_Map_Plus.fold_map;
+      expect(fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])).to_be([[1,2,3],[4,5]]);
     });
   }));
 
   describe("Traversable", () => {
-    module T = Array.Traversable(Option.Applicative);
-
-    it("should traverse the array", () => T.({
+    let (traverse, sequence) = ArrayF.Option.Traversable.(traverse, sequence);
+    it("should traverse the array", () => {
       let positive_int = (x) => x >= 0 ? Some(x) : None;
       expect(traverse(positive_int, [|1,2,3|])).to_be(Some([|1,2,3|]));
       expect(traverse(positive_int, [|1,2,-3|])).to_be(None);
-    }));
-
-    it("should sequence the array", () => T.({
+    });
+    it("should sequence the array", () => {
       expect(sequence([|Some(3), Some(4), Some(5)|])).to_be(Some([|3,4,5|]));
       expect(sequence([|Some(3), Some(4), None|])).to_be(None);
-    }));
+    });
   });
 
   describe("Eq", () => {
     let arb_int' = arb_int(-10000, 10000);
-    module Array_Int_Eq = Array.Eq(Int.Eq);
-    module V = Verify.Eq1(Array_Int_Eq);
+    module V = Verify.Eq1(ArrayF.Int.Eq);
     property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity);
     property2(
       "should satisfy symmetry", arb_array(arb_int'), arb_array(arb_int'), V.symmetry
@@ -151,4 +149,4 @@ describe("Array", () => Fn.({
       V.transitivity
     );
   });
-}));
+});

@@ -1,10 +1,14 @@
 open Interface;
+module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+let (<<) = Fn.(<<);
+
 
 let maybe: (~f:'a => 'b, ~default:'b, option('a)) => 'b =
   (~f, ~default, opt) => switch opt {
   | Some(a) => f(a)
   | None => default
   };
+
 
 module Functor: FUNCTOR with type t('a) = option('a) = {
   type t('a) = option('a);
@@ -86,32 +90,17 @@ module Alternative: ALTERNATIVE with type t('a) = option('a) = {
 
 module Foldable: FOLDABLE with type t('a) = option('a) = {
   type t('a) = option('a);
-  let fold_left = (f, init, x) => switch x {
-    | Some(x') => f(init, x')
-    | None => init
-    };
-  let fold_right = (f, init, x) => switch x {
-    | Some(x') => f(x', init)
-    | None => init
-    };
+  let fold_left = (f, init, x) => maybe(~f=f(init), ~default=init, x);
+  let fold_right = (f, init, x) => maybe(~f=(x') => f(x', init), ~default=init, x);
 
   module Fold_Map = (M: MONOID) => {
-    let fold_map = (f, x) => switch x {
-      | Some(x') => f(x')
-      | None => M.empty
-      }
+    let fold_map = (f, x) => maybe(~f, ~default=M.empty, x)
   };
   module Fold_Map_Any = (M: MONOID_ANY) => {
-    let fold_map = (f, x) => switch x {
-      | Some(x') => f(x')
-      | None => M.empty
-      }
+    let fold_map = (f, x) => maybe(~f, ~default=M.empty, x)
   };
   module Fold_Map_Plus = (P: PLUS) => {
-    let fold_map = (f, x) => switch x {
-      | Some(x') => f(x')
-      | None => P.empty
-      }
+    let fold_map = (f, x) => maybe(~f, ~default=P.empty, x)
   };
 };
 
@@ -125,16 +114,8 @@ module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
   include (Functor: FUNCTOR with type t('a) := t('a));
   include (Foldable: FOLDABLE with type t('a) := t('a));
 
-  module I = Infix.Functor(A);
-  let traverse = (f, x) => I.(switch x {
-    | Some(x') => (a => Some(a)) <$> f(x')
-    | None => A.pure(None)
-    });
-
-  let sequence = (x) => I.(switch x {
-    | Some(x') => (a => Some(a)) <$> x'
-    | None => A.pure(None)
-  });
+  let traverse = (f, x) => maybe(~f=A.map(a => Some(a)) << f, ~default=A.pure(None), x);
+  let sequence = (x) => maybe(~f=A.map(a => Some(a)), ~default=A.pure(None), x);
 };
 
 

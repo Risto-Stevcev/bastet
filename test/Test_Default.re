@@ -1,18 +1,18 @@
 open Mocha;
-module Fn = Infix.Semigroupoid(Function.Semigroupoid);
+open Interface;
 
 
 describe("Default", () => {
-  module Foldable: Interface.FOLDABLE with type t('a) = list('a) = {
+  module Foldable: FOLDABLE with type t('a) = list('a) = {
     type t('a) = list('a);
 
     module FM: Default.FOLD_MAP with type t('a) = list('a) = {
       type t('a) = list('a);
-      module Fold_Map_Any = (M: Interface.MONOID_ANY) => {
+      module Fold_Map_Any = (M: MONOID_ANY) => {
         let fold_map = (f, x) =>
           ListLabels.fold_left(~f=(acc, x) => M.append(acc, f(x)), ~init=M.empty, x);
       };
-      module Fold_Map_Plus = (P: Interface.PLUS) => {
+      module Fold_Map_Plus = (P: PLUS) => {
         let fold_map = (f, x) =>
           ListLabels.fold_left(~f=(acc, x) => P.alt(acc, f(x)), ~init=P.empty, x);
       };
@@ -25,11 +25,11 @@ describe("Default", () => {
     let (fold_left, fold_right) = (F.fold_left_default, F.fold_right_default);
   };
 
-  module Traversable: List.TRAVERSABLE_F = (A: Interface.APPLICATIVE) => {
+  module Traversable: List.TRAVERSABLE_F = (A: APPLICATIVE) => {
     type t('a) = list('a);
     type applicative_t('a) = A.t('a);
-    include (List.Functor: Interface.FUNCTOR with type t('a) := t('a));
-    include (List.Foldable: Interface.FOLDABLE with type t('a) := t('a));
+    include (List.Functor: FUNCTOR with type t('a) := t('a));
+    include (List.Foldable: FOLDABLE with type t('a) := t('a));
 
     module I = Infix.Apply(A);
     let sequence = (xs) => I.({
@@ -43,7 +43,7 @@ describe("Default", () => {
     module D = Default.Traverse({
       type t('a) = list('a);
       type applicative_t('a) = A.t('a);
-      include (List.Functor: Interface.FUNCTOR with type t('a) := t('a));
+      include (List.Functor: FUNCTOR with type t('a) := t('a));
       let sequence = sequence;
     });
     let traverse = D.traverse_default;
@@ -61,13 +61,11 @@ describe("Default", () => {
 
   describe("Traversable", () => {
     module T = Traversable(Option.Applicative);
-
     it("should traverse the list", () => T.({
       let positive_int = (x) => x >= 0 ? Some(x) : None;
       expect(traverse(positive_int, [1,2,3])).to_be(Some([1,2,3]));
       expect(traverse(positive_int, [1,2,-3])).to_be(None);
     }));
-
     it("should sequence the list", () => T.({
       expect(sequence([Some(3), Some(4), Some(5)])).to_be(Some([3,4,5]));
       expect(sequence([Some(3), Some(4), None])).to_be(None);

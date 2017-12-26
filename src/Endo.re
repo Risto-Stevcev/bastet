@@ -1,7 +1,6 @@
 open Interface;
-
-module Fn = Infix.Category(Function.Category);
-open Fn;
+let (id) = Function.Category.id;
+let (<<) = Function.Infix.Semigroupoid.(<<);
 
 /* A data structure representing the monoid of endomorphisms under composition (a => a) */
 type endo('a) = Endo('a => 'a);

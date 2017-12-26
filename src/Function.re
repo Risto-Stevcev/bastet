@@ -15,6 +15,6 @@ let flip: (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b);
 let const: ('a, 'b) => 'a = (a, _) => a;
 
 module Infix = {
-  module I = Infix.Category(Category);
-  include I;
+  module Semigroupoid = Infix.Semigroupoid(Semigroupoid);
+  include Semigroupoid;
 };
