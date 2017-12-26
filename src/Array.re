@@ -93,37 +93,39 @@ module Foldable: FOLDABLE with type t('a) = array('a) = {
 };
 
 
-module type TRAVERSABLE_F = (A: APPLICATIVE) => TRAVERSABLE
-  with type applicative_t('a) = A.t('a) and type t('a) = array('a);
-
-module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
-  type t('a) = array('a);
-  type applicative_t('a) = A.t('a);
-  include (Functor: FUNCTOR with type t('a) := t('a));
-  include (Foldable: FOLDABLE with type t('a) := t('a));
-
-  module I = Infix.Apply(A);
-  let traverse = (f) => I.({
-    ArrayLabels.fold_right(
-      ~f=(acc, x) => A.pure((x, y) => ArrayLabels.append([|x|], y)) <*> f(acc) <*> x,
-      ~init=A.pure([||])
-    )
-  });
-  module D = Default.Sequence({
+module Traversable = (A: APPLICATIVE) => {
+  module Array_Traversable: TRAVERSABLE
+    with type applicative_t('a) = A.t('a) and type t('a) = array('a) = {
     type t('a) = array('a);
     type applicative_t('a) = A.t('a);
-    let traverse = traverse;
-  });
-  let sequence = D.sequence_default;
+    include (Functor: FUNCTOR with type t('a) := t('a));
+    include (Foldable: FOLDABLE with type t('a) := t('a));
+
+    module I = Infix.Apply(A);
+    let traverse = (f) => I.({
+      ArrayLabels.fold_right(
+        ~f=(acc, x) => A.pure((x, y) => ArrayLabels.append([|x|], y)) <*> f(acc) <*> x,
+        ~init=A.pure([||])
+      )
+    });
+    module D = Default.Sequence({
+      type t('a) = array('a);
+      type applicative_t('a) = A.t('a);
+      let traverse = traverse;
+    });
+    let sequence = D.sequence_default;
+  };
+  include Array_Traversable;
 };
 
 
-module type EQ1_F = (E: EQ) => EQ1 with type t('a) = array(E.t);
-
-module Eq: EQ1_F = (E: EQ) => {
-  type t('a) = array(E.t);
-  let eq = (xs, ys) => {
-    Js.Array.length(xs) == Js.Array.length(ys) &&
-    Js.Array.every(((a, b)) => E.eq(a, b), zip(xs, ys))
+module Eq = (E: EQ) => {
+  module Array_Eq: EQ with type t = array(E.t) = {
+    type t = array(E.t);
+    let eq = (xs, ys) => {
+      Js.Array.length(xs) == Js.Array.length(ys) &&
+      Js.Array.every(((a, b)) => E.eq(a, b), zip(xs, ys))
+    };
   };
+  include Array_Eq;
 };

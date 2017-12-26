@@ -129,7 +129,7 @@ describe("List", () => {
   });
 
   describe("Eq", () => {
-    module V = Verify.Eq1(ListF.Int.Eq);
+    module V = Verify.Eq(ListF.Int.Eq);
     let arb_int' = arb_int(-10000, 10000);
 
     property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity <. to_list);

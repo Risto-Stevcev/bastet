@@ -107,11 +107,3 @@ module Eq = (E: Interface.EQ) => {
   let transitivity: (E.t, E.t, E.t) => bool =
     (a, b, c) => I.(!(a =|= b && (b =|= c)) || (a =|= c));
 };
-
-module Eq1 = (E: Interface.EQ1) => {
-  module I = Infix.Eq1(E);
-  let reflexivity: E.t('a) => bool = (a) => I.(a =|= a);
-  let symmetry: (E.t('a), E.t('a)) => bool = (a, b) => I.(a =|= b == (b =|= a));
-  let transitivity: (E.t('a), E.t('a), E.t('a)) => bool =
-    (a, b, c) => I.(!(a =|= b && (b =|= c)) || (a =|= c));
-};

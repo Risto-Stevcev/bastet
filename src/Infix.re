@@ -51,8 +51,3 @@ module Eq = (E: EQ) => {
   include E;
   let (=|=) = eq;
 };
-
-module Eq1 = (E: EQ1) => {
-  include E;
-  let (=|=) = eq;
-};

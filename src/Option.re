@@ -104,27 +104,29 @@ module Foldable: FOLDABLE with type t('a) = option('a) = {
 };
 
 
-module type TRAVERSABLE_F = (A: APPLICATIVE) => TRAVERSABLE
-  with type applicative_t('a) = A.t('a) and type t('a) = option('a);
+module Traversable = (A: APPLICATIVE) => {
+  module Option_Traversable: TRAVERSABLE
+    with type applicative_t('a) = A.t('a) and type t('a) = option('a) = {
+    type t('a) = option('a);
+    type applicative_t('a) = A.t('a);
+    include (Functor: FUNCTOR with type t('a) := t('a));
+    include (Foldable: FOLDABLE with type t('a) := t('a));
 
-module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
-  type t('a) = option('a);
-  type applicative_t('a) = A.t('a);
-  include (Functor: FUNCTOR with type t('a) := t('a));
-  include (Foldable: FOLDABLE with type t('a) := t('a));
-
-  let traverse = (f, x) => maybe(~f=A.map(a => Some(a)) <. f, ~default=A.pure(None), x);
-  let sequence = (x) => maybe(~f=A.map(a => Some(a)), ~default=A.pure(None), x);
+    let traverse = (f, x) => maybe(~f=A.map(a => Some(a)) <. f, ~default=A.pure(None), x);
+    let sequence = (x) => maybe(~f=A.map(a => Some(a)), ~default=A.pure(None), x);
+  };
+  include Option_Traversable;
 };
 
 
-module type EQ1_F = (E: EQ) => EQ1 with type t('a) = option(E.t);
-
-module Eq: EQ1_F = (E: EQ) => {
-  type t('a) = option(E.t);
-  let eq = (xs, ys) => switch (xs, ys) {
-    | (Some(a), Some(b)) => E.eq(a, b)
-    | (None, None) => true
-    | _ => false
-    };
+module Eq = (E: EQ) => {
+  module Option_Eq: EQ with type t = option(E.t) = {
+    type t = option(E.t);
+    let eq = (xs, ys) => switch (xs, ys) {
+      | (Some(a), Some(b)) => E.eq(a, b)
+      | (None, None) => true
+      | _ => false
+      };
+  };
+  include Option_Eq;
 };

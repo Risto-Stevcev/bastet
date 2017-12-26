@@ -2,6 +2,9 @@
  * Any data structure implementing one of these interfaces must also satisfy the
  * corresponding laws in the `Verified` module
  */
+module type TYPE = {
+  type t;
+};
 
 module type SEMIGROUP = {
   type t;
@@ -101,10 +104,3 @@ module type EQ = {
   type t;
   let eq: (t, t) => bool;
 };
-
-module type EQ1 {
-  type t('a);
-  let eq: (t('a), t('a)) => bool;
-};
-
-module type EQ1_F = (E: EQ) => EQ1;

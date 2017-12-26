@@ -82,16 +82,17 @@ module Foldable: FOLDABLE with type t('a) = dual('a) = {
 };
 
 
-module type TRAVERSABLE_F = (A: APPLICATIVE) => TRAVERSABLE
-  with type applicative_t('a) = A.t('a) and type t('a) = dual('a);
+module Traversable = (A: APPLICATIVE) => {
+  module Dual_Traversable: TRAVERSABLE
+    with type applicative_t('a) = A.t('a) and type t('a) = dual('a) = {
+    type t('a) = dual('a);
+    type applicative_t('a) = A.t('a);
+    include (Functor: FUNCTOR with type t('a) := t('a));
+    include (Foldable: FOLDABLE with type t('a) := t('a));
 
-module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
-  type t('a) = dual('a);
-  type applicative_t('a) = A.t('a);
-  include (Functor: FUNCTOR with type t('a) := t('a));
-  include (Foldable: FOLDABLE with type t('a) := t('a));
-
-  module I = Infix.Functor(A);
-  let traverse = (f, x) => I.(switch x { | Dual(x') => ((x) => Dual(x)) <$> f(x') });
-  let sequence = (x) => I.(switch x { | Dual(x') => ((x) => Dual(x)) <$> x' });
+    module I = Infix.Functor(A);
+    let traverse = (f, x) => I.(switch x { | Dual(x') => ((x) => Dual(x)) <$> f(x') });
+    let sequence = (x) => I.(switch x { | Dual(x') => ((x) => Dual(x)) <$> x' });
+  };
+  include Dual_Traversable
 };

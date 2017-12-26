@@ -25,28 +25,33 @@ describe("Default", () => {
     let (fold_left, fold_right) = (F.fold_left_default, F.fold_right_default);
   };
 
-  module Traversable: List.TRAVERSABLE_F = (A: APPLICATIVE) => {
-    type t('a) = list('a);
-    type applicative_t('a) = A.t('a);
-    include (List.Functor: FUNCTOR with type t('a) := t('a));
-    include (List.Foldable: FOLDABLE with type t('a) := t('a));
+  module Traversable = (A: APPLICATIVE) => {
+    module List_Traversable: TRAVERSABLE
+      with type applicative_t('a) = A.t('a) and type t('a) = list('a) = {
 
-    module I = Infix.Apply(A);
-    let sequence = (xs) => I.({
-      ListLabels.fold_right(
-        ~f=(acc, x) => A.pure((y, ys) => [y, ...ys]) <*> acc <*> x,
-        ~init=A.pure([]),
-        xs
-      )
-    });
-
-    module D = Default.Traverse({
       type t('a) = list('a);
       type applicative_t('a) = A.t('a);
       include (List.Functor: FUNCTOR with type t('a) := t('a));
-      let sequence = sequence;
-    });
-    let traverse = D.traverse_default;
+      include (List.Foldable: FOLDABLE with type t('a) := t('a));
+
+      module I = Infix.Apply(A);
+      let sequence = (xs) => I.({
+        ListLabels.fold_right(
+          ~f=(acc, x) => A.pure((y, ys) => [y, ...ys]) <*> acc <*> x,
+          ~init=A.pure([]),
+          xs
+        )
+      });
+
+      module D = Default.Traverse({
+        type t('a) = list('a);
+        type applicative_t('a) = A.t('a);
+        include (List.Functor: FUNCTOR with type t('a) := t('a));
+        let sequence = sequence;
+      });
+      let traverse = D.traverse_default;
+    };
+    include List_Traversable
   };
 
   describe("Foldable", () => Foldable.({

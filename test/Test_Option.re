@@ -174,7 +174,7 @@ describe("Option", () => {
   });
 
   describe("Eq", () => {
-    module V = Verify.Eq1(OptionF.Int.Eq);
+    module V = Verify.Eq(OptionF.Int.Eq);
 
     property1(
       "should satisfy reflexivity",

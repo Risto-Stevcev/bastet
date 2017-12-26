@@ -138,7 +138,7 @@ describe("Array", () => {
 
   describe("Eq", () => {
     let arb_int' = arb_int(-10000, 10000);
-    module V = Verify.Eq1(ArrayF.Int.Eq);
+    module V = Verify.Eq(ArrayF.Int.Eq);
     property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity);
     property2(
       "should satisfy symmetry", arb_array(arb_int'), arb_array(arb_int'), V.symmetry

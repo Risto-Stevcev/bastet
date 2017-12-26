@@ -78,41 +78,42 @@ module Foldable: FOLDABLE with type t('a) = list('a) = {
 };
 
 
-module type TRAVERSABLE_F = (A: APPLICATIVE) => TRAVERSABLE
-  with type applicative_t('a) = A.t('a) and type t('a) = list('a);
-
-module Traversable: TRAVERSABLE_F = (A: APPLICATIVE) => {
-  type t('a) = list('a);
-  type applicative_t('a) = A.t('a);
-  include (Functor: FUNCTOR with type t('a) := t('a));
-  include (Foldable: FOLDABLE with type t('a) := t('a));
-
-  module I = Infix.Apply(A);
-  let traverse = (f) => I.({
-    ListLabels.fold_right(
-      ~f=(acc, x) => A.pure((y, ys) => [y, ...ys]) <*> f(acc) <*> x,
-      ~init=A.pure([])
-    )
-  });
-
-  module D = Default.Sequence({
+module Traversable = (A: APPLICATIVE) => {
+  module List_Traversable: TRAVERSABLE
+    with type applicative_t('a) = A.t('a) and type t('a) = list('a) = {
     type t('a) = list('a);
     type applicative_t('a) = A.t('a);
-    let traverse = traverse;
-  });
-  let sequence = D.sequence_default;
+    include (Functor: FUNCTOR with type t('a) := t('a));
+    include (Foldable: FOLDABLE with type t('a) := t('a));
+
+    module I = Infix.Apply(A);
+    let traverse = (f) => I.({
+      ListLabels.fold_right(
+        ~f=(acc, x) => A.pure((y, ys) => [y, ...ys]) <*> f(acc) <*> x,
+        ~init=A.pure([])
+      )
+    });
+
+    module D = Default.Sequence({
+      type t('a) = list('a);
+      type applicative_t('a) = A.t('a);
+      let traverse = traverse;
+    });
+    let sequence = D.sequence_default;
+  };
+  include List_Traversable;
 };
 
 
-
-module type EQ1_F = (E: EQ) => EQ1 with type t('a) = list(E.t);
-
-module Eq: EQ1_F = (E: EQ) => {
-  type t('a) = list(E.t);
-  let eq = (xs, ys) => {
-    ListLabels.length(xs) == ListLabels.length(ys) &&
-    ListLabels.fold_left(
-      ~f=(acc, (a, b)) => acc && E.eq(a, b), ~init=true, ListLabels.combine(xs, ys)
-    )
+module Eq = (E: EQ) => {
+  module List_Eq: EQ with type t = list(E.t) = {
+    type t = list(E.t);
+    let eq = (xs, ys) => {
+      ListLabels.length(xs) == ListLabels.length(ys) &&
+      ListLabels.fold_left(
+        ~f=(acc, (a, b)) => acc && E.eq(a, b), ~init=true, ListLabels.combine(xs, ys)
+      )
+    };
   };
+  include List_Eq;
 };

@@ -140,12 +140,11 @@ module Foldable = (F: FOLDABLE) => {
 
 module Traversable = (T: TRAVERSABLE_F) => {
   module Internal = {
-    module type TYPE = {type s};
     type accum('s, 'a) = { accum: 's, value: 'a };
     type state('s, 'a) = 's => accum('s, 'a);
     let apply_state: (state('s, 'a), 's) => accum('s, 'a) = (s, a) => s(a);
 
-    module State_Left = (Type: (module type of {type t})) => {
+    module State_Left = (Type: TYPE) => {
       module Functor: FUNCTOR with type t('a) = state(Type.t, 'a) = {
         type t('a) = state(Type.t, 'a);
         let map = (f, k) =>
@@ -171,7 +170,7 @@ module Traversable = (T: TRAVERSABLE_F) => {
       };
     };
 
-    module State_Right = (Type: (module type of {type t})) => {
+    module State_Right = (Type: TYPE) => {
       module Functor: FUNCTOR with type t('a) = state(Type.t, 'a) = {
         type t('a) = state(Type.t, 'a);
         let map = (f, k) =>
@@ -198,8 +197,8 @@ module Traversable = (T: TRAVERSABLE_F) => {
     };
 
     module Map_Accum = (Type: TYPE, T: TRAVERSABLE_F) => {
-      module SL = State_Left({type t = Type.s});
-      module SR = State_Right({type t = Type.s});
+      module SL = State_Left({type t = Type.t});
+      module SR = State_Right({type t = Type.t});
       module TSL = T(SL.Applicative);
       module TSR = T(SR.Applicative);
       let map_accum_left:
@@ -215,8 +214,8 @@ module Traversable = (T: TRAVERSABLE_F) => {
     };
   };
 
-  module Scan = (Type: Internal.TYPE) => {
-    module MA = Internal.Map_Accum({type s = Type.s}, T);
+  module Scan = (Type: TYPE) => {
+    module MA = Internal.Map_Accum({type t = Type.t}, T);
     let scan_left: (('b, 'a) => 'b, 'b, MA.TSL.t('a)) => MA.TSL.t('b) =
       (f, init, xs) =>
         MA.map_accum_left((b, a) => {

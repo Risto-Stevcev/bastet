@@ -1,6 +1,7 @@
 open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
+open Functors;
 let (<.) = Function.Infix.(<.);
 
 
