@@ -42,3 +42,23 @@ module Show: SHOW with type t = int = {
   type t = int;
   let show = string_of_int;
 };
+
+module Semiring: SEMIRING with type t = int = {
+  type t = int;
+  let add = (+);
+  let zero = 0;
+  let multiply = (*);
+  let one = 1;
+};
+
+module Infix = {
+  module Additive = {
+    module Semigroup = Infix.Semigroup(Additive.Semigroup);
+  };
+  module Multiplicative = {
+    module Semigroup = Infix.Semigroup(Multiplicative.Semigroup);
+  };
+  module Eq = Infix.Eq(Eq);
+  module Ord = Infix.Ord(Ord);
+  module Semiring = Infix.Semiring(Semiring);
+};

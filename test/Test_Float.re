@@ -56,4 +56,48 @@ describe("Float", () => {
     module V = Verify.Bounded(Float.Bounded);
     property1("should satisfy bounded", arb_float', V.bounded);
   });
+
+  describe("Semiring", () => {
+    module V = Verify.Semiring(Float.Semiring);
+    let ((|+|), (|*|)) = Float.Infix.Semiring.((|+|), (|*|));
+    let tolerance = 0.001;
+
+    property3(
+      "should satisfy additive associativity",
+      arb_float', arb_float', arb_float',
+      V.additive_associativity
+    );
+    property1("should satisfy additive identity", arb_float', V.additive_identity);
+    property2("should satisfy commutativity", arb_float', arb_float', V.commutativity);
+    property3(
+      "should satisfy multiplicative associativity",
+      arb_float', arb_float', arb_float',
+      (a, b, c) => Float.approximately_equal(
+        ~tolerance,
+        (a |*| b) |*| c,
+        a |*| (b |*| c)
+      )
+    );
+    property1(
+      "should satisfy multiplicative identity", arb_float', V.multiplicative_identity
+    );
+    property3(
+      "should satisfy left distributivity",
+      arb_float', arb_float', arb_float',
+      (a, b, c) => Float.approximately_equal(
+        ~tolerance,
+        a |*| (b |+| c),
+        (a |*| b) |+| (a |*| c)
+      )
+    );
+    property3(
+      "should satisfy right distributivity",
+      arb_float', arb_float', arb_float',
+      (a, b, c) => Float.approximately_equal(
+        ~tolerance,
+        (a |+| b) |*| c,
+        (a |*| c) |+| (b |*| c)
+      )
+    );
+  });
 });

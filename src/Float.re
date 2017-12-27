@@ -1,5 +1,8 @@
 open Interface;
 
+let approximately_equal: (~tolerance:float, float, float) => bool =
+  (~tolerance, a, b) => Js.Math.abs_float(a -. b) <= tolerance;
+
 module Additive = {
   module Semigroup: SEMIGROUP with type t = float = {
     type t = float;
@@ -41,4 +44,24 @@ module Bounded: BOUNDED with type t = float = {
 module Show: SHOW with type t = float = {
   type t = float;
   let show = string_of_float;
+};
+
+module Semiring: SEMIRING with type t = float = {
+  type t = float;
+  let add = (+.);
+  let zero = 0.0;
+  let multiply = (*.);
+  let one = 1.0;
+};
+
+module Infix = {
+  module Additive = {
+    module Semigroup = Infix.Semigroup(Additive.Semigroup);
+  };
+  module Multiplicative = {
+    module Semigroup = Infix.Semigroup(Multiplicative.Semigroup);
+  };
+  module Eq = Infix.Eq(Eq);
+  module Ord = Infix.Ord(Ord);
+  module Semiring = Infix.Semiring(Semiring);
 };

@@ -51,3 +51,16 @@ module Eq = (E: EQ) => {
   include E;
   let (=|=) = eq;
 };
+
+module Ord = (O: ORD) => {
+  module Fn = Ordering(O);
+  let (<||) = Fn.less_than;
+  let (||>) = Fn.greater_than;
+  let (<|=) = Fn.less_than_or_equal;
+  let (>|=) = Fn.greater_than_or_equal;
+};
+
+module Semiring = (S: SEMIRING) => {
+  let (|+|) = S.add;
+  let (|*|) = S.multiply;
+};

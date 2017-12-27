@@ -52,4 +52,33 @@ describe("Int", () => {
     module V = Verify.Bounded(Int.Bounded);
     property1("should satisfy bounded", arb_int', V.bounded);
   });
+
+  describe("Semiring", () => {
+    module V = Verify.Semiring(Int.Semiring);
+    property3(
+      "should satisfy additive associativity",
+      arb_int', arb_int', arb_int',
+      V.additive_associativity
+    );
+    property1("should satisfy additive identity", arb_int', V.additive_identity);
+    property2("should satisfy commutativity", arb_int', arb_int', V.commutativity);
+    property3(
+      "should satisfy multiplicative associativity",
+      arb_int', arb_int', arb_int',
+      V.multiplicative_associativity
+    );
+    property1(
+      "should satisfy multiplicative identity", arb_int', V.multiplicative_identity
+    );
+    property3(
+      "should satisfy left distributivity",
+      arb_int', arb_int', arb_int',
+      V.left_distributivity
+    );
+     property3(
+      "should satisfy right distributivity",
+      arb_int', arb_int', arb_int',
+      V.right_distributivity
+    );
+  });
 });

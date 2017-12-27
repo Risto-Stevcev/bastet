@@ -107,7 +107,7 @@ module Eq = (E: Interface.EQ) => {
 };
 
 module Ord = (O: Interface.ORD) => {
-  module Ordering_Functions = Interface.Ordering(O);
+  module Ordering_Functions = Infix.Ord(O);
   let ((<|=), (>|=)) = Ordering_Functions.((<|=), (>|=));
   let reflexivity: O.t => bool = (a) => a <|= a;
   let antisymmetry: (O.t, O.t) => bool = (a, b) => !((a <|= b) && (b <|= a)) || (a == b);
@@ -116,7 +116,7 @@ module Ord = (O: Interface.ORD) => {
 };
 
 module Bounded = (B: Interface.BOUNDED) => {
-  module Ordering_Functions = Interface.Ordering(B);
+  module Ordering_Functions = Infix.Ord(B);
   let (<|=) = Ordering_Functions.((<|=));
   let bounded: B.t => bool = (a) => B.bottom <|= a && (a <|= B.top);
 };
@@ -166,7 +166,7 @@ module Bounded_Distributive_Lattice = (L: Interface.BOUNDED_DISTRIBUTIVE_LATTICE
 };
 
 module Heyting_Algebra = (H: Interface.HEYTING_ALGEBRA) => {
-  module O = Interface.Ordering(H);
+  module O = Infix.Ord(H);
   let (<|=) = O.(<|=);
   let pseudocomplement: H.t => bool = (a) => H.not(a) == H.implies(a, H.bottom);
   let relative_pseudocomplement: (H.t, H.t, H.t) => bool =
@@ -179,4 +179,20 @@ module Involutive_Heyting_Algebra = (H: Interface.HEYTING_ALGEBRA) => {
 
 module Boolean_Algebra = (B: Interface.BOOLEAN_ALGEBRA) => {
   let excluded_middle: B.t => bool = (a) => B.join(a, B.not(a)) == B.top;
+};
+
+module Semiring = (S: Interface.SEMIRING) => {
+  module I = Infix.Semiring(S);
+  open I;
+  let additive_associativity: (S.t, S.t, S.t) => bool =
+    (a, b, c) => (a |+| b) |+| c == (a |+| (b |+| c));
+  let additive_identity: S.t => bool = (a) => S.zero |+| a == a;
+  let commutativity: (S.t, S.t) => bool = (a, b) => a |+| b == (b |+| a);
+  let multiplicative_associativity: (S.t, S.t, S.t) => bool =
+    (a, b, c) => (a |*| b) |*| c == (a |*| (b |*| c));
+  let multiplicative_identity: S.t => bool = (a) => S.one |*| a == a;
+  let left_distributivity: (S.t, S.t, S.t) => bool =
+    (a, b, c) => a |*| (b |+| c) == ((a |*| b) |+| (a |*| c));
+  let right_distributivity: (S.t, S.t, S.t) => bool =
+    (a, b, c) => (a |+| b) |*| c == ((a |*| c) |+| (b |*| c));
 };

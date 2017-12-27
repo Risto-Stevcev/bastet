@@ -128,11 +128,6 @@ module Ordering = (O: ORD) => {
     (a, b) => O.compare(a, b) != `greater_than;
   let greater_than_or_equal: (O.t, O.t) => bool =
     (a, b) => O.compare(a, b) != `less_than;
-
-  let (<||) = less_than;
-  let (||>) = greater_than;
-  let (<|=) = less_than_or_equal;
-  let (>|=) = greater_than_or_equal;
 };
 
 
@@ -199,4 +194,12 @@ module type BOOLEAN_ALGEBRA = {
 module type SHOW = {
   type t;
   let show: t => string;
+};
+
+module type SEMIRING = {
+  type t;
+  let add: (t, t) => t;
+  let zero: t;
+  let multiply: (t, t) => t;
+  let one: t;
 };
