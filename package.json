@@ -1,6 +1,11 @@
 {
   "name": "bs-abstract",
   "version": "0.2.0",
+  "description": "Bucklescript interfaces and implementations for category theory and abstract algebra",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Risto-Stevcev/bs-abstract.git"
+  },
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
@@ -8,8 +13,10 @@
     "test": "./node_modules/.bin/mocha lib/js/test/Test_*.js",
     "test-watch": "./node_modules/.bin/mocha -w lib/js/test/Test_*.js"
   },
+  "homepage": "https://github.com/Risto-Stevcev/bs-abstract",
+  "bugs": "https://github.com/Risto-Stevcev/bs-abstract/issues",
   "keywords": [
-    "BuckleScript"
+    "BuckleScript", "reason"
   ],
   "author": "Risto Stevcev",
   "license": "BSD-3-Clause",
