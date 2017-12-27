@@ -196,3 +196,46 @@ module Semiring = (S: Interface.SEMIRING) => {
   let right_distributivity: (S.t, S.t, S.t) => bool =
     (a, b, c) => (a |+| b) |*| c == ((a |*| c) |+| (b |*| c));
 };
+
+module Ring = (R: Interface.RING) => {
+  module I = Infix.Ring(R);
+  let additive_inverse: R.t => bool = (a) => I.((R.zero |-| a) |+| a == R.zero);
+};
+
+module Commutative_Ring = (R: Interface.COMMUTATIVE_RING) => {
+  module I = Infix.Ring(R);
+  let multiplicative_commutativity: (R.t, R.t) => bool =
+    (a, b) => I.(a |*| b == (b |*| a));
+};
+
+module Division_Ring = (R: Interface.DIVISION_RING) => {
+  module I = Infix.Ring(R);
+  let non_zero_ring: bool = R.zero != R.one;
+  let multiplicative_inverse: R.t => bool = (a) => I.({
+    R.reciprocal(a) |*| a == R.one
+  });
+};
+
+module Euclidean_Ring = (R: Interface.EUCLIDEAN_RING) => {
+  module I = Infix.Euclidean_Ring(R);
+  let non_zero_ring: bool = R.zero != R.one;
+  let integral_domain: (R.t, R.t) => bool =
+    (a, b) => I.(!(a != R.zero && b != R.zero) || (a |*| b != R.zero));
+  let non_negative_degree: R.t => bool = (a) => !(a != R.zero) || (R.degree(a) >= 0);
+  let remainder: (R.t, R.t) => bool = (a, b) => I.({
+    if (b != R.zero) {
+      let q = a |/| b;
+      let r = a |%| b;
+      a == (q |*| b |+| r) &&
+      (r == R.zero || (R.degree(r) < R.degree(b)))
+    }
+    else { true }
+  });
+  let submultiplicative: (R.t, R.t) => bool =
+    (a, b) => I.(R.degree(a) <= R.degree(a |*| b));
+};
+
+module Field = (F: Interface.FIELD) => {
+  let non_zero_multiplicative_inverse: (F.t, F.t) => bool =
+    (a, b) => F.modulo(a, b) == F.zero;
+};

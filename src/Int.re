@@ -51,6 +51,22 @@ module Semiring: SEMIRING with type t = int = {
   let one = 1;
 };
 
+module Ring: RING with type t = int = {
+  include Semiring;
+  let subtract = (-);
+};
+
+module Commutative_Ring: COMMUTATIVE_RING with type t = int = {
+  include Ring;
+};
+
+module Euclidean_Ring: EUCLIDEAN_RING with type t = int = {
+  include Commutative_Ring;
+  let degree = (a) => Js.Math.min_int(Js.Math.abs_int(a), Bounded.top);
+  let divide = (/);
+  let modulo = (a, b) => a mod b;
+};
+
 module Infix = {
   module Additive = {
     module Semigroup = Infix.Semigroup(Additive.Semigroup);
@@ -61,4 +77,6 @@ module Infix = {
   module Eq = Infix.Eq(Eq);
   module Ord = Infix.Ord(Ord);
   module Semiring = Infix.Semiring(Semiring);
+  module Ring = Infix.Ring(Ring);
+  module Euclidean_Ring = Infix.Euclidean_Ring(Euclidean_Ring);
 };

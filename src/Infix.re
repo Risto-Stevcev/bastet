@@ -64,3 +64,16 @@ module Semiring = (S: SEMIRING) => {
   let (|+|) = S.add;
   let (|*|) = S.multiply;
 };
+
+module Ring = (R: RING) => {
+  module S_ = Semiring(R);
+  include S_;
+  let (|-|) = R.subtract;
+};
+
+module Euclidean_Ring = (E: EUCLIDEAN_RING) => {
+  module R_ = Ring(E);
+  include R_;
+  let (|/|) = E.divide;
+  let (|%|) = E.modulo;
+};

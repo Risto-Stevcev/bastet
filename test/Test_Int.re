@@ -81,4 +81,35 @@ describe("Int", () => {
       V.right_distributivity
     );
   });
+
+  describe("Ring", () => {
+    module V = Verify.Ring(Int.Ring);
+    property1("should satisfy additive inverse", arb_int', V.additive_inverse);
+  });
+
+  describe("Commutative Ring", () => {
+    module V = Verify.Commutative_Ring(Int.Commutative_Ring);
+    property2(
+      "should satisfy multiplicative commutativity",
+      arb_int', arb_int',
+      V.multiplicative_commutativity
+    );
+  });
+
+  describe("Euclidean Ring", () => {
+    module V = Verify.Euclidean_Ring(Int.Euclidean_Ring);
+    it("should be a non zero ring (zero is not one)", () => {
+      expect(V.non_zero_ring).to_be(true);
+    });
+    property2(
+      "should satisfy integral domain", arb_int', arb_int', V.integral_domain
+    );
+    property1("should satisfy non negative degree", arb_int', V.non_negative_degree);
+    property2(
+      "should satisfy the properties for remainder", arb_int', arb_int', V.remainder
+    );
+    property2(
+      "should satisfy submultiplicative", arb_int', arb_int', V.submultiplicative
+    );
+  });
 });

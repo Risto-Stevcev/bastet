@@ -203,3 +203,29 @@ module type SEMIRING = {
   let multiply: (t, t) => t;
   let one: t;
 };
+
+module type RING = {
+  include SEMIRING;
+  let subtract: (t, t) => t;
+};
+
+module type COMMUTATIVE_RING = {
+  include RING;
+};
+
+module type DIVISION_RING = {
+  include RING;
+  let reciprocal: t => t;
+};
+
+module type EUCLIDEAN_RING = {
+  include COMMUTATIVE_RING;
+  let degree: t => int;
+  let divide: (t, t) => t;
+  let modulo: (t, t) => t;
+};
+
+module type FIELD = {
+  include EUCLIDEAN_RING;
+  include DIVISION_RING with type t := t;
+};
