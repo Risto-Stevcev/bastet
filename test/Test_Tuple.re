@@ -127,4 +127,16 @@ describe("Tuple", () => {
       V.transitivity
     );
   });
+
+  describe("Bifunctor", () => {
+    module V = Verify.Bifunctor(Tuple.Bifunctor);
+    property1(
+      "should satisfy identity", arb_tuple((arb_string, arb_nat)), V.identity
+    );
+    property1(
+      "should satisfy composition",
+      arb_tuple((arb_string, arb_nat)),
+      V.composition((++)("!"), (*.)(3.0), (++)("-"), float_of_int)
+    );
+  });
 });

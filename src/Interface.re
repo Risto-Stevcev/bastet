@@ -263,3 +263,48 @@ module type COMONAD = {
   include EXTEND;
   let extract: t('a) => 'a;
 };
+
+module type BIFUNCTOR = {
+  type t('a, 'b);
+  let bimap: ('a => 'b, 'c => 'd, t('a, 'c)) => t('b, 'd);
+};
+
+module type BIAPPLY = {
+  include BIFUNCTOR;
+  let biapply: (t('a => 'b, 'c => 'd), t('a, 'c)) => t('b, 'd);
+};
+
+module type BIAPPLICATIVE = {
+  include BIAPPLY;
+  let bipure: ('a, 'b) => t('a, 'b);
+};
+
+module type BIFOLDABLE = {
+  type t('a, 'b);
+  let bifold_left: (('c, 'a) => 'c, ('c, 'b) => 'c, 'c, t('a, 'b)) => 'c;
+  let bifold_right: (('a, 'c) => 'c, ('b, 'c) => 'c, 'c, t('a, 'b)) => 'c;
+
+  module Fold_Map: (M: MONOID) => {
+    let fold_map: ('a => M.t, 'b => M.t, t('a, 'b)) => M.t;
+  };
+  module Fold_Map_Any: (M: MONOID_ANY) => {
+    let fold_map: ('a => M.t('a), 'b => M.t('a), t('a, 'b)) => M.t('a);
+  };
+  module Fold_Map_Plus: (P: PLUS) => {
+    let fold_map: ('a => P.t('a), 'b => P.t('a), t('a, 'b)) => P.t('a);
+  };
+};
+
+module type BITRAVERSABLE = {
+  include BIFUNCTOR;
+  include BIFOLDABLE with type t('a, 'b) := t('a, 'b);
+  type applicative_t('a);
+
+  let bitraverse: ('a => applicative_t('c), 'b => applicative_t('d), t('a, 'b)) => applicative_t(t('c, 'd));
+  let bisequence: t(applicative_t('a), applicative_t('b)) => applicative_t(t('a, 'b));
+};
+
+
+module type BITRAVERSABLE_F = (A: APPLICATIVE) => BITRAVERSABLE
+  with type applicative_t('a) = A.t('a);
+

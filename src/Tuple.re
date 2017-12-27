@@ -115,3 +115,49 @@ module Show = (First: SHOW, Second: SHOW) => {
   };
   include Tuple_Show;
 };
+
+module Bifunctor: BIFUNCTOR with type t('a, 'b) = ('a, 'b) = {
+  type t('a, 'b) = ('a, 'b);
+  let bimap = (f, g, (a, b)) => (f(a), g(b));
+};
+
+module Biapply: BIAPPLY with type t('a, 'b) = ('a, 'b) = {
+  include Bifunctor;
+  let biapply = ((f, g), (a, b)) => (f(a), g(b));
+};
+
+module Biapplicative: BIAPPLICATIVE with type t('a, 'b) = ('a, 'b) = {
+  include Biapply;
+  let bipure = (a, b) => (a, b);
+};
+
+module Bifoldable: BIFOLDABLE with type t('a, 'b) = ('a, 'b) = {
+  type t('a, 'b) = ('a, 'b);
+  let bifold_left = (f, g, init, (a, b)) => g(f(init, a), b);
+  let bifold_right = (f, g, init, (a, b)) => f(a, g(b, init));
+
+  module Fold_Map = (M: MONOID) => {
+    let fold_map = (f, g, (a, b)) => M.append(f(a), g(b));
+  };
+  module Fold_Map_Any = (M: MONOID_ANY) => {
+    let fold_map = (f, g, (a, b)) => M.append(f(a), g(b));
+  };
+  module Fold_Map_Plus = (P: PLUS) => {
+    let fold_map = (f, g, (a, b)) => P.alt(f(a), g(b));
+  };
+};
+
+module Bitraversable = (A: APPLICATIVE) => {
+  module I = Infix.Apply(A);
+  module Tuple_Bitraversable: BITRAVERSABLE
+    with type applicative_t('a) = A.t('a) and type t('a, 'b) = ('a, 'b) = {
+    type t('a, 'b) = ('a, 'b);
+    type applicative_t('a) = A.t('a);
+    include (Bifunctor: BIFUNCTOR with type t('a, 'b) := t('a, 'b));
+    include (Bifoldable: BIFOLDABLE with type t('a, 'b) := t('a, 'b));
+
+    let bitraverse = (f, g, (a, b)) => I.(A.map((a, b) => (a, b), f(a)) <*> g(b));
+    let bisequence = ((a, b)) => I.(A.map((a, b) => (a, b), a) <*> b);
+  };
+  include Tuple_Bitraversable;
+};
