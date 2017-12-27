@@ -2,6 +2,8 @@
 
 Bucklescript interfaces and implementations for category theory and abstract algebra
 
+<img src="https://raw.githubusercontent.com/Risto-Stevcev/bs-abstract/master/cantellated_tesseract.png" height="100" width="100"/>
+
 ## Installation
 
 Install the project:
