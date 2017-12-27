@@ -2,6 +2,7 @@
   "name": "bs-abstract",
   "version": "0.1.0",
   "refmt": 3,
+  "namespace": true,
   "bsc-flags": ["-bs-super-errors"],
   "warnings": { "number": "-102" },
   "sources": [{
