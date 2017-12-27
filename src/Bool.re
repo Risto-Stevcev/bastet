@@ -26,3 +26,8 @@ module Eq: EQ with type t = bool = {
   type t = bool;
   let eq = (==);
 };
+
+module Ord: ORD with type t = bool = {
+  include Eq;
+  let compare = unsafe_compare;
+};

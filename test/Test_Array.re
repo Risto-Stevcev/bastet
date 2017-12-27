@@ -6,6 +6,8 @@ let (<.) = Function.Infix.(<.);
 
 
 describe("Array", () => {
+  let arb_int' = arb_int(-10000, 10000);
+
   describe("Functions", () => {
     describe("zip_with", () => {
       it("should zip two arrays", () => {
@@ -137,11 +139,32 @@ describe("Array", () => {
   });
 
   describe("Eq", () => {
-    let arb_int' = arb_int(-10000, 10000);
     module V = Verify.Eq(ArrayF.Int.Eq);
     property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity);
     property2(
       "should satisfy symmetry", arb_array(arb_int'), arb_array(arb_int'), V.symmetry
+    );
+    property3(
+      "should satisfy transitivity",
+      arb_array(arb_int'), arb_array(arb_int'), arb_array(arb_int'),
+      V.transitivity
+    );
+  });
+
+
+  describe("Ord", () => {
+    module V = Verify.Ord(ArrayF.Int.Ord);
+    it("should compare two arrays", () => {
+      let compare = ArrayF.Int.Ord.compare;
+      expect(compare([|5,6,7|], [|1,2,3,4|])).to_be(`less_than);
+      expect(compare([|1,2,3|], [|1,2,3|])).to_be(`equal_to);
+      expect(compare([|1,2,4|], [|1,2,3|])).to_be(`greater_than);
+    });
+    property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity);
+    property2(
+      "should satisfy antisymmetry",
+      arb_array(arb_int'), arb_array(arb_int'),
+      V.antisymmetry
     );
     property3(
       "should satisfy transitivity",

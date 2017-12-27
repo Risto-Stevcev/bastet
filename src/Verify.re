@@ -107,3 +107,12 @@ module Eq = (E: Interface.EQ) => {
   let transitivity: (E.t, E.t, E.t) => bool =
     (a, b, c) => I.(!(a =|= b && (b =|= c)) || (a =|= c));
 };
+
+module Ord = (O: Interface.ORD) => {
+  module Ordering_Functions = Interface.Ordering(O);
+  let ((<|=), (>|=)) = Ordering_Functions.((<|=), (>|=));
+  let reflexivity: O.t => bool = (a) => a <|= a;
+  let antisymmetry: (O.t, O.t) => bool = (a, b) => !((a <|= b) && (b <|= a)) || (a == b);
+  let transitivity: (O.t, O.t, O.t) => bool =
+    (a, b, c) => !((a <|= b) && (b <|= c)) || (a <|= c);
+};

@@ -24,4 +24,13 @@ describe("String", () => {
       "should satisfy transitivity", arb_string, arb_string, arb_string, V.transitivity
     );
   });
+
+  describe("Ord", () => {
+    module V = Verify.Ord(String.Ord);
+    property1("should satisfy reflexivity", arb_string, V.reflexivity);
+    property2("should satisfy antisymmetry", arb_string, arb_string, V.antisymmetry);
+    property3(
+      "should satisfy transitivity", arb_string, arb_string, arb_string, V.transitivity
+    );
+  });
 });

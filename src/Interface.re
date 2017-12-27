@@ -104,3 +104,33 @@ module type EQ = {
   type t;
   let eq: (t, t) => bool;
 };
+
+
+type ordering = [ | `less_than | `equal_to | `greater_than ];
+
+let invert = (ordering) => switch ordering {
+  | `less_than => `greater_than
+  | `greater_than => `less_than
+  | `equal_to => `equal_to
+  };
+
+let unsafe_compare = (a, b) => a < b ? `less_than : a == b ? `equal_to : `greater_than;
+
+module type ORD = {
+  include EQ;
+  let compare: (t, t) => ordering;
+};
+
+module Ordering = (O: ORD) => {
+  let less_than: (O.t, O.t) => bool = (a, b) => O.compare(a, b) == `less_than;
+  let greater_than: (O.t, O.t) => bool = (a, b) => O.compare(a, b) == `greater_than;
+  let less_than_or_equal: (O.t, O.t) => bool =
+    (a, b) => O.compare(a, b) != `greater_than;
+  let greater_than_or_equal: (O.t, O.t) => bool =
+    (a, b) => O.compare(a, b) != `less_than;
+
+  let (<||) = less_than;
+  let (||>) = greater_than;
+  let (<|=) = less_than_or_equal;
+  let (>|=) = greater_than_or_equal;
+};

@@ -7,6 +7,7 @@ module ArrayF = {
   };
   module Int = {
     module Eq = Array.Eq(Int.Eq);
+    module Ord = Array.Ord(Int.Ord);
     module Additive = {
       module Fold_Map = Array.Foldable.Fold_Map(Int.Additive.Monoid);
     };
@@ -19,9 +20,11 @@ module ArrayF = {
   };
   module Bool = {
     module Eq = Array.Eq(Bool.Eq);
+    module Ord = Array.Ord(Bool.Ord);
   };
   module String = {
     module Eq = Array.Eq(String.Eq);
+    module Ord = Array.Ord(String.Ord);
   };
   module List = {
     module Fold_Map_Plus = Array.Foldable.Fold_Map_Plus(List.Plus);

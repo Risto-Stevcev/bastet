@@ -50,4 +50,17 @@ describe("Bool", () => {
       V.transitivity(a', b', c');
     })
   });
+
+  describe("Ord", () => {
+    module V = Verify.Ord(Bool.Ord);
+    property1("should satisfy reflexivity", arb_bool, V.reflexivity <. Js.to_bool);
+    property2("should satisfy antisymmetry", arb_bool, arb_bool, (a, b) => {
+      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
+      V.antisymmetry(a', b');
+    });
+    property3("should satisfy transitivity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
+      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
+      V.transitivity(a', b', c');
+    })
+  });
 });

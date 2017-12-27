@@ -14,7 +14,7 @@ module Additive = {
 module Multiplicative = {
   module Semigroup: SEMIGROUP with type t = int = {
     type t = int;
-    let append = ( * );
+    let append = (*);
   };
   module Monoid: MONOID with type t = int = {
     include Semigroup;
@@ -25,4 +25,9 @@ module Multiplicative = {
 module Eq: EQ with type t = int = {
   type t = int;
   let eq = (==);
+};
+
+module Ord: ORD with type t = int = {
+  include Eq;
+  let compare = unsafe_compare;
 };

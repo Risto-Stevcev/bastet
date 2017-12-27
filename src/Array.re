@@ -1,7 +1,7 @@
 open Interface;
+let (get, length) = ArrayLabels.((get, length));
 
 let zip_with: (('a, 'b) => 'c, array('a), array('b)) => array('c) = (f, xs, ys) => {
-  let (get, length) = ArrayLabels.((get, length));
   let l = length(xs) < length(ys) ? length(xs) : length(ys);
   let result = [||];
   for (i in 0 to (l - 1)) { Js.Array.push(f(get(xs, i), get(ys, i)), result) |> ignore };
@@ -128,4 +128,22 @@ module Eq = (E: EQ) => {
     };
   };
   include Array_Eq;
+};
+
+
+module Ord = (O: ORD) => {
+  module Array_Eq = Eq(O);
+  module Array_Ord: ORD with type t = array(O.t) = {
+    include Array_Eq;
+    let compare = (xs, ys) => {
+      if (Js.Array.length(xs) == Js.Array.length(ys)) {
+        Js.Array.reducei((acc, e, index) => {
+          acc != `equal_to ? acc : O.compare(e, get(ys, index))
+        }, `equal_to, xs);
+      }
+      else if (Js.Array.length(xs) < Js.Array.length(ys)) { `less_than }
+      else { `greater_than }
+    };
+  };
+  include Array_Ord;
 };

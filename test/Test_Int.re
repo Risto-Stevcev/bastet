@@ -40,4 +40,11 @@ describe("Int", () => {
     property2("should satisfy symmetry", arb_int', arb_int', V.symmetry);
     property3("should satisfy transitivity", arb_int', arb_int', arb_int', V.transitivity);
   });
+
+  describe("Ord", () => {
+    module V = Verify.Ord(Int.Ord);
+    property1("should satisfy reflexivity", arb_int', V.reflexivity);
+    property2("should satisfy antisymmetry", arb_int', arb_int', V.antisymmetry);
+    property3("should satisfy transitivity", arb_int', arb_int', arb_int', V.transitivity);
+  });
 });
