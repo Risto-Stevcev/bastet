@@ -239,3 +239,33 @@ module Field = (F: Interface.FIELD) => {
   let non_zero_multiplicative_inverse: (F.t, F.t) => bool =
     (a, b) => F.modulo(a, b) == F.zero;
 };
+
+module Invariant = (I: Interface.INVARIANT) => {
+  let id = Function.Category.id;
+  let (<.) = Function.Infix.(<.);
+  let identity: I.t('a) => bool = (a) => I.imap(id, id, a) == a;
+  let composition: ('a => 'b, 'b => 'a, 'b => 'a, 'a => 'b, I.t('a)) => bool =
+    (f1, f2, g1, g2, a) => {
+      (I.imap(g1, g2) <. I.imap(f1, f2))(a) ==
+      I.imap(g1 <. f1, f2 <. g2, a)
+    }
+};
+
+module Contravariant = (C: Interface.CONTRAVARIANT) => {
+  let id = Function.Category.id;
+  let (<.) = Function.Infix.(<.);
+  let identity: C.t('a) => bool = (a) => C.cmap(id, a) == a;
+  let composition: ('c => 'b, 'b => 'a, C.t('a)) => bool =
+    (f, g, a) => (C.cmap(f) <. C.cmap(g))(a) == C.cmap(g <. f, a);
+};
+
+module Profunctor = (P: Interface.PROFUNCTOR) => {
+  let id = Function.Category.id;
+  let ((<.), (>.)) = Function.Infix.((<.), (>.));
+  let identity: P.t('a, 'b) => bool = (a) => P.dimap(id, id, a) == a;
+  let composition: ('a => 'b, 'c => 'd, 'e => 'a, 'd => 'f, P.t('b, 'c)) => bool =
+    (f1, g1, f2, g2, a) => {
+      (P.dimap(f2, g2) <. P.dimap(f1, g1))(a) ==
+      P.dimap(f2 >. f1, g2 <. g1, a);
+    }
+};

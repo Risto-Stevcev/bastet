@@ -179,4 +179,17 @@ describe("Array", () => {
       expect(S.show([|1, 1, 2, 3, 5, 8, 13|])).to_be("[1, 1, 2, 3, 5, 8, 13]")
     });
   });
+
+  describe("Invariant", () => {
+    module V = Verify.Invariant(Array.Invariant);
+    property1("should satisfy reflexivity", arb_array(arb_int'), V.identity);
+    property1(
+      "should satisfy composition",
+      arb_array(arb_int'),
+      V.composition(
+        float_of_int, int_of_float,
+        (*)(3) <. int_of_float, (*.)(4.0) <. float_of_int
+      )
+    );
+  });
 });

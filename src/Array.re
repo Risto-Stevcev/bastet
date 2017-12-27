@@ -159,3 +159,9 @@ module Show = (S: SHOW) => {
   };
   include Array_Show;
 };
+
+
+module Invariant: INVARIANT with type t('a) = array('a) = {
+  type t('a) = array('a);
+  let imap = (f, _) => Functor.map(f);
+};

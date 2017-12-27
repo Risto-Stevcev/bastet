@@ -24,6 +24,22 @@ module Category: CATEGORY with type t('a, 'b) = 'a => 'b = {
   let id = (a) => a;
 };
 
+module Invariant = (T: TYPE) => {
+  module F = Functor(T);
+  module Function_Invariant: INVARIANT with type t('b) = T.t => 'b = {
+    type t('b) = T.t => 'b;
+    let imap = (f, _) => F.map(f);
+  };
+  include Function_Invariant;
+};
+
+module Profunctor: PROFUNCTOR with type t('a, 'b) = 'a => 'b = {
+  module I = Infix.Semigroupoid(Semigroupoid);
+  let (>.) = I.(>.);
+  type t('a, 'b) = 'a => 'b;
+  let dimap = (a_to_b, c_to_d, b_to_c) => a_to_b >. b_to_c >. c_to_d;
+};
+
 module Infix = {
   module Semigroupoid = Infix.Semigroupoid(Semigroupoid);
   include Semigroupoid;

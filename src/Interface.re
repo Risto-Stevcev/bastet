@@ -229,3 +229,18 @@ module type FIELD = {
   include EUCLIDEAN_RING;
   include DIVISION_RING with type t := t;
 };
+
+module type INVARIANT = {
+  type t('a);
+  let imap: ('a => 'b, 'b => 'a, t('a)) => t('b);
+};
+
+module type CONTRAVARIANT = {
+  type t('a);
+  let cmap: ('b => 'a, t('a)) => t('b);
+};
+
+module type PROFUNCTOR = {
+  type t('a, 'b);
+  let dimap: ('a => 'b, 'c => 'd, t('b, 'c)) => t('a, 'd);
+};

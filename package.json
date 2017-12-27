@@ -4,7 +4,9 @@
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
-    "watch": "bsb -make-world -w"
+    "watch": "bsb -make-world -w",
+    "test": "./node_modules/.bin/mocha lib/js/test/Test_*.js",
+    "test-watch": "./node_modules/.bin/mocha -w lib/js/test/Test_*.js"
   },
   "keywords": [
     "BuckleScript"
