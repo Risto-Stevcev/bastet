@@ -47,4 +47,9 @@ describe("Int", () => {
     property2("should satisfy antisymmetry", arb_int', arb_int', V.antisymmetry);
     property3("should satisfy transitivity", arb_int', arb_int', arb_int', V.transitivity);
   });
+
+  describe("Bounded", () => {
+    module V = Verify.Bounded(Int.Bounded);
+    property1("should satisfy bounded", arb_int', V.bounded);
+  });
 });

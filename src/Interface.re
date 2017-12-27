@@ -134,3 +134,64 @@ module Ordering = (O: ORD) => {
   let (<|=) = less_than_or_equal;
   let (>|=) = greater_than_or_equal;
 };
+
+
+module type BOUNDED = {
+  include ORD;
+  let top: t;
+  let bottom: t;
+};
+
+module type JOIN_SEMILATTICE = {
+  type t;
+  let join: (t, t) => t;
+};
+
+module type MEET_SEMILATTICE = {
+  type t;
+  let meet: (t, t) => t;
+};
+
+module type BOUNDED_JOIN_SEMILATTICE = {
+  include JOIN_SEMILATTICE;
+  let bottom: t;
+};
+
+module type BOUNDED_MEET_SEMILATTICE = {
+  include MEET_SEMILATTICE;
+  let top: t;
+};
+
+module type LATTICE = {
+  include JOIN_SEMILATTICE;
+  include MEET_SEMILATTICE with type t := t;
+};
+
+module type BOUNDED_LATTICE = {
+  include BOUNDED_JOIN_SEMILATTICE;
+  include BOUNDED_MEET_SEMILATTICE with type t := t;
+};
+
+module type DISTRIBUTIVE_LATTICE = {
+  include LATTICE;
+};
+
+module type BOUNDED_DISTRIBUTIVE_LATTICE = {
+  include BOUNDED_LATTICE;
+};
+
+module type HEYTING_ALGEBRA = {
+  include ORD;
+  include BOUNDED_DISTRIBUTIVE_LATTICE with type t := t;
+
+  let not: t => t;
+  let implies: (t, t) => t;
+};
+
+module type INVOLUTIVE_HEYTING_ALGEBRA = {
+  include HEYTING_ALGEBRA;
+};
+
+module type BOOLEAN_ALGEBRA = {
+  include HEYTING_ALGEBRA;
+};

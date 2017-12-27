@@ -51,4 +51,9 @@ describe("Float", () => {
       "should satisfy transitivity", arb_float', arb_float', arb_float', V.transitivity
     );
   });
+
+  describe("Bounded", () => {
+    module V = Verify.Bounded(Float.Bounded);
+    property1("should satisfy bounded", arb_float', V.bounded);
+  });
 });

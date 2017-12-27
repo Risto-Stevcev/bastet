@@ -31,3 +31,9 @@ module Ord: ORD with type t = int = {
   include Eq;
   let compare = unsafe_compare;
 };
+
+module Bounded: BOUNDED with type t = int = {
+  include Ord;
+  let top = 2147483647;
+  let bottom = -2147483648;
+};

@@ -56,10 +56,8 @@ module Monad = (A: Interface.MONAD) => {
     (f, g, x) => I.({
       (x >>= f) >>= g == (x >>= (k) => f(k) >>= g)
     });
-
   let left_identity: ('a => A.t('b), 'a) => bool =
     (f, x) => I.(pure(x) >>= f == f(x));
-
   let right_identity: A.t('a) => bool = (x) => I.(x >>= pure == x);
 };
 
@@ -115,4 +113,70 @@ module Ord = (O: Interface.ORD) => {
   let antisymmetry: (O.t, O.t) => bool = (a, b) => !((a <|= b) && (b <|= a)) || (a == b);
   let transitivity: (O.t, O.t, O.t) => bool =
     (a, b, c) => !((a <|= b) && (b <|= c)) || (a <|= c);
+};
+
+module Bounded = (B: Interface.BOUNDED) => {
+  module Ordering_Functions = Interface.Ordering(B);
+  let (<|=) = Ordering_Functions.((<|=));
+  let bounded: B.t => bool = (a) => B.bottom <|= a && (a <|= B.top);
+};
+
+module Join_Semilattice = (J: Interface.JOIN_SEMILATTICE) => {
+  let associativity: (J.t, J.t, J.t) => bool =
+    (a, b, c) => J.join(a, J.join(b, c)) == J.join(J.join(a, b), c);
+  let commutativity: (J.t, J.t) => bool =
+    (a, b) => J.join(a, b) == J.join(b, a);
+  let idempotency: J.t => bool = (a) => J.join(a, a) == a;
+};
+
+module Meet_Semilattice = (M: Interface.MEET_SEMILATTICE) => {
+  let associativity: (M.t, M.t, M.t) => bool =
+    (a, b, c) => M.meet(a, M.meet(b, c)) == M.meet(M.meet(a, b), c);
+  let commutativity: (M.t, M.t) => bool =
+    (a, b) => M.meet(a, b) == M.meet(b, a);
+  let idempotency: M.t => bool = (a) => M.meet(a, a) == a;
+};
+
+module Bounded_Join_Semilattice = (B: Interface.BOUNDED_JOIN_SEMILATTICE) => {
+  let neutral: B.t => bool = (a) => B.join(a, B.bottom) == a;
+};
+
+module Bounded_Meet_Semilattice = (B: Interface.BOUNDED_MEET_SEMILATTICE) => {
+  let neutral: B.t => bool = (a) => B.meet(a, B.top) == a;
+};
+
+module Lattice = (L: Interface.LATTICE) => {
+  let absorption: (L.t, L.t) => bool =
+    (a, b) => L.meet(a, L.join(a, b)) == a && (L.join(a, L.meet(a, b)) == a);
+};
+
+module Bounded_Lattice = (L: Interface.BOUNDED_LATTICE) => {
+  let absorption: (L.t, L.t) => bool =
+    (a, b) => L.meet(a, L.join(a, b)) == a && (L.join(a, L.meet(a, b)) == a);
+};
+
+module Distributive_Lattice = (L: Interface.DISTRIBUTIVE_LATTICE) => {
+  let distributivity: (L.t, L.t, L.t) => bool =
+    (a, b, c) => L.meet(a, L.join(b, c)) == L.join(L.meet(a, b), L.meet(a, c));
+};
+
+module Bounded_Distributive_Lattice = (L: Interface.BOUNDED_DISTRIBUTIVE_LATTICE) => {
+  let distributivity: (L.t, L.t, L.t) => bool =
+    (a, b, c) => L.meet(a, L.join(b, c)) == L.join(L.meet(a, b), L.meet(a, c));
+};
+
+module Heyting_Algebra = (H: Interface.HEYTING_ALGEBRA) => {
+  module O = Interface.Ordering(H);
+  let (<|=) = O.(<|=);
+  let pseudocomplement: H.t => bool = (a) => H.not(a) == H.implies(a, H.bottom);
+  let relative_pseudocomplement: (H.t, H.t, H.t) => bool =
+    (a, b, c) => H.meet(c, a) <|= b == (c <|= H.implies(a, b));
+};
+
+module Involutive_Heyting_Algebra = (H: Interface.HEYTING_ALGEBRA) => {
+  let involution: H.t => bool = (a) => H.not(H.not(a)) == a;
+};
+
+module Boolean_Algebra = (B: Interface.BOOLEAN_ALGEBRA) => {
+  let excluded_middle: B.t => bool = (a) => B.join(a, B.not(a)) == B.top;
 };
