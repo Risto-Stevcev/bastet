@@ -130,3 +130,15 @@ module Eq = (E: EQ) => {
   };
   include Option_Eq;
 };
+
+
+module Show = (S: SHOW) => {
+  module Option_Show: SHOW with type t = option(S.t) = {
+    type t = option(S.t);
+    let show = (a) => switch a {
+      | Some(a') => "Some(" ++ S.show(a') ++ ")"
+      | None => "None"
+      }
+  };
+  include Option_Show;
+};

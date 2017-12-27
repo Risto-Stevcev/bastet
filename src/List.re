@@ -117,3 +117,15 @@ module Eq = (E: EQ) => {
   };
   include List_Eq;
 };
+
+
+module Show = (S: SHOW) => {
+  module F = Functions.Foldable(Foldable);
+  module M = F.Monoid(String.Monoid);
+  module List_Show: SHOW with type t = list(S.t) = {
+    type t = list(S.t);
+    let show =
+      (xs) => "["++ M.intercalate(~separator=", ", Functor.map(S.show, xs)) ++ "]";
+  };
+  include List_Show;
+};

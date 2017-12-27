@@ -147,3 +147,15 @@ module Ord = (O: ORD) => {
   };
   include Array_Ord;
 };
+
+
+module Show = (S: SHOW) => {
+  module F = Functions.Foldable(Foldable);
+  module M = F.Monoid(String.Monoid);
+  module Array_Show: SHOW with type t = array(S.t) = {
+    type t = array(S.t);
+    let show =
+      (xs) => "["++ M.intercalate(~separator=", ", Functor.map(S.show, xs)) ++ "]";
+  };
+  include Array_Show;
+};

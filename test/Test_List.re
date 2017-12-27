@@ -144,4 +144,12 @@ describe("List", () => {
       (a, b, c) => V.transitivity(to_list(a), to_list(b), to_list(c))
     );
   });
+
+
+  describe("Show", () => {
+    module S = List.Show(Int.Show);
+    it("should convert the array to a string", () => {
+      expect(S.show([1, 1, 2, 3, 5, 8, 13])).to_be("[1, 1, 2, 3, 5, 8, 13]")
+    });
+  });
 });

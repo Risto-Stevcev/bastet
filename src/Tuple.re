@@ -107,3 +107,11 @@ module Semigroupoid: SEMIGROUPOID with type t('a, 'b) = ('a, 'b) = {
   type t('a, 'b) = ('a, 'b);
   let compose = ((_, c), (a, _)) => (a, c);
 };
+
+module Show = (First: SHOW, Second: SHOW) => {
+  module Tuple_Show: SHOW with type t = (First.t, Second.t) = {
+    type t = (First.t, Second.t);
+    let show = ((a, b)) => "(" ++ First.show(a) ++ ", " ++ Second.show(b) ++ ")";
+  };
+  include Tuple_Show;
+};

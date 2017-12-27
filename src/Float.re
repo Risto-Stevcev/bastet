@@ -37,3 +37,8 @@ module Bounded: BOUNDED with type t = float = {
   let top = 2147483647.0;
   let bottom = -2147483648.0;
 };
+
+module Show: SHOW with type t = float = {
+  type t = float;
+  let show = string_of_float;
+};

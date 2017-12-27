@@ -172,4 +172,11 @@ describe("Array", () => {
       V.transitivity
     );
   });
+
+  describe("Show", () => {
+    module S = Array.Show(Int.Show);
+    it("should convert the array to a string", () => {
+      expect(S.show([|1, 1, 2, 3, 5, 8, 13|])).to_be("[1, 1, 2, 3, 5, 8, 13]")
+    });
+  });
 });

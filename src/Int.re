@@ -37,3 +37,8 @@ module Bounded: BOUNDED with type t = int = {
   let top = 2147483647;
   let bottom = -2147483648;
 };
+
+module Show: SHOW with type t = int = {
+  type t = int;
+  let show = string_of_int;
+};

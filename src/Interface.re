@@ -195,3 +195,8 @@ module type INVOLUTIVE_HEYTING_ALGEBRA = {
 module type BOOLEAN_ALGEBRA = {
   include HEYTING_ALGEBRA;
 };
+
+module type SHOW = {
+  type t;
+  let show: t => string;
+};

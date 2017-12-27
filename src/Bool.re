@@ -90,3 +90,8 @@ module Involutive_Heyting_Algebra: INVOLUTIVE_HEYTING_ALGEBRA with type t = bool
 module Boolean_Algebra: BOOLEAN_ALGEBRA with type t = bool = {
   include Heyting_Algebra;
 };
+
+module Show: SHOW with type t = bool = {
+  type t = bool;
+  let show = string_of_bool;
+};
