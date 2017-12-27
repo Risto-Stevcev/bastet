@@ -77,3 +77,8 @@ module Euclidean_Ring = (E: EUCLIDEAN_RING) => {
   let (|/|) = E.divide;
   let (|%|) = E.modulo;
 };
+
+module Extend = (E: EXTEND) => {
+  let (<<=) = E.extend;
+  let (=>>) = (a, f) => E.extend(f, a);
+};

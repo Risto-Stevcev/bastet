@@ -269,3 +269,24 @@ module Profunctor = (P: Interface.PROFUNCTOR) => {
       P.dimap(f2 >. f1, g2 <. g1, a);
     }
 };
+
+module Monad_Zero = (M: Interface.MONAD_ZERO) => {
+  let annihalation: ('a => M.t('b)) => bool = (f) => M.flat_map(M.empty, f) == M.empty;
+};
+
+module Monad_Plus = (M: Interface.MONAD_PLUS) => {
+  let distributivity: ('a => M.t('b), M.t('a), M.t('a)) => bool =
+    (f, a, b) => M.flat_map(M.alt(a, b), f) == M.alt(M.flat_map(a, f), M.flat_map(b, f));
+};
+
+module Extend = (E: Interface.EXTEND) => {
+  let (<.) = Function.Infix.(<.);
+  let associativity: (E.t('b) => 'c, E.t('a) => 'b, E.t('a)) => bool =
+    (f, g, a) => (E.extend(f) <. E.extend(g))(a) == E.extend(f <. E.extend(g), a);
+};
+
+module Comonad = (C: Interface.COMONAD) => {
+  let left_identity: C.t('a) => bool = (a) => C.extend(C.extract, a) == a;
+  let right_identity: (C.t('a) => 'a, C.t('a)) => bool =
+    (f, a) => C.extract(C.extend(f, a)) == f(a);
+};

@@ -18,6 +18,19 @@ module ArrayF = {
       module Scan = Functions.Travsersable.Scan({type t = int});
     };
   };
+  module Float = {
+    module Eq = Array.Eq(Float.Eq);
+    module Ord = Array.Ord(Float.Ord);
+    module Additive = {
+      module Fold_Map = Array.Foldable.Fold_Map(Float.Additive.Monoid);
+    };
+    module Multiplicative = {
+      module Fold_Map = Array.Foldable.Fold_Map(Float.Multiplicative.Monoid);
+    };
+    module Functions = {
+      module Scan = Functions.Travsersable.Scan({type t = float});
+    };
+  };
   module Bool = {
     module Eq = Array.Eq(Bool.Eq);
     module Ord = Array.Ord(Bool.Ord);

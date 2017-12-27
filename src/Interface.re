@@ -244,3 +244,22 @@ module type PROFUNCTOR = {
   type t('a, 'b);
   let dimap: ('a => 'b, 'c => 'd, t('b, 'c)) => t('a, 'd);
 };
+
+module type MONAD_ZERO = {
+  include MONAD;
+  include ALTERNATIVE with type t('a) := t('a);
+};
+
+module type MONAD_PLUS = {
+  include MONAD_ZERO;
+};
+
+module type EXTEND = {
+  include FUNCTOR;
+  let extend: (t('a) => 'b, t('a)) => t('b);
+};
+
+module type COMONAD = {
+  include EXTEND;
+  let extract: t('a) => 'a;
+};

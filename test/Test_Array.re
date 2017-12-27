@@ -2,6 +2,7 @@ open Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
+let id = Function.Category.id;
 let (<.) = Function.Infix.(<.);
 
 
@@ -190,6 +191,33 @@ describe("Array", () => {
         float_of_int, int_of_float,
         (*)(3) <. int_of_float, (*.)(4.0) <. float_of_int
       )
+    );
+  });
+
+  describe("Monad_Zero", () => {
+    module V = Verify.Monad_Zero(Array.Monad_Zero);
+    it("should satisfy annihalation", () => {
+      expect(V.annihalation(Array.Applicative.pure <. string_of_int)).to_be(true);
+    });
+  });
+
+  describe("Monad_Plus", () => {
+    module V = Verify.Monad_Plus(Array.Monad_Plus);
+    property2(
+      "should satisfy distributivity",
+      arb_array(arb_int'), arb_array(arb_int'),
+      V.distributivity(Array.Applicative.pure <. string_of_int)
+    );
+  });
+
+  describe("Extend", () => {
+    module V = Verify.Extend(Array.Extend);
+    let fold = ArrayF.Int.Additive.Fold_Map.fold_map(id);
+    let fold' = ArrayF.Float.Additive.Fold_Map.fold_map(id);
+    property1(
+      "should satisfy associativity",
+      arb_array(arb_int'),
+      V.associativity(string_of_float <. fold', float_of_int <. fold)
     );
   });
 });

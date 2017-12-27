@@ -165,3 +165,18 @@ module Invariant: INVARIANT with type t('a) = array('a) = {
   type t('a) = array('a);
   let imap = (f, _) => Functor.map(f);
 };
+
+
+module Monad_Zero: MONAD_ZERO with type t('a) = array('a) = {
+  include Monad;
+  include (Alternative: ALTERNATIVE with type t('a) := t('a));
+};
+
+module Monad_Plus: MONAD_PLUS with type t('a) = array('a) = {
+  include Monad_Zero;
+};
+
+module Extend: EXTEND with type t('a) = array('a) = {
+  include Functor;
+  let extend = (f, xs) => Js.Array.mapi((_, i) => f(Js.Array.sliceFrom(i, xs)), xs);
+};
