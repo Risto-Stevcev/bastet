@@ -8,6 +8,7 @@ module ArrayF = {
   module Int = {
     module Eq = Array.Eq(Int.Eq);
     module Ord = Array.Ord(Int.Ord);
+    module Show = Array.Show(Int.Show);
     module Additive = {
       module Fold_Map = Array.Foldable.Fold_Map(Int.Additive.Monoid);
     };
@@ -21,6 +22,7 @@ module ArrayF = {
   module Float = {
     module Eq = Array.Eq(Float.Eq);
     module Ord = Array.Ord(Float.Ord);
+    module Show = Array.Show(Float.Show);
     module Additive = {
       module Fold_Map = Array.Foldable.Fold_Map(Float.Additive.Monoid);
     };
@@ -34,6 +36,7 @@ module ArrayF = {
   module Bool = {
     module Eq = Array.Eq(Bool.Eq);
     module Ord = Array.Ord(Bool.Ord);
+    module Show = Array.Show(Bool.Show);
   };
   module String = {
     module Eq = Array.Eq(String.Eq);
@@ -67,6 +70,7 @@ module ListF = {
   };
   module Int = {
     module Eq = List.Eq(Int.Eq);
+    module Show = List.Show(Int.Show);
     module Additive = {
       module Fold_Map = List.Foldable.Fold_Map(Int.Additive.Monoid);
     };
@@ -77,8 +81,22 @@ module ListF = {
       module Scan = Functions.Travsersable.Scan({type t = int});
     };
   };
+  module Float = {
+    module Eq = List.Eq(Float.Eq);
+    module Show = List.Show(Float.Show);
+    module Additive = {
+      module Fold_Map = List.Foldable.Fold_Map(Float.Additive.Monoid);
+    };
+    module Multiplicative = {
+      module Fold_Map = List.Foldable.Fold_Map(Float.Multiplicative.Monoid);
+    };
+    module Functions = {
+      module Scan = Functions.Travsersable.Scan({type t = float});
+    };
+  };
   module Bool = {
     module Eq = List.Eq(Bool.Eq);
+    module Show = List.Show(Bool.Show);
   };
   module String = {
     module Eq = List.Eq(String.Eq);
@@ -117,6 +135,19 @@ module OptionF = {
       module Semigroup = Option.Semigroup(Int.Multiplicative.Semigroup);
       module Monoid = Option.Monoid(Int.Multiplicative.Semigroup);
       module Fold_Map = Option.Foldable.Fold_Map(Int.Multiplicative.Monoid);
+    };
+  };
+  module Float = {
+    module Eq = Option.Eq(Float.Eq);
+    module Additive = {
+      module Semigroup = Option.Semigroup(Float.Additive.Semigroup);
+      module Monoid = Option.Monoid(Float.Additive.Semigroup);
+      module Fold_Map = Option.Foldable.Fold_Map(Float.Additive.Monoid);
+    };
+    module Multiplicative = {
+      module Semigroup = Option.Semigroup(Float.Multiplicative.Semigroup);
+      module Monoid = Option.Monoid(Float.Multiplicative.Semigroup);
+      module Fold_Map = Option.Foldable.Fold_Map(Float.Multiplicative.Monoid);
     };
   };
   module Bool = {
