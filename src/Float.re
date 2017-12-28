@@ -21,6 +21,17 @@ module Additive = {
     include Semigroup;
     let empty = 0.0;
   };
+  module Quasigroup: QUASIGROUP with type t = float = {
+    include Magma;
+  };
+  module Loop: LOOP with type t = float = {
+    include Quasigroup;
+    let empty = 0.0;
+  };
+  module Group: GROUP with type t = float = {
+    include Monoid;
+    let inverse = (*.)(-1.0);
+  };
 };
 
 module Multiplicative = {
@@ -33,6 +44,13 @@ module Multiplicative = {
   };
   module Monoid: MONOID with type t = float = {
     include Semigroup;
+    let empty = 1.0;
+  };
+  module Quasigroup: QUASIGROUP with type t = float = {
+    include Magma;
+  };
+  module Loop: LOOP with type t = float = {
+    include Quasigroup;
     let empty = 1.0;
   };
 };

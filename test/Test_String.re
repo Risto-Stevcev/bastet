@@ -16,6 +16,24 @@ describe("String", () => {
     property1("should satisfy neutrality", arb_string, V.neutral)
   });
 
+  describe("Quasigroup", () => {
+    module V = Verify.Quasigroup(String.Quasigroup);
+    property3(
+      "should satisfy left cancellative",
+      arb_string, arb_string, arb_string,
+      V.left_cancellative
+    );
+    property3(
+      "should satisfy right cancellative",
+      arb_string, arb_string, arb_string,
+      V.right_cancellative
+    );
+  });
+  describe("Loop", () => {
+    module V = Verify.Loop(String.Loop);
+    property1("should satisfy identity", arb_string, V.identity)
+  });
+
   describe("Eq", () => {
     module V = Verify.Eq(String.Eq);
     property1("should satisfy reflexivity", arb_string, V.reflexivity);

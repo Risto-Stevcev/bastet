@@ -38,15 +38,15 @@ module Multiplicative = {
   module Semigroup: SEMIGROUP with type t = int = {
     include Magma;
   };
+  module Monoid: MONOID with type t = int = {
+    include Semigroup;
+    let empty = 1;
+  };
   module Quasigroup: QUASIGROUP with type t = int = {
     include Magma;
   };
   module Loop: LOOP with type t = int = {
     include Quasigroup;
-    let empty = 1;
-  };
-  module Monoid: MONOID with type t = int = {
-    include Semigroup;
     let empty = 1;
   };
 };

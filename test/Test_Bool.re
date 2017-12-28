@@ -3,19 +3,19 @@ open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let (<.) = Function.Infix.(<.);
 
+let to_bool2 = (f, a, b) => f(Js.to_bool(a), Js.to_bool(b));
+let to_bool3 = (f, a, b, c) => f(Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
 
 describe("Bool", () => {
   describe("Conjunctive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Conjunctive.Semigroup);
       property3(
-        "should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-          let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-          V.associativity(a', b', c')
-        }
+        "should satisfy associativity",
+        arb_bool, arb_bool, arb_bool,
+        to_bool3(V.associativity)
       );
     });
-
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Conjunctive.Monoid);
       property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool)
@@ -26,10 +26,10 @@ describe("Bool", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Disjunctive.Semigroup);
       property3(
-        "should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-        let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-        V.associativity(a', b', c')
-      })
+        "should satisfy associativity",
+        arb_bool, arb_bool, arb_bool,
+        to_bool3(V.associativity)
+      )
     });
 
     describe("Monoid", () => {
@@ -41,52 +41,50 @@ describe("Bool", () => {
   describe("Eq", () => {
     module V = Verify.Eq(Bool.Eq);
     property1("should satisfy reflexivity", arb_bool, V.reflexivity <. Js.to_bool);
-    property2("should satisfy symmetry", arb_bool, arb_bool, (a, b) => {
-      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
-      V.symmetry(a', b');
-    });
-    property3("should satisfy transitivity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-      V.transitivity(a', b', c');
-    })
+    property2("should satisfy symmetry", arb_bool, arb_bool, to_bool2(V.symmetry));
+    property3(
+      "should satisfy transitivity",
+      arb_bool, arb_bool, arb_bool,
+      to_bool3(V.transitivity)
+    )
   });
 
   describe("Ord", () => {
     module V = Verify.Ord(Bool.Ord);
     property1("should satisfy reflexivity", arb_bool, V.reflexivity <. Js.to_bool);
-    property2("should satisfy antisymmetry", arb_bool, arb_bool, (a, b) => {
-      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
-      V.antisymmetry(a', b');
-    });
-    property3("should satisfy transitivity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-      V.transitivity(a', b', c');
-    })
+    property2("should satisfy antisymmetry", arb_bool, arb_bool, to_bool2(V.antisymmetry));
+    property3(
+      "should satisfy transitivity",
+      arb_bool, arb_bool, arb_bool,
+      to_bool3(V.transitivity)
+    )
   });
 
   describe("Join_Semilattice", () => {
     module V = Verify.Join_Semilattice(Bool.Join_Semilattice);
-    property3("should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-      V.associativity(a', b', c');
-    });
-    property2("should satisfy commutativity", arb_bool, arb_bool, (a, b) => {
-      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
-      V.commutativity(a', b');
-    });
+    property3(
+      "should satisfy associativity",
+      arb_bool, arb_bool, arb_bool,
+      to_bool3(V.associativity)
+    );
+    property2(
+      "should satisfy commutativity",
+      arb_bool, arb_bool,
+      to_bool2(V.commutativity)
+    );
     property1("should satisfy idempotency", arb_bool, V.idempotency <. Js.to_bool);
   });
 
   describe("Meet_Semilattice", () => {
     module V = Verify.Meet_Semilattice(Bool.Meet_Semilattice);
-    property3("should satisfy associativity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-      V.associativity(a', b', c');
-    });
-    property2("should satisfy commutativity", arb_bool, arb_bool, (a, b) => {
-      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
-      V.commutativity(a', b');
-    });
+    property3(
+      "should satisfy associativity",
+      arb_bool, arb_bool, arb_bool,
+      to_bool3(V.associativity)
+    );
+    property2(
+      "should satisfy commutativity", arb_bool, arb_bool, to_bool2(V.commutativity)
+    );
     property1("should satisfy idempotency", arb_bool, V.idempotency <. Js.to_bool);
   });
 
@@ -102,34 +100,34 @@ describe("Bool", () => {
 
   describe("Lattice", () => {
     module V = Verify.Lattice(Bool.Lattice);
-    property2("should satisfy absorption", arb_bool, arb_bool, (a, b) => {
-      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
-      V.absorption(a', b');
-    });
+    property2(
+      "should satisfy absorption", arb_bool, arb_bool, to_bool2(V.absorption)
+    );
   });
 
   describe("Bounded_Lattice", () => {
     module V = Verify.Bounded_Lattice(Bool.Bounded_Lattice);
-    property2("should satisfy absorption", arb_bool, arb_bool, (a, b) => {
-      let (a', b') = (Js.to_bool(a), Js.to_bool(b));
-      V.absorption(a', b');
-    });
+    property2(
+      "should satisfy absorption", arb_bool, arb_bool, to_bool2(V.absorption)
+    );
   });
 
   describe("Distributive_Lattice", () => {
     module V = Verify.Distributive_Lattice(Bool.Distributive_Lattice);
-    property3("should satisfy distributivity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-      V.distributivity(a', b', c');
-    });
+    property3(
+      "should satisfy distributivity",
+      arb_bool, arb_bool, arb_bool,
+      to_bool3(V.distributivity)
+    );
   });
 
   describe("Bounded_Distributive_Lattice", () => {
     module V = Verify.Bounded_Distributive_Lattice(Bool.Bounded_Distributive_Lattice);
-    property3("should satisfy distributivity", arb_bool, arb_bool, arb_bool, (a, b, c) => {
-      let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-      V.distributivity(a', b', c');
-    });
+    property3(
+      "should satisfy distributivity",
+      arb_bool, arb_bool, arb_bool,
+      to_bool3(V.distributivity)
+    );
   });
 
   describe("Heyting_Algebra", () => {
@@ -140,10 +138,7 @@ describe("Bool", () => {
     property3(
       "should satisfy relative pseudocomplement",
       arb_bool, arb_bool, arb_bool,
-      (a, b, c) => {
-        let (a', b', c') = (Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
-        V.relative_pseudocomplement(a', b', c');
-      }
+      to_bool3(V.relative_pseudocomplement)
     );
   });
 

@@ -13,6 +13,15 @@ module Monoid: MONOID with type t = string = {
   let empty = "";
 };
 
+module Quasigroup: QUASIGROUP with type t = string = {
+  include Magma;
+};
+
+module Loop: LOOP with type t = string = {
+  include Quasigroup;
+  let empty = "";
+};
+
 module Eq: EQ with type t = string = {
   type t = string;
   let eq = (==);

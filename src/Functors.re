@@ -128,26 +128,39 @@ module OptionF = {
     module Eq = Option.Eq(Int.Eq);
     module Additive = {
       module Semigroup = Option.Semigroup(Int.Additive.Semigroup);
+      module Quasigroup = Option.Quasigroup(Int.Additive.Quasigroup);
       module Monoid = Option.Monoid(Int.Additive.Semigroup);
       module Fold_Map = Option.Foldable.Fold_Map(Int.Additive.Monoid);
     };
     module Multiplicative = {
       module Semigroup = Option.Semigroup(Int.Multiplicative.Semigroup);
+      module Quasigroup = Option.Quasigroup(Int.Multiplicative.Quasigroup);
       module Monoid = Option.Monoid(Int.Multiplicative.Semigroup);
       module Fold_Map = Option.Foldable.Fold_Map(Int.Multiplicative.Monoid);
+    };
+    module Subtractive = {
+      module Quasigroup = Option.Quasigroup(Int.Subtractive.Quasigroup);
     };
   };
   module Float = {
     module Eq = Option.Eq(Float.Eq);
     module Additive = {
       module Semigroup = Option.Semigroup(Float.Additive.Semigroup);
+      module Quasigroup = Option.Quasigroup(Float.Additive.Quasigroup);
       module Monoid = Option.Monoid(Float.Additive.Semigroup);
       module Fold_Map = Option.Foldable.Fold_Map(Float.Additive.Monoid);
     };
     module Multiplicative = {
       module Semigroup = Option.Semigroup(Float.Multiplicative.Semigroup);
+      module Quasigroup = Option.Quasigroup(Float.Multiplicative.Quasigroup);
       module Monoid = Option.Monoid(Float.Multiplicative.Semigroup);
       module Fold_Map = Option.Foldable.Fold_Map(Float.Multiplicative.Monoid);
+    };
+    module Subtractive = {
+      module Quasigroup = Option.Quasigroup(Float.Subtractive.Quasigroup);
+    };
+    module Divisive = {
+      module Quasigroup = Option.Quasigroup(Float.Divisive.Quasigroup);
     };
   };
   module Bool = {

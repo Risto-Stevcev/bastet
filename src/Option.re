@@ -65,6 +65,21 @@ module Monoid = (S: SEMIGROUP) => {
   include Option_Monoid_;
 };
 
+module Quasigroup = (Q: QUASIGROUP) => {
+  module Option_Quasigroup_: QUASIGROUP with type t = option(Q.t) = {
+    include Magma(Q);
+  };
+  include Option_Quasigroup_;
+};
+
+module Loop = (L: LOOP) => {
+  module Option_Loop_: LOOP with type t = option(L.t) = {
+    include Quasigroup(L);
+    let empty = None;
+  };
+  include Option_Loop_;
+};
+
 module Alt: ALT with type t('a) = option('a) = {
   include Functor;
   let alt = (a, b) => switch (a, b) {

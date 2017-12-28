@@ -39,10 +39,20 @@ module type QUASIGROUP = {
   include MAGMA;
 };
 
+module type QUASIGROUP_ANY = {
+  include MAGMA_ANY;
+};
+
 module type LOOP = {
   /* A Loop only needs to be commutative with the empty element */
   include QUASIGROUP;
   let empty: t;
+};
+
+module type LOOP_ANY = {
+  /* A Loop only needs to be commutative with the empty element */
+  include QUASIGROUP_ANY;
+  let empty: t('a);
 };
 
 module type GROUP = {
@@ -51,8 +61,15 @@ module type GROUP = {
   let inverse: t => t;
 };
 
+module type GROUP_ANY = {
+  /* This is for documentation purposes only, include either LOOP or MONOID */
+  include LOOP_ANY; /* or */ include MONOID_ANY with type t('a) := t('a);
+  let inverse: t('a) => t('a);
+};
+
 /* Every group is a loop */
 module type GROUP_LOOP = (G: GROUP) => LOOP;
+module type GROUP_LOOP_ANY = (G: GROUP_ANY) => LOOP_ANY;
 
 module type FUNCTOR = {
   type t('a);

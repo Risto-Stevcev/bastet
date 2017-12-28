@@ -4,20 +4,49 @@ open BsJsverify.Verify.Property;
 
 
 describe("Float", () => {
-  let arb_float' = arb_float(-10000.0, 10000.0);
-  let tolerance = 0.001;
+  /* Intentionally restricted range to avoid arithmetic overflows as much as possible */
+  let arb_float' =
+    arb_float(Float.Bounded.bottom /. 100000.0, Float.Bounded.top /. 100000.0);
+  let tolerance = 0.01;
 
   describe("Additive", () => {
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Float.Additive.Semigroup);
       property3(
-        "should satisfy associativity", arb_float', arb_float', arb_float', V.associativity
+        "should satisfy associativity",
+        arb_float', arb_float', arb_float',
+        V.associativity
       )
     });
-
     describe("Monoid", () => {
       module V = Verify.Monoid(Float.Additive.Monoid);
       property1("should satisfy neutrality", arb_float', V.neutral)
+    });
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Float.Additive.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_float', arb_float', arb_float',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_float', arb_float', arb_float',
+        V.right_cancellative
+      );
+    });
+    describe("Loop", () => {
+      module V = Verify.Loop(Float.Additive.Loop);
+      property1("should satisfy identity", arb_float', V.identity)
+    });
+    describe("Group", () => {
+      module V = Verify.Group(Float.Additive.Group);
+      property1("should satisfy invertibility", arb_float', V.invertibility);
+      property3(
+        "should satisfy associativity",
+        arb_float', arb_float', arb_float',
+        V.associativity
+      )
     });
   });
 
@@ -28,10 +57,26 @@ describe("Float", () => {
         "should satisfy associativity", arb_float', arb_float', arb_float', V.associativity
       )
     });
-
     describe("Monoid", () => {
       module V = Verify.Monoid(Float.Multiplicative.Monoid);
       property1("should satisfy neutrality", arb_float', V.neutral)
+    });
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Float.Multiplicative.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_float', arb_float', arb_float',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_float', arb_float', arb_float',
+        V.right_cancellative
+      );
+    });
+    describe("Loop", () => {
+      module V = Verify.Loop(Float.Multiplicative.Loop);
+      property1("should satisfy identity", arb_float', V.identity)
     });
   });
 

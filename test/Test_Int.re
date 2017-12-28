@@ -4,7 +4,8 @@ open BsJsverify.Verify.Property;
 
 
 describe("Int", () => {
-  let arb_int' = arb_int(-10000, 10000);
+  /* Intentionally restricted range to avoid arithmetic overflows as much as possible */
+  let arb_int' = arb_int(Int.Bounded.bottom / 10000, Int.Bounded.top / 10000);
 
   describe("Additive", () => {
     describe("Semigroup", () => {
