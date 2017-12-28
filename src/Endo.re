@@ -21,5 +21,5 @@ module Monoid: MONOID_ANY with type t('a) = endo('a) = {
 };
 
 module Infix = {
-  include Infix.Monoid_Any(Monoid)
+  include Infix.Magma_Any(Magma)
 };

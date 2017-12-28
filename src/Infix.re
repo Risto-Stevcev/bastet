@@ -4,21 +4,7 @@ module Magma = (M: MAGMA) => {
   let (<:>) = M.append;
 };
 
-module Semigroup = (S: SEMIGROUP) => {
-  let (<:>) = S.append;
-};
-
-module Semigroup_Any = (S: SEMIGROUP_ANY) => {
-  let (<:>) = S.append;
-};
-
-module Monoid = (M: MONOID) => {
-  include Semigroup(M);
-  let (<:>) = M.append;
-};
-
-module Monoid_Any = (M: MONOID_ANY) => {
-  include Semigroup_Any(M);
+module Magma_Any = (M: MAGMA_ANY) => {
   let (<:>) = M.append;
 };
 
@@ -83,4 +69,13 @@ module Euclidean_Ring = (E: EUCLIDEAN_RING) => {
 module Extend = (E: EXTEND) => {
   let (<<=) = E.extend;
   let (=>>) = (a, f) => E.extend(f, a);
+};
+
+module Bifunctor = (B: BIFUNCTOR) => {
+  let (<<$>>) = B.bimap;
+};
+
+module Biapply = (B: BIAPPLY) => {
+  include Bifunctor(B);
+  let (<<*>>) = B.biapply;
 };

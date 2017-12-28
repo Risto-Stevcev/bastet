@@ -1,5 +1,11 @@
 open Interface;
 
+/* Note: `float` is not a fully law abiding member of Additive.Semigroup,
+ * Multiplicative.Semigroup, Semiring, Division_Ring, and Euclidean_Ring, and any
+ * abstractions dependent on these, due to potential arithmetic overflows and
+ * floating point precision issues
+ */
+
 let approximately_equal: (~tolerance:float, float, float) => bool =
   (~tolerance, a, b) => Js.Math.abs_float(a -. b) <= tolerance;
 
@@ -28,6 +34,26 @@ module Multiplicative = {
   module Monoid: MONOID with type t = float = {
     include Semigroup;
     let empty = 1.0;
+  };
+};
+
+module Subtractive = {
+  module Magma: MAGMA with type t = float = {
+    type t = float;
+    let append = (-.);
+  };
+  module Quasigroup: QUASIGROUP with type t = float = {
+    include Magma;
+  };
+};
+
+module Divisive = {
+  module Magma: MAGMA with type t = float = {
+    type t = float;
+    let append = (/.);
+  };
+  module Quasigroup: QUASIGROUP with type t = float = {
+    include Magma;
   };
 };
 
@@ -88,10 +114,10 @@ module Field: FIELD with type t = float = {
 
 module Infix = {
   module Additive = {
-    include Infix.Semigroup(Additive.Semigroup);
+    include Infix.Magma(Additive.Magma);
   };
   module Multiplicative = {
-    include Infix.Semigroup(Multiplicative.Semigroup);
+    include Infix.Magma(Multiplicative.Magma);
   };
   include Infix.Eq(Eq);
   include Infix.Ord(Ord);

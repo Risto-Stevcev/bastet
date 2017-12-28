@@ -162,3 +162,7 @@ module Bitraversable = (A: APPLICATIVE) => {
   };
   include Tuple_Bitraversable_;
 };
+
+module Infix = {
+  include Infix.Biapply(Biapply);
+};

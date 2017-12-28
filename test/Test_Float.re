@@ -35,6 +35,38 @@ describe("Float", () => {
     });
   });
 
+  describe("Subtractive", () => {
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Float.Subtractive.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_float', arb_float', arb_float',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_float', arb_float', arb_float',
+        V.right_cancellative
+      );
+    });
+  });
+
+  describe("Divisive", () => {
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Float.Divisive.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_float', arb_float', arb_float',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_float', arb_float', arb_float',
+        V.right_cancellative
+      );
+    });
+  });
+
   describe("Eq", () => {
     module V = Verify.Eq(Float.Eq);
     property1("should satisfy reflexivity", arb_float', V.reflexivity);

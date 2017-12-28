@@ -1,25 +1,48 @@
 open Interface;
 
 module Semigroup = (S: SEMIGROUP) => {
-  module I = Infix.Semigroup(S);
+  module I = Infix.Magma(S);
   let associativity: (S.t, S.t, S.t) => bool =
     (a, b, c) => I.(a <:> (b <:> c) == (a <:> (b <:> c)));
 };
 
 module Semigroup_Any = (S: SEMIGROUP_ANY) => {
-  module I = Infix.Semigroup_Any(S);
+  module I = Infix.Magma_Any(S);
   let associativity: (S.t('a), S.t('a), S.t('a)) => bool =
     (a, b, c) => I.(a <:> (b <:> c) == (a <:> (b <:> c)));
 };
 
 module Monoid = (M: MONOID) => {
-  module I = Infix.Monoid(M);
+  module I = Infix.Magma(M);
   let neutral: M.t => bool = (a) => I.(a <:> M.empty == a && M.empty <:> a == a);
 };
 
 module Monoid_Any = (M: MONOID_ANY) => {
-  module I = Infix.Monoid_Any(M);
+  module I = Infix.Magma_Any(M);
   let neutral: M.t('a) => bool = (a) => I.(a <:> M.empty == a && M.empty <:> a == a);
+};
+
+module Quasigroup = (Q: QUASIGROUP) => {
+  module I = Infix.Magma(Q);
+  let left_cancellative: (Q.t, Q.t, Q.t) => bool =
+    (a, b, c) => I.( !(a <:> b == (a <:> c)) || b == c );
+  let right_cancellative: (Q.t, Q.t, Q.t) => bool =
+    (a, b, c) => I.( !(b <:> a == (c <:> a)) || b == c );
+};
+
+module Loop = (L: LOOP) => {
+  module I = Infix.Magma(L);
+  let identity: L.t => bool = (a) => I.(a <:> L.empty == a && L.empty <:> a == a);
+};
+
+module Group = (G: GROUP) => {
+  module I = Infix.Magma(G);
+  /* via Monoid */
+  let invertibility: G.t => bool =
+    (a) => I.( G.inverse(a) <:> a == G.empty && a <:> G.inverse(a) == G.empty );
+  /* via Loop */
+  let associativity: (G.t, G.t, G.t) => bool =
+    (a, b, c) => I.(a <:> (b <:> c) == (a <:> (b <:> c)));
 };
 
 module Functor = (F: FUNCTOR) => {

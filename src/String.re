@@ -24,7 +24,7 @@ module Ord: ORD with type t = string = {
 };
 
 module Infix = {
-  include Infix.Monoid(Monoid);
+  include Infix.Magma(Magma);
   include Infix.Eq(Eq);
   include Infix.Ord(Ord);
 };

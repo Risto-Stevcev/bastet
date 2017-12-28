@@ -1,5 +1,10 @@
 open Interface;
 
+/* Note: `int` is not a fully law abiding member of Additive.Semigroup,
+ * Multiplicative.Semigroup and Semiring, and any abstractions dependent on these,
+ * due to potential arithmetic overflows
+ */
+
 module Additive = {
   module Magma: MAGMA with type t = int = {
     type t = int;
@@ -12,6 +17,17 @@ module Additive = {
     include Semigroup;
     let empty = 0;
   };
+  module Quasigroup: QUASIGROUP with type t = int = {
+    include Magma;
+  };
+  module Loop: LOOP with type t = int = {
+    include Quasigroup;
+    let empty = 0;
+  };
+  module Group: GROUP with type t = int = {
+    include Monoid;
+    let inverse = (*)(-1);
+  };
 };
 
 module Multiplicative = {
@@ -22,9 +38,33 @@ module Multiplicative = {
   module Semigroup: SEMIGROUP with type t = int = {
     include Magma;
   };
+  module Quasigroup: QUASIGROUP with type t = int = {
+    include Magma;
+  };
+  module Loop: LOOP with type t = int = {
+    include Quasigroup;
+    let empty = 1;
+  };
   module Monoid: MONOID with type t = int = {
     include Semigroup;
     let empty = 1;
+  };
+};
+
+module Subtractive = {
+  module Magma: MAGMA with type t = int = {
+    type t = int;
+    let append = (-);
+  };
+  module Quasigroup: QUASIGROUP with type t = int = {
+    include Magma;
+  };
+};
+
+module Divisive = {
+  module Magma: MAGMA with type t = int = {
+    type t = int;
+    let append = (/);
   };
 };
 
@@ -75,10 +115,10 @@ module Euclidean_Ring: EUCLIDEAN_RING with type t = int = {
 
 module Infix = {
   module Additive = {
-    include Infix.Semigroup(Additive.Semigroup);
+    include Infix.Magma(Additive.Magma);
   };
   module Multiplicative = {
-    include Infix.Semigroup(Multiplicative.Semigroup);
+    include Infix.Magma(Multiplicative.Magma);
   };
   include Infix.Eq(Eq);
   include Infix.Ord(Ord);

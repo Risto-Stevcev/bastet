@@ -5,7 +5,7 @@ let (id) = Function.Category.(id);
 let (<.) = Function.Infix.(<.);
 
 module Monoid = (M : MONOID) => {
-  module I = Infix.Monoid(M);
+  module I = Infix.Magma(M);
   let power: (M.t, int) => M.t = (x, p) => I.({
     let rec go = (p) => switch p {
       | p when p <= 0 => M.empty
@@ -89,7 +89,7 @@ module Monad = (M: MONAD) => {
 module Foldable = (F: FOLDABLE) => {
   module Semigroup = (S: SEMIGROUP) => {
     module FM = F.Fold_Map_Any(Endo.Monoid);
-    module I = Infix.Semigroup(S);
+    module I = Infix.Magma(S);
     let surround_map: (~delimiter:S.t, 'a => S.t, F.t('a)) => S.t =
       (~delimiter, f, fa) => I.({
         let joined = (a) => Endo.Endo(m => delimiter <:> f(a) <:> m);
@@ -103,7 +103,7 @@ module Foldable = (F: FOLDABLE) => {
 
   module Monoid = (M: MONOID) => {
     module FM = F.Fold_Map(M);
-    module I = Infix.Monoid(M);
+    module I = Infix.Magma(M);
     type acc = { init: bool, acc: M.t };
     let fold: F.t(M.t) => M.t = FM.fold_map(id);
     let intercalate: (~separator:M.t, F.t(M.t)) => M.t =

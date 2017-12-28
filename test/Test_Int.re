@@ -13,10 +13,33 @@ describe("Int", () => {
         "should satisfy associativity", arb_int', arb_int', arb_int', V.associativity
       )
     });
-
     describe("Monoid", () => {
       module V = Verify.Monoid(Int.Additive.Monoid);
       property1("should satisfy neutrality", arb_int', V.neutral)
+    });
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Int.Additive.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_int', arb_int', arb_int',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_int', arb_int', arb_int',
+        V.right_cancellative
+      );
+    });
+    describe("Loop", () => {
+      module V = Verify.Loop(Int.Additive.Loop);
+      property1("should satisfy identity", arb_int', V.identity)
+    });
+    describe("Group", () => {
+      module V = Verify.Group(Int.Additive.Group);
+      property1("should satisfy invertibility", arb_int', V.invertibility);
+      property3(
+        "should satisfy associativity", arb_int', arb_int', arb_int', V.associativity
+      )
     });
   });
 
@@ -27,10 +50,42 @@ describe("Int", () => {
         "should satisfy associativity", arb_int', arb_int', arb_int', V.associativity
       )
     });
-
     describe("Monoid", () => {
       module V = Verify.Monoid(Int.Multiplicative.Monoid);
       property1("should satisfy neutrality", arb_int', V.neutral)
+    });
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Int.Multiplicative.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_int', arb_int', arb_int',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_int', arb_int', arb_int',
+        V.right_cancellative
+      );
+    });
+    describe("Loop", () => {
+      module V = Verify.Loop(Int.Multiplicative.Loop);
+      property1("should satisfy identity", arb_int', V.identity)
+    });
+  });
+
+  describe("Subtractive", () => {
+    describe("Quasigroup", () => {
+      module V = Verify.Quasigroup(Int.Subtractive.Quasigroup);
+      property3(
+        "should satisfy left cancellative",
+        arb_int', arb_int', arb_int',
+        V.left_cancellative
+      );
+      property3(
+        "should satisfy right cancellative",
+        arb_int', arb_int', arb_int',
+        V.right_cancellative
+      );
     });
   });
 

@@ -25,6 +25,7 @@ module type SEMIGROUP_ANY = {
 };
 
 module type MONOID = {
+  /* A Monoid only needs to be commutative with the empty element */
   include SEMIGROUP;
   let empty: t;
 };
@@ -33,6 +34,25 @@ module type MONOID_ANY = {
   include SEMIGROUP_ANY;
   let empty: t('a);
 };
+
+module type QUASIGROUP = {
+  include MAGMA;
+};
+
+module type LOOP = {
+  /* A Loop only needs to be commutative with the empty element */
+  include QUASIGROUP;
+  let empty: t;
+};
+
+module type GROUP = {
+  /* This is for documentation purposes only, include either LOOP or MONOID */
+  include LOOP; /* or */ include MONOID with type t := t;
+  let inverse: t => t;
+};
+
+/* Every group is a loop */
+module type GROUP_LOOP = (G: GROUP) => LOOP;
 
 module type FUNCTOR = {
   type t('a);

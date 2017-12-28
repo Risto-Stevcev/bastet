@@ -104,10 +104,10 @@ module Show: SHOW with type t = bool = {
 
 module Infix = {
   module Conjunctive = {
-    include Infix.Monoid(Conjunctive.Monoid)
+    include Infix.Magma(Conjunctive.Magma)
   };
   module Disjunctive = {
-    include Infix.Monoid(Disjunctive.Monoid)
+    include Infix.Magma(Disjunctive.Magma)
   };
   include Infix.Eq(Eq);
   include Infix.Ord(Ord);
