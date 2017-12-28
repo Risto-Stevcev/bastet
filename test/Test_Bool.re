@@ -5,9 +5,19 @@ let (<.) = Function.Infix.(<.);
 
 let to_bool2 = (f, a, b) => f(Js.to_bool(a), Js.to_bool(b));
 let to_bool3 = (f, a, b, c) => f(Js.to_bool(a), Js.to_bool(b), Js.to_bool(c));
+let to_bool4 =
+  (f, a, b, c, d) => f(Js.to_bool(a), Js.to_bool(b), Js.to_bool(c), Js.to_bool(d));
 
 describe("Bool", () => {
   describe("Conjunctive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Bool.Conjunctive.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_bool, arb_bool, arb_bool, arb_bool,
+        to_bool4(V.bicommutativity)
+      )
+    });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Conjunctive.Semigroup);
       property3(
@@ -23,6 +33,14 @@ describe("Bool", () => {
   });
 
   describe("Disjunctive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Bool.Disjunctive.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_bool, arb_bool, arb_bool, arb_bool,
+        to_bool4(V.bicommutativity)
+      )
+    });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Disjunctive.Semigroup);
       property3(
@@ -31,7 +49,6 @@ describe("Bool", () => {
         to_bool3(V.associativity)
       )
     });
-
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Disjunctive.Monoid);
       property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool)

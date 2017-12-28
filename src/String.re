@@ -4,6 +4,7 @@ module Magma: MAGMA with type t = string = {
   type t = string;
   let append = (++);
 };
+
 module Semigroup: SEMIGROUP with type t = string = {
   include Magma;
 };

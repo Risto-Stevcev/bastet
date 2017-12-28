@@ -10,6 +10,7 @@ module Additive = {
     type t = int;
     let append = (+);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = int = Magma;
   module Semigroup: SEMIGROUP with type t = int = {
     include Magma;
   };
@@ -20,6 +21,9 @@ module Additive = {
   module Quasigroup: QUASIGROUP with type t = int = {
     include Magma;
   };
+  module Medial_Quasigroup: MEDIAL_QUASIGROUP with type t = int = {
+    include Medial_Magma;
+  };
   module Loop: LOOP with type t = int = {
     include Quasigroup;
     let empty = 0;
@@ -28,6 +32,9 @@ module Additive = {
     include Monoid;
     let inverse = (*)(-1);
   };
+  module Abelian_Group: ABELIAN_GROUP with type t = int = {
+    include Group;
+  };
 };
 
 module Multiplicative = {
@@ -35,6 +42,7 @@ module Multiplicative = {
     type t = int;
     let append = (*);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = int = Magma;
   module Semigroup: SEMIGROUP with type t = int = {
     include Magma;
   };
@@ -56,6 +64,7 @@ module Subtractive = {
     type t = int;
     let append = (-);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = int = Magma;
   module Quasigroup: QUASIGROUP with type t = int = {
     include Magma;
   };

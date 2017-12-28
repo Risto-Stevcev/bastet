@@ -8,6 +8,14 @@ describe("Int", () => {
   let arb_int' = arb_int(Int.Bounded.bottom / 10000, Int.Bounded.top / 10000);
 
   describe("Additive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Int.Additive.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_int', arb_int', arb_int', arb_int',
+        V.bicommutativity
+      )
+    });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Int.Additive.Semigroup);
       property3(
@@ -42,9 +50,23 @@ describe("Int", () => {
         "should satisfy associativity", arb_int', arb_int', arb_int', V.associativity
       )
     });
+    describe("Abelian Group", () => {
+      module V = Verify.Abelian_Group(Int.Additive.Abelian_Group);
+      property2(
+        "should satisfy commutativity", arb_int', arb_int', V.commutativity
+      )
+    });
   });
 
   describe("Multiplicative", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Int.Multiplicative.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_int', arb_int', arb_int', arb_int',
+        V.bicommutativity
+      )
+    });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Int.Multiplicative.Semigroup);
       property3(
@@ -75,6 +97,14 @@ describe("Int", () => {
   });
 
   describe("Subtractive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Int.Subtractive.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_int', arb_int', arb_int', arb_int',
+        V.bicommutativity
+      )
+    });
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Int.Subtractive.Quasigroup);
       property3(

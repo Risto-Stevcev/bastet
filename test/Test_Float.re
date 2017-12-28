@@ -10,6 +10,14 @@ describe("Float", () => {
   let tolerance = 0.01;
 
   describe("Additive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Float.Additive.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_float', arb_float', arb_float', arb_float',
+        V.bicommutativity
+      )
+    });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Float.Additive.Semigroup);
       property3(
@@ -48,9 +56,29 @@ describe("Float", () => {
         V.associativity
       )
     });
+    describe("Abelian Group", () => {
+      module V = Verify.Abelian_Group(Float.Additive.Abelian_Group);
+      property2(
+        "should satisfy commutativity", arb_float', arb_float', V.commutativity
+      )
+    });
   });
 
   describe("Multiplicative", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Float.Multiplicative.Medial_Magma);
+      module I = Infix.Magma(Float.Multiplicative.Medial_Magma);
+      open I;
+      let arb_float'' = arb_float(1000.0, -1000.0); /* to avoid arithmetic overflows */
+      property4(
+        "should satisfy bicommutativity",
+        arb_float'', arb_float'', arb_float'', arb_float'',
+        (a, b, c, d) => Float.approximately_equal(
+          ~tolerance, (a <:> b) <:> (c <:> d), (a <:> c) <:> (b <:> d)
+        )
+      )
+    });
+
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Float.Multiplicative.Semigroup);
       property3(
@@ -81,6 +109,14 @@ describe("Float", () => {
   });
 
   describe("Subtractive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Float.Subtractive.Medial_Magma);
+      property4(
+        "should satisfy bicommutativity",
+        arb_float', arb_float', arb_float', arb_float',
+        V.bicommutativity
+      )
+    });
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Subtractive.Quasigroup);
       property3(
@@ -97,6 +133,20 @@ describe("Float", () => {
   });
 
   describe("Divisive", () => {
+    describe("Medial Magma", () => {
+      module V = Verify.Medial_Magma(Float.Divisive.Medial_Magma);
+      module I = Infix.Magma(Float.Divisive.Medial_Magma);
+      open I;
+      property4(
+        "should satisfy bicommutativity",
+        arb_float', arb_float', arb_float', arb_float',
+        (a, b, c, d) => Float.approximately_equal(
+          ~tolerance,
+          (a <:> b) <:> (c <:> d),
+          (a <:> c) <:> (b <:> d)
+        )
+      )
+    });
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Divisive.Quasigroup);
       property3(

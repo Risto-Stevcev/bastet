@@ -5,6 +5,7 @@ module Conjunctive = {
     type t = bool;
     let append = (&&);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = bool = Magma;
   module Semigroup: SEMIGROUP with type t = bool = {
     include Magma;
   };
@@ -19,6 +20,7 @@ module Disjunctive = {
     type t = bool;
     let append = (||);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = bool = Magma;
   module Semigroup: SEMIGROUP with type t = bool = {
     include Magma;
   };

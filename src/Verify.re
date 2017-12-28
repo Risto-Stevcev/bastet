@@ -1,5 +1,11 @@
 open Interface;
 
+module Medial_Magma = (M: MEDIAL_MAGMA) => {
+  module I = Infix.Magma(M);
+  let bicommutativity: (M.t, M.t, M.t, M.t) => bool =
+    (a, b, c, d) => I.( (a <:> b) <:> (c <:> d) == ((a <:> c) <:> (b <:> d)) )
+};
+
 module Semigroup = (S: SEMIGROUP) => {
   module I = Infix.Magma(S);
   let associativity: (S.t, S.t, S.t) => bool =
@@ -34,6 +40,9 @@ module Quasigroup_Any = (Q: QUASIGROUP_ANY) => {
   let right_cancellative: (Q.t('a), Q.t('a), Q.t('a)) => bool =
     (a, b, c) => I.( !(b <:> a == (c <:> a)) || b == c );
 };
+module Medial_Quasigroup = (Q: MEDIAL_QUASIGROUP) => {
+  include Quasigroup(Q);
+};
 
 module Loop = (L: LOOP) => {
   module I = Infix.Magma(L);
@@ -48,7 +57,7 @@ module Group = (G: GROUP) => {
   module I = Infix.Magma(G);
   /* via Monoid */
   let invertibility: G.t => bool =
-    (a) => I.( G.inverse(a) <:> a == G.empty && a <:> G.inverse(a) == G.empty );
+    (a) => I.(G.inverse(a) <:> a == G.empty && a <:> G.inverse(a) == G.empty);
   /* via Loop */
   let associativity: (G.t, G.t, G.t) => bool =
     (a, b, c) => I.(a <:> (b <:> c) == (a <:> (b <:> c)));
@@ -57,10 +66,18 @@ module Group_Any = (G: GROUP_ANY) => {
   module I = Infix.Magma_Any(G);
   /* via Monoid */
   let invertibility: G.t('a) => bool =
-    (a) => I.( G.inverse(a) <:> a == G.empty && a <:> G.inverse(a) == G.empty );
+    (a) => I.(G.inverse(a) <:> a == G.empty && a <:> G.inverse(a) == G.empty);
   /* via Loop */
   let associativity: (G.t('a), G.t('a), G.t('a)) => bool =
     (a, b, c) => I.(a <:> (b <:> c) == (a <:> (b <:> c)));
+};
+
+module Abelian_Group = (G: GROUP) => {
+  let commutativity: (G.t, G.t) => bool = (a, b) => G.append(a, b) == G.append(b, a);
+};
+module Abelian_Group_Any = (G: GROUP_ANY) => {
+  let commutativity: (G.t('a), G.t('a)) => bool =
+    (a, b) => G.append(a, b) == G.append(b, a);
 };
 
 module Functor = (F: FUNCTOR) => {

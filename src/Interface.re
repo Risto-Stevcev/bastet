@@ -11,6 +11,10 @@ module type MAGMA = {
   let append: (t, t) => t;
 };
 
+module type MEDIAL_MAGMA = {
+  include MAGMA;
+};
+
 module type MAGMA_ANY = {
   type t('a);
   let append: (t('a), t('a)) => t('a);
@@ -37,6 +41,11 @@ module type MONOID_ANY = {
 
 module type QUASIGROUP = {
   include MAGMA;
+};
+
+module type MEDIAL_QUASIGROUP = {
+  /* Every medial quasigroup is isotopic to an abelian group */
+  include MEDIAL_MAGMA;
 };
 
 module type QUASIGROUP_ANY = {
@@ -70,6 +79,10 @@ module type GROUP_ANY = {
 /* Every group is a loop */
 module type GROUP_LOOP = (G: GROUP) => LOOP;
 module type GROUP_LOOP_ANY = (G: GROUP_ANY) => LOOP_ANY;
+
+module type ABELIAN_GROUP = {
+  include GROUP;
+};
 
 module type FUNCTOR = {
   type t('a);

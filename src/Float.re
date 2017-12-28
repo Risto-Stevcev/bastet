@@ -14,6 +14,7 @@ module Additive = {
     type t = float;
     let append = (+.);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = float = Magma;
   module Semigroup: SEMIGROUP with type t = float = {
     include Magma;
   };
@@ -23,6 +24,9 @@ module Additive = {
   };
   module Quasigroup: QUASIGROUP with type t = float = {
     include Magma;
+  };
+  module Medial_Quasigroup: MEDIAL_QUASIGROUP with type t = float = {
+    include Medial_Magma;
   };
   module Loop: LOOP with type t = float = {
     include Quasigroup;
@@ -32,6 +36,9 @@ module Additive = {
     include Monoid;
     let inverse = (*.)(-1.0);
   };
+  module Abelian_Group: ABELIAN_GROUP with type t = float = {
+    include Group;
+  };
 };
 
 module Multiplicative = {
@@ -39,6 +46,7 @@ module Multiplicative = {
     type t = float;
     let append = (*.);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = float = Magma;
   module Semigroup: SEMIGROUP with type t = float = {
     include Magma;
   };
@@ -48,6 +56,9 @@ module Multiplicative = {
   };
   module Quasigroup: QUASIGROUP with type t = float = {
     include Magma;
+  };
+  module Medial_Quasigroup: MEDIAL_QUASIGROUP with type t = float = {
+    include Medial_Magma;
   };
   module Loop: LOOP with type t = float = {
     include Quasigroup;
@@ -60,8 +71,12 @@ module Subtractive = {
     type t = float;
     let append = (-.);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = float = Magma;
   module Quasigroup: QUASIGROUP with type t = float = {
     include Magma;
+  };
+  module Medial_Quasigroup: MEDIAL_QUASIGROUP with type t = float = {
+    include Medial_Magma;
   };
 };
 
@@ -70,8 +85,12 @@ module Divisive = {
     type t = float;
     let append = (/.);
   };
+  module Medial_Magma: MEDIAL_MAGMA with type t = float = Magma;
   module Quasigroup: QUASIGROUP with type t = float = {
     include Magma;
+  };
+  module Medial_Quasigroup: MEDIAL_QUASIGROUP with type t = float = {
+    include Medial_Magma;
   };
 };
 
