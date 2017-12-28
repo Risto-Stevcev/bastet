@@ -6,62 +6,65 @@ let swap = (a, b) => (b, a);
 let curry = (f, a, b) => f((a, b));
 let uncurry = (f, (a, b)) => f(a, b);
 
-module Semigroup = (First: SEMIGROUP, Second: SEMIGROUP) => {
-  module Tuple_Semigroup: SEMIGROUP with type t = (First.t, Second.t) = {
+module Magma = (First: MAGMA, Second: MAGMA) => {
+  module Tuple_Magma_: MAGMA with type t = (First.t, Second.t) = {
     type t = (First.t, Second.t);
     let append = ((a, b), (a', b')) => (First.append(a, a'), Second.append(b, b'));
   };
-  include Tuple_Semigroup;
+  include Tuple_Magma_;
+};
+
+module Semigroup = (First: SEMIGROUP, Second: SEMIGROUP) => {
+  module Tuple_Semigroup_: SEMIGROUP with type t = (First.t, Second.t) = {
+    include Magma(First, Second);
+  };
+  include Tuple_Semigroup_;
 };
 
 module Monoid = (First: MONOID, Second: MONOID) => {
-  module Tuple_Semigroup = Semigroup(First, Second);
-  module Tuple_Monoid: MONOID with type t = (First.t, Second.t) = {
-    include Tuple_Semigroup;
+  module Tuple_Monoid_: MONOID with type t = (First.t, Second.t) = {
+    include Semigroup(First, Second);
     let empty = (First.empty, Second.empty)
   };
-  include Tuple_Monoid;
+  include Tuple_Monoid_;
 };
 
 module Functor = (T: TYPE) => {
-  module Tuple_Functor: FUNCTOR with type t('a) = (T.t, 'a) = {
+  module Tuple_Functor_: FUNCTOR with type t('a) = (T.t, 'a) = {
     type t('a) = (T.t, 'a);
     let map = (f, (a, b)) => (a, f(b));
   };
-  include Tuple_Functor;
+  include Tuple_Functor_;
 };
 
 module Apply = (S: SEMIGROUP) => {
-  module Tuple_Functor = Functor(S);
-  module Tuple_Apply: APPLY with type t('a) = (S.t, 'a) = {
-    include Tuple_Functor;
+  module Tuple_Apply_: APPLY with type t('a) = (S.t, 'a) = {
+    include Functor(S);
     let apply = ((a, f), (a', x)) => (S.append(a, a'), f(x));
   };
-  include Tuple_Apply;
+  include Tuple_Apply_;
 };
 
 module Applicative = (M: MONOID) => {
-  module Tuple_Apply = Apply(M);
-  module Tuple_Applicative: APPLICATIVE with type t('a) = (M.t, 'a) = {
-    include Tuple_Apply;
+  module Tuple_Applicative_: APPLICATIVE with type t('a) = (M.t, 'a) = {
+    include Apply(M);
     let pure = (a) => (M.empty, a);
   };
-  include Tuple_Applicative
+  include Tuple_Applicative_;
 };
 
 module Monad = (M: MONOID) => {
-  module Tuple_Applicative = Applicative(M);
-  module Tuple_Monad: MONAD with type t('a) = (M.t, 'a) = {
-    include Tuple_Applicative;
+  module Tuple_Monad_: MONAD with type t('a) = (M.t, 'a) = {
+    include Applicative(M);
     let flat_map = ((a, b), f) => switch (f(b)) {
       | (a', c) => (M.append(a, a'), c)
       }
   };
-  include Tuple_Monad
+  include Tuple_Monad_
 };
 
 module Foldable = (T: TYPE) => {
-  module Tuple_Foldable: FOLDABLE with type t('a) = (T.t, 'a) = {
+  module Tuple_Foldable_: FOLDABLE with type t('a) = (T.t, 'a) = {
     type t('a) = (T.t, 'a);
     let fold_left = (f, init, (_, x)) => f(init, x);
     let fold_right = (f, init, (_ , x)) => f(x, init);
@@ -76,31 +79,29 @@ module Foldable = (T: TYPE) => {
       let fold_map = (f, (_, x)) => f(x);
     };
   };
-  include Tuple_Foldable
+  include Tuple_Foldable_;
 };
 
 module Traversable = (T: TYPE, A: APPLICATIVE) => {
-  module Tuple_Functor = Functor(T);
-  module Tuple_Foldable = Foldable(T);
-  module Tuple_Traversable: TRAVERSABLE
+  module Tuple_Traversable_: TRAVERSABLE
     with type applicative_t('a) = A.t('a) and type t('a) = (T.t, 'a) = {
     type t('a) = (T.t, 'a);
     type applicative_t('a) = A.t('a);
-    include (Tuple_Functor: FUNCTOR with type t('a) := t('a));
-    include (Tuple_Foldable: FOLDABLE with type t('a) := t('a));
+    include (Functor(T): FUNCTOR with type t('a) := t('a));
+    include (Foldable(T): FOLDABLE with type t('a) := t('a));
 
     let traverse = (f, (x, y)) => A.map(z => (x, z), f(y));
     let sequence = ((x, y)) => A.map(z => (x, z), y);
   };
-  include Tuple_Traversable
+  include Tuple_Traversable_;
 };
 
 module Eq = (First: EQ, Second: EQ) => {
-  module Tuple_Eq: EQ with type t = (First.t, Second.t) = {
+  module Tuple_Eq_: EQ with type t = (First.t, Second.t) = {
     type t = (First.t, Second.t);
     let eq = ((a, b), (a', b')) => First.eq(a, a') && Second.eq(b, b');
   };
-  include Tuple_Eq;
+  include Tuple_Eq_;
 };
 
 module Semigroupoid: SEMIGROUPOID with type t('a, 'b) = ('a, 'b) = {
@@ -109,11 +110,11 @@ module Semigroupoid: SEMIGROUPOID with type t('a, 'b) = ('a, 'b) = {
 };
 
 module Show = (First: SHOW, Second: SHOW) => {
-  module Tuple_Show: SHOW with type t = (First.t, Second.t) = {
+  module Tuple_Show_: SHOW with type t = (First.t, Second.t) = {
     type t = (First.t, Second.t);
     let show = ((a, b)) => "(" ++ First.show(a) ++ ", " ++ Second.show(b) ++ ")";
   };
-  include Tuple_Show;
+  include Tuple_Show_;
 };
 
 module Bifunctor: BIFUNCTOR with type t('a, 'b) = ('a, 'b) = {
@@ -148,9 +149,9 @@ module Bifoldable: BIFOLDABLE with type t('a, 'b) = ('a, 'b) = {
 };
 
 module Bitraversable = (A: APPLICATIVE) => {
-  module I = Infix.Apply(A);
-  module Tuple_Bitraversable: BITRAVERSABLE
+  module Tuple_Bitraversable_: BITRAVERSABLE
     with type applicative_t('a) = A.t('a) and type t('a, 'b) = ('a, 'b) = {
+    module I = Infix.Apply(A);
     type t('a, 'b) = ('a, 'b);
     type applicative_t('a) = A.t('a);
     include (Bifunctor: BIFUNCTOR with type t('a, 'b) := t('a, 'b));
@@ -159,5 +160,5 @@ module Bitraversable = (A: APPLICATIVE) => {
     let bitraverse = (f, g, (a, b)) => I.(A.map((a, b) => (a, b), f(a)) <*> g(b));
     let bisequence = ((a, b)) => I.(A.map((a, b) => (a, b), a) <*> b);
   };
-  include Tuple_Bitraversable;
+  include Tuple_Bitraversable_;
 };

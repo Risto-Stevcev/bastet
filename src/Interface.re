@@ -6,14 +6,22 @@ module type TYPE = {
   type t;
 };
 
-module type SEMIGROUP = {
+module type MAGMA = {
   type t;
   let append: (t, t) => t;
 };
 
-module type SEMIGROUP_ANY = {
+module type MAGMA_ANY = {
   type t('a);
   let append: (t('a), t('a)) => t('a);
+};
+
+module type SEMIGROUP = {
+  include MAGMA;
+};
+
+module type SEMIGROUP_ANY = {
+  include MAGMA_ANY;
 };
 
 module type MONOID = {

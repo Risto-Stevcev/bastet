@@ -14,12 +14,12 @@ module Semigroup_Any = (S: SEMIGROUP_ANY) => {
 
 module Monoid = (M: MONOID) => {
   module I = Infix.Monoid(M);
-  let neutral: M.t => bool = (a) => I.(a <:> empty == a && empty <:> a == a);
+  let neutral: M.t => bool = (a) => I.(a <:> M.empty == a && M.empty <:> a == a);
 };
 
 module Monoid_Any = (M: MONOID_ANY) => {
   module I = Infix.Monoid_Any(M);
-  let neutral: M.t('a) => bool = (a) => I.(a <:> empty == a && empty <:> a == a);
+  let neutral: M.t('a) => bool = (a) => I.(a <:> M.empty == a && M.empty <:> a == a);
 };
 
 module Functor = (F: FUNCTOR) => {
@@ -39,7 +39,6 @@ module Apply = (A: APPLY) => {
 
 module Applicative = (A: APPLICATIVE) => {
   module I = Infix.Apply(A);
-
   let identity: A.t('a) => bool = (a) => I.({
     A.pure(Function.Category.id) <*> a == a
   });
@@ -51,16 +50,15 @@ module Applicative = (A: APPLICATIVE) => {
   });
 };
 
-module Monad = (A: MONAD) => {
-  module I = Infix.Monad(A);
-
-  let associativity: ('a => A.t('b), 'b => A.t('c), A.t('a)) => bool =
+module Monad = (M: MONAD) => {
+  module I = Infix.Monad(M);
+  let associativity: ('a => M.t('b), 'b => M.t('c), M.t('a)) => bool =
     (f, g, x) => I.({
       (x >>= f) >>= g == (x >>= (k) => f(k) >>= g)
     });
-  let left_identity: ('a => A.t('b), 'a) => bool =
-    (f, x) => I.(pure(x) >>= f == f(x));
-  let right_identity: A.t('a) => bool = (x) => I.(x >>= pure == x);
+  let left_identity: ('a => M.t('b), 'a) => bool =
+    (f, x) => I.(M.pure(x) >>= f == f(x));
+  let right_identity: M.t('a) => bool = (x) => I.(x >>= M.pure == x);
 };
 
 module Alt = (A: ALT) => {
@@ -79,11 +77,7 @@ module Plus = (P: PLUS) => {
 };
 
 module Alternative = (A: ALTERNATIVE) => {
-  module I = {
-    include Infix.Alt(A);
-    include (Infix.Apply(A): (module type of Infix.Apply(A)) with type t('a) := t('a));
-  };
-
+  module I = Infix.Alternative(A);
   let distributivity: (A.t('a => 'b), A.t('a => 'b), A.t('a)) => bool =
     (f, g, x) => I.((f <|> g) <*> x == ((f <*> x) <|> (g <*> x)));
   let annihalation: A.t('a => 'b) => bool = (f) => I.(A.empty <*> f == A.empty);
@@ -299,7 +293,6 @@ module Bifunctor = (B: BIFUNCTOR) => {
   let identity: B.t('a, 'b) => bool = (a) => B.bimap(id, id, a) == a;
   let composition: ('b => 'e, 'd => 'f, 'a => 'b, 'c => 'd, B.t('a, 'c)) => bool =
     (f1, g1, f2, g2, a) => {
-      (B.bimap(f1, g1) <. B.bimap(f2, g2))(a) ==
-      B.bimap(f1 <. f2, g1 <. g2, a)
+      (B.bimap(f1, g1) <. B.bimap(f2, g2))(a) == B.bimap(f1 <. f2, g1 <. g2, a)
     };
 };

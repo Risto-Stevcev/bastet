@@ -17,7 +17,6 @@ module Functor: FUNCTOR with type t('a) = array('a) = {
   let map = (f) => ArrayLabels.map(~f)
 };
 
-
 module Apply: APPLY with type t('a) = array('a) = {
   include Functor;
   let apply = (fn_array, a) =>
@@ -28,12 +27,10 @@ module Apply: APPLY with type t('a) = array('a) = {
     )
 };
 
-
 module Applicative: APPLICATIVE with type t('a) = array('a) = {
   include Apply;
   let pure = (a) => [|a|];
 };
-
 
 module Monad: MONAD with type t('a) = array('a) = {
   include Applicative;
@@ -45,24 +42,20 @@ module Monad: MONAD with type t('a) = array('a) = {
     )
 };
 
-
 module Alt: ALT with type t('a) = array('a) = {
   include Functor;
   let alt = Js.Array.concat;
 };
-
 
 module Plus: PLUS with type t('a) = array('a) = {
   include Alt;
   let empty = [||];
 };
 
-
 module Alternative: ALTERNATIVE with type t('a) = array('a) = {
   include Applicative;
   include (Plus: PLUS with type t('a) := t('a));
 };
-
 
 module Foldable: FOLDABLE with type t('a) = array('a) = {
   type t('a) = array('a);
@@ -70,7 +63,7 @@ module Foldable: FOLDABLE with type t('a) = array('a) = {
   let fold_right = (f, init) => ArrayLabels.fold_right(~f, ~init);
 
   module Fold_Map = (M: MONOID) => {
-     module D = Default.Fold_Map(M, {
+    module D = Default.Fold_Map(M, {
       type t('a) = array('a);
       let (fold_left, fold_right) = (fold_left, fold_right);
     });
@@ -92,9 +85,8 @@ module Foldable: FOLDABLE with type t('a) = array('a) = {
   };
 };
 
-
 module Traversable = (A: APPLICATIVE) => {
-  module Array_Traversable: TRAVERSABLE
+  module Array_Traversable_: TRAVERSABLE
     with type applicative_t('a) = A.t('a) and type t('a) = array('a) = {
     type t('a) = array('a);
     type applicative_t('a) = A.t('a);
@@ -115,26 +107,23 @@ module Traversable = (A: APPLICATIVE) => {
     });
     let sequence = D.sequence_default;
   };
-  include Array_Traversable;
+  include Array_Traversable_;
 };
 
-
 module Eq = (E: EQ) => {
-  module Array_Eq: EQ with type t = array(E.t) = {
+  module Array_Eq_: EQ with type t = array(E.t) = {
     type t = array(E.t);
     let eq = (xs, ys) => {
       Js.Array.length(xs) == Js.Array.length(ys) &&
       Js.Array.every(((a, b)) => E.eq(a, b), zip(xs, ys))
     };
   };
-  include Array_Eq;
+  include Array_Eq_;
 };
 
-
 module Ord = (O: ORD) => {
-  module Array_Eq = Eq(O);
-  module Array_Ord: ORD with type t = array(O.t) = {
-    include Array_Eq;
+  module Array_Ord_: ORD with type t = array(O.t) = {
+    include Eq(O);
     let compare = (xs, ys) => {
       if (Js.Array.length(xs) == Js.Array.length(ys)) {
         Js.Array.reducei((acc, e, index) => {
@@ -145,27 +134,27 @@ module Ord = (O: ORD) => {
       else { `greater_than }
     };
   };
-  include Array_Ord;
+  include Array_Ord_;
 };
-
 
 module Show = (S: SHOW) => {
-  module F = Functions.Foldable(Foldable);
-  module M = F.Monoid(String.Monoid);
-  module Array_Show: SHOW with type t = array(S.t) = {
+  let _intercalate = {
+    module F = Functions.Foldable(Foldable);
+    module M = F.Monoid(String.Monoid);
+    M.intercalate
+  };
+  module Array_Show_: SHOW with type t = array(S.t) = {
     type t = array(S.t);
     let show =
-      (xs) => "["++ M.intercalate(~separator=", ", Functor.map(S.show, xs)) ++ "]";
+      (xs) => "["++ _intercalate(~separator=", ", Functor.map(S.show, xs)) ++ "]";
   };
-  include Array_Show;
+  include Array_Show_;
 };
-
 
 module Invariant: INVARIANT with type t('a) = array('a) = {
   type t('a) = array('a);
   let imap = (f, _) => Functor.map(f);
 };
-
 
 module Monad_Zero: MONAD_ZERO with type t('a) = array('a) = {
   include Monad;
@@ -179,4 +168,10 @@ module Monad_Plus: MONAD_PLUS with type t('a) = array('a) = {
 module Extend: EXTEND with type t('a) = array('a) = {
   include Functor;
   let extend = (f, xs) => Js.Array.mapi((_, i) => f(Js.Array.sliceFrom(i, xs)), xs);
+};
+
+module Infix = {
+  include Infix.Monad(Monad);
+  include Infix.Extend(Extend);
+  include Infix.Alternative(Alternative);
 };

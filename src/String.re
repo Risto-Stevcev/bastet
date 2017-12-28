@@ -1,8 +1,11 @@
 open Interface;
 
-module Semigroup: SEMIGROUP with type t = string = {
+module Magma: MAGMA with type t = string = {
   type t = string;
   let append = (++);
+};
+module Semigroup: SEMIGROUP with type t = string = {
+  include Magma;
 };
 
 module Monoid: MONOID with type t = string = {
@@ -18,4 +21,10 @@ module Eq: EQ with type t = string = {
 module Ord: ORD with type t = string = {
   include Eq;
   let compare = unsafe_compare;
+};
+
+module Infix = {
+  include Infix.Monoid(Monoid);
+  include Infix.Eq(Eq);
+  include Infix.Ord(Ord);
 };

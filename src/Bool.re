@@ -1,9 +1,12 @@
 open Interface;
 
 module Conjunctive = {
-  module Semigroup: SEMIGROUP with type t = bool = {
+  module Magma: MAGMA with type t = bool = {
     type t = bool;
     let append = (&&);
+  };
+  module Semigroup: SEMIGROUP with type t = bool = {
+    include Magma;
   };
   module Monoid: MONOID with type t = bool = {
     include Semigroup;
@@ -12,9 +15,12 @@ module Conjunctive = {
 };
 
 module Disjunctive = {
-  module Semigroup: SEMIGROUP with type t = bool = {
+  module Magma: MAGMA with type t = bool = {
     type t = bool;
     let append = (||);
+  };
+  module Semigroup: SEMIGROUP with type t = bool = {
+    include Magma;
   };
   module Monoid: MONOID with type t = bool = {
     include Semigroup;
@@ -94,4 +100,15 @@ module Boolean_Algebra: BOOLEAN_ALGEBRA with type t = bool = {
 module Show: SHOW with type t = bool = {
   type t = bool;
   let show = string_of_bool;
+};
+
+module Infix = {
+  module Conjunctive = {
+    include Infix.Monoid(Conjunctive.Monoid)
+  };
+  module Disjunctive = {
+    include Infix.Monoid(Disjunctive.Monoid)
+  };
+  include Infix.Eq(Eq);
+  include Infix.Ord(Ord);
 };

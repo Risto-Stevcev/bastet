@@ -32,10 +32,7 @@ module Functor = (F: FUNCTOR) => {
 };
 
 module Apply = (A: APPLY) => {
-  module I = {
-    include Infix.Apply(A);
-    include (Infix.Functor(A): (module type of Infix.Functor(A)) with type t('a) := t('a))
-  };
+  module I = Infix.Apply(A);
   open I;
 
   let apply_first: (A.t('a), A.t('b)) => A.t('a) = (a, b) => const <$> a <*> b;
@@ -76,7 +73,7 @@ module Monad = (M: MONAD) => {
   let if_m: (M.t(bool), M.t('a), M.t('a)) => M.t('a) =
     (p, t, f) => I.(p >>= (p') => p' ? t : f);
   let liftM1: (('a => 'b), M.t('a)) => M.t('b) =
-    (f, fa) => I.(fa >>= (fa') => pure(f(fa')));
+    (f, fa) => I.(fa >>= (fa') => M.pure(f(fa')));
   let ap: (M.t('a => 'b), M.t('a)) => M.t('b) =
     (f, fa) => I.({
       f >>= (f') =>

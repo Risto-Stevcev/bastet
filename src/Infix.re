@@ -1,45 +1,51 @@
 open Interface;
 
+module Magma = (M: MAGMA) => {
+  let (<:>) = M.append;
+};
+
 module Semigroup = (S: SEMIGROUP) => {
-  include S;
-  let (<:>) = append;
+  let (<:>) = S.append;
 };
 
 module Semigroup_Any = (S: SEMIGROUP_ANY) => {
-  include S;
-  let (<:>) = append;
+  let (<:>) = S.append;
 };
 
 module Monoid = (M: MONOID) => {
-  include M;
-  let (<:>) = append;
+  include Semigroup(M);
+  let (<:>) = M.append;
 };
 
 module Monoid_Any = (M: MONOID_ANY) => {
-  include M;
-  let (<:>) = append;
+  include Semigroup_Any(M);
+  let (<:>) = M.append;
 };
 
 module Functor = (F: FUNCTOR) => {
-  include F;
-  let (<$>) = map;
-  let (<#>) = (f, x) => map(x, f);
+  let (<$>) = F.map;
+  let (<#>) = (f, x) => F.map(x, f);
 };
 
 module Apply = (A: APPLY) => {
-  include A;
-  let (<*>) = apply;
+  include Functor(A);
+  let (<*>) = A.apply;
 };
 
 module Monad = (M: MONAD) => {
-  include M;
-  let (>>=) = flat_map;
-  let (=<<) = (ma, f) => flat_map(f, ma);
+  include Apply(M);
+  let (>>=) = M.flat_map;
+  let (=<<) = (ma, f) => M.flat_map(f, ma);
 };
 
 module Alt = (A: ALT) => {
-  include A;
-  let (<|>) = alt;
+  include Functor(A);
+  let (<|>) = A.alt;
+};
+
+module Alternative = (A: ALTERNATIVE) => {
+  include Alt(A);
+  include Apply(A);
 };
 
 module Semigroupoid = (S: SEMIGROUPOID) => {
@@ -48,16 +54,14 @@ module Semigroupoid = (S: SEMIGROUPOID) => {
 };
 
 module Eq = (E: EQ) => {
-  include E;
-  let (=|=) = eq;
+  let (=|=) = E.eq;
 };
 
 module Ord = (O: ORD) => {
-  module Fn = Ordering(O);
-  let (<||) = Fn.less_than;
-  let (||>) = Fn.greater_than;
-  let (<|=) = Fn.less_than_or_equal;
-  let (>|=) = Fn.greater_than_or_equal;
+  let ((<||), (||>), (<|=), (>|=)) = {
+    module Fn = Ordering(O);
+   (Fn.less_than, Fn.greater_than, Fn.less_than_or_equal, Fn.greater_than_or_equal)
+  };
 };
 
 module Semiring = (S: SEMIRING) => {
@@ -66,14 +70,12 @@ module Semiring = (S: SEMIRING) => {
 };
 
 module Ring = (R: RING) => {
-  module S_ = Semiring(R);
-  include S_;
+  include Semiring(R);
   let (|-|) = R.subtract;
 };
 
 module Euclidean_Ring = (E: EUCLIDEAN_RING) => {
-  module R_ = Ring(E);
-  include R_;
+  include Ring(E);
   let (|/|) = E.divide;
   let (|%|) = E.modulo;
 };

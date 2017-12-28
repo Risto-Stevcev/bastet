@@ -1,9 +1,12 @@
 open Interface;
 
 module Additive = {
-  module Semigroup: SEMIGROUP with type t = int = {
+  module Magma: MAGMA with type t = int = {
     type t = int;
     let append = (+);
+  };
+  module Semigroup: SEMIGROUP with type t = int = {
+    include Magma;
   };
   module Monoid: MONOID with type t = int = {
     include Semigroup;
@@ -12,9 +15,12 @@ module Additive = {
 };
 
 module Multiplicative = {
-  module Semigroup: SEMIGROUP with type t = int = {
+  module Magma: MAGMA with type t = int = {
     type t = int;
     let append = (*);
+  };
+  module Semigroup: SEMIGROUP with type t = int = {
+    include Magma;
   };
   module Monoid: MONOID with type t = int = {
     include Semigroup;
@@ -69,14 +75,12 @@ module Euclidean_Ring: EUCLIDEAN_RING with type t = int = {
 
 module Infix = {
   module Additive = {
-    module Semigroup = Infix.Semigroup(Additive.Semigroup);
+    include Infix.Semigroup(Additive.Semigroup);
   };
   module Multiplicative = {
-    module Semigroup = Infix.Semigroup(Multiplicative.Semigroup);
+    include Infix.Semigroup(Multiplicative.Semigroup);
   };
-  module Eq = Infix.Eq(Eq);
-  module Ord = Infix.Ord(Ord);
-  module Semiring = Infix.Semiring(Semiring);
-  module Ring = Infix.Ring(Ring);
-  module Euclidean_Ring = Infix.Euclidean_Ring(Euclidean_Ring);
+  include Infix.Eq(Eq);
+  include Infix.Ord(Ord);
+  include Infix.Euclidean_Ring(Euclidean_Ring);
 };

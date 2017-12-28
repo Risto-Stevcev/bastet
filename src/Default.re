@@ -1,4 +1,4 @@
-let (<.) = Function.Infix.Semigroupoid.(<.);
+let (<.) = Function.Infix.(<.);
 
 module type FOLD = {
   type t('a);
@@ -44,7 +44,7 @@ module type FOLD_MAP = {
 module Fold = (F: FOLD_MAP) => {
   type t('a) = F.t('a);
   module Dual_Endo = Dual.Monoid_Any(Endo.Monoid);
-  module Dual_Fold_Map = F.Fold_Map_Any(Dual_Endo.Monoid_Any);
+  module Dual_Fold_Map = F.Fold_Map_Any(Dual_Endo);
   module Endo_Fold_Map = F.Fold_Map_Any(Endo.Monoid);
 
   let fold_left_default = (f, init, xs) => {

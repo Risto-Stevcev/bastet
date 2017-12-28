@@ -60,7 +60,7 @@ describe("Float", () => {
 
   describe("Semiring", () => {
     module V = Verify.Semiring(Float.Semiring);
-    let ((|+|), (|*|)) = Float.Infix.Semiring.((|+|), (|*|));
+    let ((|+|), (|*|)) = Float.Infix.((|+|), (|*|));
 
     property3(
       "should satisfy additive associativity",
@@ -116,7 +116,7 @@ describe("Float", () => {
   });
 
   describe("Division Ring", () => {
-    let (|*|) = Float.Infix.Semiring.((|*|));
+    let (|*|) = Float.Infix.((|*|));
     module V = Verify.Division_Ring(Float.Division_Ring);
     it("should be a non-zero ring (one is not zero)", () => {
       expect(V.non_zero_ring).to_be(true);
@@ -145,7 +145,7 @@ describe("Float", () => {
     property2(
       "should satisfy the properties for remainder",
       arb_float', arb_float',
-      (a, b) => Float.Infix.Euclidean_Ring.({
+      (a, b) => Float.Infix.({
         if (b != zero) {
           let q = a |/| b;
           let r = a |%| b;

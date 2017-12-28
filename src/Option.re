@@ -8,7 +8,6 @@ let maybe: (~f:'a => 'b, ~default:'b, option('a)) => 'b =
   | None => default
   };
 
-
 module Functor: FUNCTOR with type t('a) = option('a) = {
   type t('a) = option('a);
   let map = (f, a) => switch a {
@@ -16,7 +15,6 @@ module Functor: FUNCTOR with type t('a) = option('a) = {
     | None => None
     };
 };
-
 
 module Apply: APPLY with type t('a) = option('a) = {
   include Functor;
@@ -26,12 +24,10 @@ module Apply: APPLY with type t('a) = option('a) = {
     }
 };
 
-
 module Applicative: APPLICATIVE with type t('a) = option('a) = {
   include Apply;
   let pure = (a) => Some(a);
 };
-
 
 module Monad: MONAD with type t('a) = option('a) = {
   include Applicative;
@@ -41,30 +37,33 @@ module Monad: MONAD with type t('a) = option('a) = {
     };
 };
 
-
-module Semigroup = (S: SEMIGROUP) => {
-  module Option_Semigroup: SEMIGROUP with type t = option(S.t) = {
-    type t = option(S.t);
+module Magma = (M: MAGMA) => {
+  module Option_Magma_: MAGMA with type t = option(M.t) = {
+    type t = option(M.t);
     let append = (a, b) => switch (a, b) {
-      | (Some(a), Some(b)) => Some(S.append(a, b))
+      | (Some(a), Some(b)) => Some(M.append(a, b))
       | (Some(a), _)
       | (_, Some(a)) => Some(a)
       | _ => None
       };
   };
-  include Option_Semigroup;
+  include Option_Magma_;
 };
 
+module Semigroup = (S: SEMIGROUP) => {
+  module Option_Semigroup_: SEMIGROUP with type t = option(S.t) = {
+    include Magma(S);
+  };
+  include Option_Semigroup_;
+};
 
 module Monoid = (S: SEMIGROUP) => {
-  module Option_Semigroup = Semigroup(S);
-  module Option_Monoid: MONOID with type t = option(S.t) = {
-    include Option_Semigroup;
+  module Option_Monoid_: MONOID with type t = option(S.t) = {
+    include Semigroup(S);
     let empty = None;
   };
-  include Option_Monoid;
+  include Option_Monoid_;
 };
-
 
 module Alt: ALT with type t('a) = option('a) = {
   include Functor;
@@ -74,18 +73,15 @@ module Alt: ALT with type t('a) = option('a) = {
     };
 };
 
-
 module Plus: PLUS with type t('a) = option('a) = {
   include Alt;
   let empty = None;
 };
 
-
 module Alternative: ALTERNATIVE with type t('a) = option('a) = {
   include Applicative;
   include (Plus: PLUS with type t('a) := t('a));
 };
-
 
 module Foldable: FOLDABLE with type t('a) = option('a) = {
   type t('a) = option('a);
@@ -103,9 +99,8 @@ module Foldable: FOLDABLE with type t('a) = option('a) = {
   };
 };
 
-
 module Traversable = (A: APPLICATIVE) => {
-  module Option_Traversable: TRAVERSABLE
+  module Option_Traversable_: TRAVERSABLE
     with type applicative_t('a) = A.t('a) and type t('a) = option('a) = {
     type t('a) = option('a);
     type applicative_t('a) = A.t('a);
@@ -115,12 +110,11 @@ module Traversable = (A: APPLICATIVE) => {
     let traverse = (f, x) => maybe(~f=A.map(a => Some(a)) <. f, ~default=A.pure(None), x);
     let sequence = (x) => maybe(~f=A.map(a => Some(a)), ~default=A.pure(None), x);
   };
-  include Option_Traversable;
+  include Option_Traversable_;
 };
 
-
 module Eq = (E: EQ) => {
-  module Option_Eq: EQ with type t = option(E.t) = {
+  module Option_Eq_: EQ with type t = option(E.t) = {
     type t = option(E.t);
     let eq = (xs, ys) => switch (xs, ys) {
       | (Some(a), Some(b)) => E.eq(a, b)
@@ -128,17 +122,21 @@ module Eq = (E: EQ) => {
       | _ => false
       };
   };
-  include Option_Eq;
+  include Option_Eq_;
 };
 
-
 module Show = (S: SHOW) => {
-  module Option_Show: SHOW with type t = option(S.t) = {
+  module Option_Show_: SHOW with type t = option(S.t) = {
     type t = option(S.t);
     let show = (a) => switch a {
       | Some(a') => "Some(" ++ S.show(a') ++ ")"
       | None => "None"
       }
   };
-  include Option_Show;
+  include Option_Show_;
+};
+
+module Infix = {
+  include Infix.Monad(Monad);
+  include Infix.Alternative(Alternative);
 };

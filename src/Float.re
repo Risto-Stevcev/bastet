@@ -4,9 +4,12 @@ let approximately_equal: (~tolerance:float, float, float) => bool =
   (~tolerance, a, b) => Js.Math.abs_float(a -. b) <= tolerance;
 
 module Additive = {
-  module Semigroup: SEMIGROUP with type t = float = {
+  module Magma: MAGMA with type t = float = {
     type t = float;
     let append = (+.);
+  };
+  module Semigroup: SEMIGROUP with type t = float = {
+    include Magma;
   };
   module Monoid: MONOID with type t = float = {
     include Semigroup;
@@ -15,9 +18,12 @@ module Additive = {
 };
 
 module Multiplicative = {
-  module Semigroup: SEMIGROUP with type t = float = {
+  module Magma: MAGMA with type t = float = {
     type t = float;
     let append = (*.);
+  };
+  module Semigroup: SEMIGROUP with type t = float = {
+    include Magma;
   };
   module Monoid: MONOID with type t = float = {
     include Semigroup;
@@ -82,14 +88,12 @@ module Field: FIELD with type t = float = {
 
 module Infix = {
   module Additive = {
-    module Semigroup = Infix.Semigroup(Additive.Semigroup);
+    include Infix.Semigroup(Additive.Semigroup);
   };
   module Multiplicative = {
-    module Semigroup = Infix.Semigroup(Multiplicative.Semigroup);
+    include Infix.Semigroup(Multiplicative.Semigroup);
   };
-  module Eq = Infix.Eq(Eq);
-  module Ord = Infix.Ord(Ord);
-  module Semiring = Infix.Semiring(Semiring);
-  module Ring = Infix.Ring(Ring);
-  module Euclidean_Ring = Infix.Euclidean_Ring(Euclidean_Ring);
+  include Infix.Eq(Eq);
+  include Infix.Ord(Ord);
+  include Infix.Euclidean_Ring(Euclidean_Ring);
 };

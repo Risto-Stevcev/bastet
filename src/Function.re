@@ -6,13 +6,12 @@ let const: ('a, 'b) => 'a = (a, _) => a;
 
 
 module Functor = (T: TYPE) => {
-  module Function_Functor: FUNCTOR with type t('b) = T.t => 'b = {
+  module Function_Functor_: FUNCTOR with type t('b) = T.t => 'b = {
     type t('b) = T.t => 'b;
     let map = (f, g, x) => f(g(x));
   };
-  include Function_Functor;
+  include Function_Functor_;
 };
-
 
 module Semigroupoid: SEMIGROUPOID with type t('a, 'b) = 'a => 'b = {
   type t('a, 'b) = 'a => 'b;
@@ -26,11 +25,11 @@ module Category: CATEGORY with type t('a, 'b) = 'a => 'b = {
 
 module Invariant = (T: TYPE) => {
   module F = Functor(T);
-  module Function_Invariant: INVARIANT with type t('b) = T.t => 'b = {
+  module Function_Invariant_: INVARIANT with type t('b) = T.t => 'b = {
     type t('b) = T.t => 'b;
     let imap = (f, _) => F.map(f);
   };
-  include Function_Invariant;
+  include Function_Invariant_;
 };
 
 module Profunctor: PROFUNCTOR with type t('a, 'b) = 'a => 'b = {
@@ -41,6 +40,5 @@ module Profunctor: PROFUNCTOR with type t('a, 'b) = 'a => 'b = {
 };
 
 module Infix = {
-  module Semigroupoid = Infix.Semigroupoid(Semigroupoid);
-  include Semigroupoid;
+  include Infix.Semigroupoid(Semigroupoid)
 };
