@@ -83,6 +83,9 @@ module type GROUP_LOOP_ANY = (G: GROUP_ANY) => LOOP_ANY;
 module type ABELIAN_GROUP = {
   include GROUP;
 };
+module type ABELIAN_GROUP_ANY = {
+  include GROUP_ANY;
+};
 
 module type FUNCTOR = {
   type t('a);
@@ -161,6 +164,16 @@ module type CATEGORY = {
 module type EQ = {
   type t;
   let eq: (t, t) => bool;
+};
+
+module type EQ1 = {
+  type t('a);
+  let eq: (t('a), t('a)) => bool;
+};
+
+module type EQ2 = {
+  type t('a, 'b);
+  let eq: (t('a, 'b), t('a, 'b)) => bool;
 };
 
 
