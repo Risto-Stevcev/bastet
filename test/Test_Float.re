@@ -33,14 +33,9 @@ describe("Float", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Additive.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_float', arb_float', arb_float',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_float', arb_float', arb_float',
-        V.right_cancellative
+        V.cancellative
       );
     });
     describe("Loop", () => {
@@ -92,14 +87,9 @@ describe("Float", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Multiplicative.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_float', arb_float', arb_float',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_float', arb_float', arb_float',
-        V.right_cancellative
+        V.cancellative
       );
     });
     describe("Loop", () => {
@@ -120,14 +110,9 @@ describe("Float", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Subtractive.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_float', arb_float', arb_float',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_float', arb_float', arb_float',
-        V.right_cancellative
+        V.cancellative
       );
     });
   });
@@ -150,14 +135,9 @@ describe("Float", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Divisive.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_float', arb_float', arb_float',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_float', arb_float', arb_float',
-        V.right_cancellative
+        V.cancellative
       );
     });
   });

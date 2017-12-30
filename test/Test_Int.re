@@ -29,14 +29,9 @@ describe("Int", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Int.Additive.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_int', arb_int', arb_int',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_int', arb_int', arb_int',
-        V.right_cancellative
+        V.cancellative
       );
     });
     describe("Loop", () => {
@@ -80,14 +75,9 @@ describe("Int", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Int.Multiplicative.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_int', arb_int', arb_int',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_int', arb_int', arb_int',
-        V.right_cancellative
+        V.cancellative
       );
     });
     describe("Loop", () => {
@@ -108,14 +98,9 @@ describe("Int", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Int.Subtractive.Quasigroup);
       property3(
-        "should satisfy left cancellative",
+        "should satisfy cancellative",
         arb_int', arb_int', arb_int',
-        V.left_cancellative
-      );
-      property3(
-        "should satisfy right cancellative",
-        arb_int', arb_int', arb_int',
-        V.right_cancellative
+        V.cancellative
       );
     });
   });
@@ -157,14 +142,7 @@ describe("Int", () => {
       "should satisfy multiplicative identity", arb_int', V.multiplicative_identity
     );
     property3(
-      "should satisfy left distributivity",
-      arb_int', arb_int', arb_int',
-      V.left_distributivity
-    );
-     property3(
-      "should satisfy right distributivity",
-      arb_int', arb_int', arb_int',
-      V.right_distributivity
+      "should satisfy distributivity", arb_int', arb_int', arb_int', V.distributivity
     );
   });
 

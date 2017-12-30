@@ -65,10 +65,7 @@ describe("Tuple", () => {
       V.associativity(pure <. string_of_int, pure <. (++)("!"))
     );
     property1(
-      "should satisfy left identity", arb_nat, V.left_identity(pure <. string_of_int)
-    );
-    property1(
-      "should satisfy right identity", arb_tuple((arb_string, arb_nat)), V.right_identity
+      "should satisfy identity", arb_nat, V.identity(pure <. string_of_int)
     );
   });
 

@@ -75,14 +75,7 @@ describe("Option", () => {
       arb_tuple((arb_nat, arb_bool)),
       V.associativity(pure <. string_of_int, pure <. (++)("!")) <. option_from_tuple
     );
-    property1(
-      "should satisfy left identity", arb_nat, V.left_identity(pure <. string_of_int)
-    );
-    property1(
-      "should satisfy right identity",
-      arb_tuple((arb_nat, arb_bool)),
-      V.right_identity <. option_from_tuple
-    );
+    property1("should satisfy identity", arb_nat, V.identity(pure <. string_of_int));
   });
 
   describe("Alt", () => {
@@ -108,19 +101,13 @@ describe("Option", () => {
 
   describe("Plus", () => {
     module V = Verify.Plus(Option.Plus);
-
     it("should satisfy annihalation", () => {
       expect(V.annihalation(string_of_int)).to_be(true);
     });
     property1(
-      "should satisfy left identity",
+      "should satisfy identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.left_identity <. option_from_tuple
-    );
-    property1(
-      "should satisfy right identity",
-      arb_tuple((arb_nat, arb_bool)),
-      V.right_identity <. option_from_tuple
+      V.identity <. option_from_tuple
     );
   });
 

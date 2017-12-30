@@ -61,12 +61,7 @@ describe("Array", () => {
       arb_array(arb_nat),
       V.associativity(pure <. string_of_int, pure <. (++)("!"))
     );
-    property1(
-      "should satisfy left identity", arb_nat, V.left_identity(pure <. string_of_int)
-    );
-    property1(
-      "should satisfy right identity", arb_array(arb_nat), V.right_identity
-    );
+    property1("should satisfy identity", arb_nat, V.identity(pure <. string_of_int));
   });
 
   describe("Alt", () => {
@@ -88,8 +83,7 @@ describe("Array", () => {
     it("should satisfy annihalation", () => {
       expect(V.annihalation(string_of_int)).to_be(true);
     });
-    property1("should satisfy left identity", arb_array(arb_nat), V.left_identity);
-    property1("should satisfy right identity", arb_array(arb_nat), V.right_identity);
+    property1("should satisfy identity", arb_array(arb_nat), V.identity);
   });
 
   describe("Alternative", () => {

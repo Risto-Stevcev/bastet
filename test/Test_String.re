@@ -19,14 +19,9 @@ describe("String", () => {
   describe("Quasigroup", () => {
     module V = Verify.Quasigroup(String.Quasigroup);
     property3(
-      "should satisfy left cancellative",
+      "should satisfy cancellative",
       arb_string, arb_string, arb_string,
-      V.left_cancellative
-    );
-    property3(
-      "should satisfy right cancellative",
-      arb_string, arb_string, arb_string,
-      V.right_cancellative
+      V.cancellative
     );
   });
   describe("Loop", () => {

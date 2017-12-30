@@ -28,17 +28,15 @@ module Compare = {
   };
   module Quasigroup = (Q: QUASIGROUP, E: EQ with type t = Q.t) => {
     module I = Infix.Magma(Q);
-    let left_cancellative: (Q.t, Q.t, Q.t) => bool =
-      (a, b, c) => I.(!E.eq(a <:> b, (a <:> c)) || E.eq(b, c));
-    let right_cancellative: (Q.t, Q.t, Q.t) => bool =
-      (a, b, c) => I.(!E.eq(b <:> a, (c <:> a)) || E.eq(b, c));
+    let cancellative: (Q.t, Q.t, Q.t) => bool =
+      (a, b, c) => I.(!E.eq(a <:> b, (a <:> c)) || E.eq(b, c)) &&
+                   I.(!E.eq(b <:> a, (c <:> a)) || E.eq(b, c));
   };
   module Quasigroup_Any = (Q: QUASIGROUP_ANY, E: EQ1 with type t('a) = Q.t('a)) => {
     module I = Infix.Magma_Any(Q);
-    let left_cancellative: (Q.t('a), Q.t('a), Q.t('a)) => bool =
-      (a, b, c) => I.(!E.eq(a <:> b, (a <:> c)) || E.eq(b, c));
-    let right_cancellative: (Q.t('a), Q.t('a), Q.t('a)) => bool =
-      (a, b, c) => I.(!E.eq(b <:> a, (c <:> a)) || E.eq(b, c));
+    let cancellative: (Q.t('a), Q.t('a), Q.t('a)) => bool =
+      (a, b, c) => I.(!E.eq(a <:> b, (a <:> c)) || E.eq(b, c)) &&
+                   I.(!E.eq(b <:> a, (c <:> a)) || E.eq(b, c));
   };
   module Medial_Quasigroup = (Q: MEDIAL_QUASIGROUP, E: EQ with type t = Q.t) => {
     include Quasigroup(Q, E);
@@ -103,9 +101,8 @@ module Compare = {
     module I = Infix.Monad(M);
     let associativity: ('a => M.t('b), 'b => M.t('c), M.t('a)) => bool =
       (f, g, x) => I.(E.eq((x >>= f) >>= g, x >>= (k) => f(k) >>= g));
-    let left_identity: ('a => M.t('b), 'a) => bool =
-      (f, x) => I.(E.eq(M.pure(x) >>= f, f(x)));
-    let right_identity: M.t('a) => bool = (x) => I.(E.eq(x >>= M.pure, x));
+    let identity: ('a => M.t('b), 'a) => bool =
+      (f, x) => I.(E.eq(M.pure(x) >>= f, f(x)) && E.eq(M.pure(x) >>= M.pure, M.pure(x)));
   };
   module Alt = (A: ALT, E: EQ1 with type t('a) = A.t('a)) => {
     module I = Infix.Alt(A);
@@ -117,8 +114,8 @@ module Compare = {
   module Plus = (P: PLUS, E: EQ1 with type t('a) = P.t('a)) => {
     module I = Infix.Alt(P);
     let annihalation: ('a => 'b) => bool = (f) => E.eq(P.map(f, P.empty), P.empty);
-    let left_identity: P.t('a) => bool = (a) => I.(E.eq(P.empty <|> a, a));
-    let right_identity: P.t('a) => bool = (a) => I.(E.eq(a <|> P.empty, a));
+    let identity: P.t('a) => bool =
+      (a) => I.(E.eq(P.empty <|> a, a) && E.eq(a <|> P.empty, a));
   };
   module Alternative = (A: ALTERNATIVE, E: EQ1 with type t('a) = A.t('a)) => {
     module I = Infix.Alternative(A);
@@ -218,10 +215,9 @@ module Compare = {
     let multiplicative_associativity: (S.t, S.t, S.t) => bool =
       (a, b, c) => E.eq((a |*| b) |*| c, a |*| (b |*| c));
     let multiplicative_identity: S.t => bool = (a) => E.eq(S.one |*| a, a);
-    let left_distributivity: (S.t, S.t, S.t) => bool =
-      (a, b, c) => E.eq(a |*| (b |+| c), (a |*| b) |+| (a |*| c));
-    let right_distributivity: (S.t, S.t, S.t) => bool =
-      (a, b, c) => E.eq((a |+| b) |*| c, (a |*| c) |+| (b |*| c));
+    let distributivity: (S.t, S.t, S.t) => bool =
+      (a, b, c) => E.eq(a |*| (b |+| c), (a |*| b) |+| (a |*| c)) &&
+                   E.eq((a |+| b) |*| c, (a |*| c) |+| (b |*| c));
   };
   module Ring = (R: RING, E: EQ with type t = R.t) => {
     module I = Infix.Ring(R);
@@ -302,9 +298,8 @@ module Compare = {
       (f, g, a) => E.eq((X.extend(f) <. X.extend(g))(a), X.extend(f <. X.extend(g), a));
   };
   module Comonad = (C: COMONAD, E: EQ1 with type t('a) = C.t('a)) => {
-    let left_identity: C.t('a) => bool = (a) => E.eq(C.extend(C.extract, a), a);
-    let right_identity: (C.t('a) => 'a, C.t('a)) => bool =
-      (f, a) => E.eq(C.extract(C.extend(f, a)), f(a));
+    let identity: (C.t('a) => 'a, C.t('a)) => bool =
+      (f, a) => E.eq(C.extend(C.extract, a), a) && E.eq(C.extract(C.extend(f, a)), f(a));
   };
   module Bifunctor = (B: BIFUNCTOR, E: EQ2 with type t('a, 'b) = B.t('a, 'b)) => {
     let id = Function.Category.id;
