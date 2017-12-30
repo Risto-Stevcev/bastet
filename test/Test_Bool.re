@@ -28,7 +28,7 @@ describe("Bool", () => {
     });
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Conjunctive.Monoid);
-      property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool)
+      property1("should satisfy identity", arb_bool, V.identity <. Js.to_bool)
     });
   });
 
@@ -51,7 +51,7 @@ describe("Bool", () => {
     });
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Disjunctive.Monoid);
-      property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool)
+      property1("should satisfy identity", arb_bool, V.identity <. Js.to_bool)
     });
   });
 
@@ -107,12 +107,12 @@ describe("Bool", () => {
 
   describe("Bounded_Join_Semilattice", () => {
     module V = Verify.Bounded_Join_Semilattice(Bool.Bounded_Join_Semilattice);
-    property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool);
+    property1("should satisfy identity", arb_bool, V.identity <. Js.to_bool);
   });
 
   describe("Bounded_Meet_Semilattice", () => {
     module V = Verify.Bounded_Meet_Semilattice(Bool.Bounded_Meet_Semilattice);
-    property1("should satisfy neutrality", arb_bool, V.neutral <. Js.to_bool);
+    property1("should satisfy identity", arb_bool, V.identity <. Js.to_bool);
   });
 
   describe("Lattice", () => {

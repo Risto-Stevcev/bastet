@@ -24,7 +24,7 @@ describe("Int", () => {
     });
     describe("Monoid", () => {
       module V = Verify.Monoid(Int.Additive.Monoid);
-      property1("should satisfy neutrality", arb_int', V.neutral)
+      property1("should satisfy identity", arb_int', V.identity)
     });
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Int.Additive.Quasigroup);
@@ -75,7 +75,7 @@ describe("Int", () => {
     });
     describe("Monoid", () => {
       module V = Verify.Monoid(Int.Multiplicative.Monoid);
-      property1("should satisfy neutrality", arb_int', V.neutral)
+      property1("should satisfy identity", arb_int', V.identity)
     });
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Int.Multiplicative.Quasigroup);

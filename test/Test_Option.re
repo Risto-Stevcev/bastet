@@ -26,9 +26,9 @@ describe("Option", () => {
   describe("Monoid", () => {
     module V = Verify.Monoid(OptionF.Int.Additive.Monoid);
     property1(
-      "should satisfy neutrality",
+      "should satisfy identity",
       arb_tuple((arb_nat, arb_bool)),
-      V.neutral <. option_from_tuple
+      V.identity <. option_from_tuple
     )
   });
 

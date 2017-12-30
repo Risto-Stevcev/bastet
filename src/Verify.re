@@ -19,11 +19,12 @@ module Compare = {
   };
   module Monoid = (M: MONOID, E: EQ with type t = M.t) => {
     module I = Infix.Magma(M);
-    let neutral: M.t => bool = (a) => I.(E.eq(a <:> M.empty, a) && E.eq(M.empty <:> a, a));
+    let identity: M.t => bool = (a) => I.(E.eq(a <:> M.empty, a) && E.eq(M.empty <:> a, a));
   };
   module Monoid_Any = (M: MONOID_ANY, E: EQ1 with type t('a) = M.t('a)) => {
     module I = Infix.Magma_Any(M);
-    let neutral: M.t('a) => bool = (a) => I.(E.eq(a <:> M.empty, a) && E.eq(M.empty <:> a, a));
+    let identity: M.t('a) => bool = (a) =>
+      I.(E.eq(a <:> M.empty, a) && E.eq(M.empty <:> a, a));
   };
   module Quasigroup = (Q: QUASIGROUP, E: EQ with type t = Q.t) => {
     module I = Infix.Magma(Q);
@@ -44,11 +45,13 @@ module Compare = {
   };
   module Loop = (L: LOOP, E: EQ with type t = L.t) => {
     module I = Infix.Magma(L);
-    let identity: L.t => bool = (a) => I.(E.eq(a <:> L.empty, a) && E.eq(L.empty <:> a, a));
+    let identity: L.t => bool =
+      (a) => I.(E.eq(a <:> L.empty, a) && E.eq(L.empty <:> a, a));
   };
   module Loop_Any = (L: LOOP_ANY, E: EQ1 with type t('a) = L.t('a)) => {
     module I = Infix.Magma_Any(L);
-    let identity: L.t('a) => bool = (a) => I.(E.eq(a <:> L.empty, a) && E.eq(L.empty <:> a, a));
+    let identity: L.t('a) => bool =
+      (a) => I.(E.eq(a <:> L.empty, a) && E.eq(L.empty <:> a, a));
   };
   module Group = (G: GROUP, E: EQ with type t = G.t) => {
     module I = Infix.Magma(G);
@@ -85,29 +88,21 @@ module Compare = {
     module I = Infix.Apply(A);
     let associative_composition:
       (A.t(('b => 'c)), A.t(('a => 'b)), A.t('a)) => bool = (f, g, h) => I.(
-        E.eq(
-          A.map(Function.Semigroupoid.compose, f) <*> g <*> h, f <*> (g <*> h)
-        )
+        E.eq(A.map(Function.Semigroupoid.compose, f) <*> g <*> h, f <*> (g <*> h))
       )
   };
   module Applicative = (A: APPLICATIVE, E: EQ1 with type t('a) = A.t('a)) => {
     module I = Infix.Apply(A);
-    let identity: A.t('a) => bool = (a) => I.(
-      E.eq(A.pure(Function.Category.id) <*> a, a)
-    );
-    let homomorphism: ('a => 'b, 'a) => bool = (f, x) => I.(
-      E.eq(A.pure(f) <*> A.pure(x), A.pure(f(x)))
-    );
-    let interchange: (A.t('a => 'b), 'a) => bool = (f, x) => I.(
-      E.eq(f <*> A.pure(x), A.pure((f') => f'(x)) <*> f)
-    );
+    let identity: A.t('a) => bool = (a) => I.(E.eq(A.pure(Function.Category.id) <*> a, a));
+    let homomorphism: ('a => 'b, 'a) => bool =
+      (f, x) => I.(E.eq(A.pure(f) <*> A.pure(x), A.pure(f(x))));
+    let interchange: (A.t('a => 'b), 'a) => bool =
+      (f, x) => I.(E.eq(f <*> A.pure(x), A.pure((f') => f'(x)) <*> f));
   };
   module Monad = (M: MONAD, E: EQ1 with type t('a) = M.t('a)) => {
     module I = Infix.Monad(M);
     let associativity: ('a => M.t('b), 'b => M.t('c), M.t('a)) => bool =
-      (f, g, x) => I.({
-        E.eq((x >>= f) >>= g, x >>= (k) => f(k) >>= g)
-      });
+      (f, g, x) => I.(E.eq((x >>= f) >>= g, x >>= (k) => f(k) >>= g));
     let left_identity: ('a => M.t('b), 'a) => bool =
       (f, x) => I.(E.eq(M.pure(x) >>= f, f(x)));
     let right_identity: M.t('a) => bool = (x) => I.(E.eq(x >>= M.pure, x));
@@ -138,7 +133,8 @@ module Compare = {
   };
   module Category = (C: CATEGORY, E: EQ2 with type t('a, 'b) = C.t('a, 'b)) => {
     module I = Infix.Semigroupoid(C);
-    let identity: C.t('a, 'b) => bool = (a) => I.(E.eq(C.id <. a, a) && E.eq(a <. C.id, a));
+    let identity: C.t('a, 'b) => bool =
+      (a) => I.(E.eq(C.id <. a, a) && E.eq(a <. C.id, a));
   };
   module Eq = (E: EQ) => {
     module I = Infix.Eq(E);
@@ -174,11 +170,13 @@ module Compare = {
       (a, b) => E.eq(M.meet(a, b), M.meet(b, a));
     let idempotency: M.t => bool = (a) => E.eq(M.meet(a, a), a);
   };
-  module Bounded_Join_Semilattice = (B: BOUNDED_JOIN_SEMILATTICE, E: EQ with type t = B.t) => {
-    let neutral: B.t => bool = (a) => B.join(a, B.bottom) == a;
+  module Bounded_Join_Semilattice =
+    (B: BOUNDED_JOIN_SEMILATTICE, E: EQ with type t = B.t) => {
+    let identity: B.t => bool = (a) => B.join(a, B.bottom) == a;
   };
-  module Bounded_Meet_Semilattice = (B: BOUNDED_MEET_SEMILATTICE, E: EQ with type t = B.t) => {
-    let neutral: B.t => bool = (a) => B.meet(a, B.top) == a;
+  module Bounded_Meet_Semilattice =
+    (B: BOUNDED_MEET_SEMILATTICE, E: EQ with type t = B.t) => {
+    let identity: B.t => bool = (a) => B.meet(a, B.top) == a;
   };
   module Lattice = (L: LATTICE, E: EQ with type t = L.t) => {
     let absorption: (L.t, L.t) => bool =
@@ -192,7 +190,8 @@ module Compare = {
     let distributivity: (L.t, L.t, L.t) => bool =
       (a, b, c) => E.eq(L.meet(a, L.join(b, c)), L.join(L.meet(a, b), L.meet(a, c)));
   };
-  module Bounded_Distributive_Lattice = (L: BOUNDED_DISTRIBUTIVE_LATTICE, E: EQ with type t = L.t) => {
+  module Bounded_Distributive_Lattice =
+    (L: BOUNDED_DISTRIBUTIVE_LATTICE, E: EQ with type t = L.t) => {
     let distributivity: (L.t, L.t, L.t) => bool =
       (a, b, c) => E.eq(L.meet(a, L.join(b, c)), L.join(L.meet(a, b), L.meet(a, c)));
   };
@@ -289,11 +288,13 @@ module Compare = {
         )
   };
   module Monad_Zero = (M: MONAD_ZERO, E: EQ1 with type t('a) = M.t('a)) => {
-    let annihalation: ('a => M.t('b)) => bool = (f) => E.eq(M.flat_map(M.empty, f), M.empty);
+    let annihalation: ('a => M.t('b)) => bool =
+      (f) => E.eq(M.flat_map(M.empty, f), M.empty);
   };
   module Monad_Plus = (M: MONAD_PLUS, E: EQ1 with type t('a) = M.t('a)) => {
     let distributivity: ('a => M.t('b), M.t('a), M.t('a)) => bool =
-      (f, a, b) => E.eq(M.flat_map(M.alt(a, b), f), M.alt(M.flat_map(a, f), M.flat_map(b, f)));
+      (f, a, b) =>
+        E.eq(M.flat_map(M.alt(a, b), f), M.alt(M.flat_map(a, f), M.flat_map(b, f)));
   };
   module Extend = (X: EXTEND, E: EQ1 with type t('a) = X.t('a)) => {
     let (<.) = Function.Infix.(<.);

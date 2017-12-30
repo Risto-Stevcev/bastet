@@ -13,7 +13,7 @@ describe("String", () => {
 
   describe("Monoid", () => {
     module V = Verify.Monoid(String.Monoid);
-    property1("should satisfy neutrality", arb_string, V.neutral)
+    property1("should satisfy identity", arb_string, V.identity)
   });
 
   describe("Quasigroup", () => {

@@ -20,7 +20,7 @@ describe("Tuple", () => {
   describe("Monoid", () => {
     module M = Tuple.Monoid(String.Monoid, Int.Additive.Monoid);
     module V = Verify.Monoid(M);
-    property1("should satisfy neutrality", arb_tuple((arb_string, arb_nat)), V.neutral)
+    property1("should satisfy identity", arb_tuple((arb_string, arb_nat)), V.identity)
   });
 
   describe("Functor", () => {
