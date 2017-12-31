@@ -50,6 +50,10 @@ Js.log(ListF.Int.Show.show([1,1,2,3,5,8]));
 
 See the unit tests for many more examples
 
+## Side effects / IO
+
+See the [bs-effects][7] package for sync and async implementations of the "IO monad".
+
 
 ## License
 
@@ -63,3 +67,4 @@ Licensed under the BSD-3-Clause license. See `LICENSE`
 [4]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/Default.re
 [5]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/Functions.re
 [6]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/Functors.re
+[7]: https://github.com/Risto-Stevcev/bs-effects
