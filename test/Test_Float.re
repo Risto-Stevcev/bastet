@@ -9,6 +9,11 @@ describe("Float", () => {
     arb_float(Float.Bounded.bottom /. 100000.0, Float.Bounded.top /. 100000.0);
   let tolerance = 0.01;
 
+  module CompareFloat = {
+    type t = float;
+    let eq = Float.approximately_equal(~tolerance);
+  };
+
   describe("Additive", () => {
     describe("Medial Magma", () => {
       module V = Verify.Medial_Magma(Float.Additive.Medial_Magma);
@@ -61,16 +66,13 @@ describe("Float", () => {
 
   describe("Multiplicative", () => {
     describe("Medial Magma", () => {
-      module V = Verify.Medial_Magma(Float.Multiplicative.Medial_Magma);
-      module I = Infix.Magma(Float.Multiplicative.Medial_Magma);
-      open I;
+      module V =
+        Verify.Compare.Medial_Magma(Float.Multiplicative.Medial_Magma, CompareFloat);
       let arb_float'' = arb_float(1000.0, -1000.0); /* to avoid arithmetic overflows */
       property4(
         "should satisfy bicommutativity",
         arb_float'', arb_float'', arb_float'', arb_float'',
-        (a, b, c, d) => Float.approximately_equal(
-          ~tolerance, (a <:> b) <:> (c <:> d), (a <:> c) <:> (b <:> d)
-        )
+        V.bicommutativity
       )
     });
 
@@ -87,9 +89,7 @@ describe("Float", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Multiplicative.Quasigroup);
       property3(
-        "should satisfy cancellative",
-        arb_float', arb_float', arb_float',
-        V.cancellative
+        "should satisfy cancellative", arb_float', arb_float', arb_float', V.cancellative
       );
     });
     describe("Loop", () => {
@@ -110,34 +110,24 @@ describe("Float", () => {
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Subtractive.Quasigroup);
       property3(
-        "should satisfy cancellative",
-        arb_float', arb_float', arb_float',
-        V.cancellative
+        "should satisfy cancellative", arb_float', arb_float', arb_float', V.cancellative
       );
     });
   });
 
   describe("Divisive", () => {
     describe("Medial Magma", () => {
-      module V = Verify.Medial_Magma(Float.Divisive.Medial_Magma);
-      module I = Infix.Magma(Float.Divisive.Medial_Magma);
-      open I;
+      module V = Verify.Compare.Medial_Magma(Float.Divisive.Medial_Magma, CompareFloat);
       property4(
         "should satisfy bicommutativity",
         arb_float', arb_float', arb_float', arb_float',
-        (a, b, c, d) => Float.approximately_equal(
-          ~tolerance,
-          (a <:> b) <:> (c <:> d),
-          (a <:> c) <:> (b <:> d)
-        )
+        V.bicommutativity
       )
     });
     describe("Quasigroup", () => {
       module V = Verify.Quasigroup(Float.Divisive.Quasigroup);
       property3(
-        "should satisfy cancellative",
-        arb_float', arb_float', arb_float',
-        V.cancellative
+        "should satisfy cancellative", arb_float', arb_float', arb_float', V.cancellative
       );
     });
   });
@@ -166,9 +156,7 @@ describe("Float", () => {
   });
 
   describe("Semiring", () => {
-    module V = Verify.Semiring(Float.Semiring);
-    let ((|+|), (|*|)) = Float.Infix.((|+|), (|*|));
-
+    module V = Verify.Compare.Semiring(Float.Semiring, CompareFloat);
     property3(
       "should satisfy additive associativity",
       arb_float', arb_float', arb_float',
@@ -179,32 +167,13 @@ describe("Float", () => {
     property3(
       "should satisfy multiplicative associativity",
       arb_float', arb_float', arb_float',
-      (a, b, c) => Float.approximately_equal(
-        ~tolerance,
-        (a |*| b) |*| c,
-        a |*| (b |*| c)
-      )
+      V.multiplicative_associativity
     );
     property1(
       "should satisfy multiplicative identity", arb_float', V.multiplicative_identity
     );
     property3(
-      "should satisfy left distributivity",
-      arb_float', arb_float', arb_float',
-      (a, b, c) => Float.approximately_equal(
-        ~tolerance,
-        a |*| (b |+| c),
-        (a |*| b) |+| (a |*| c)
-      )
-    );
-    property3(
-      "should satisfy right distributivity",
-      arb_float', arb_float', arb_float',
-      (a, b, c) => Float.approximately_equal(
-        ~tolerance,
-        (a |+| b) |*| c,
-        (a |*| c) |+| (b |*| c)
-      )
+      "should satisfy distributivity", arb_float', arb_float', arb_float', V.distributivity
     );
   });
 
@@ -223,25 +192,17 @@ describe("Float", () => {
   });
 
   describe("Division Ring", () => {
-    let (|*|) = Float.Infix.((|*|));
-    module V = Verify.Division_Ring(Float.Division_Ring);
+    module V = Verify.Compare.Division_Ring(Float.Division_Ring, CompareFloat);
     it("should be a non-zero ring (one is not zero)", () => {
       expect(V.non_zero_ring).to_be(true);
     });
     property1(
-      "should satisfy multiplicative inverse", arb_float',
-      (a) => Float.approximately_equal(
-        ~tolerance,
-        Float.Division_Ring.reciprocal(a) |*| a,
-        Float.Semiring.one
-      )
+      "should satisfy multiplicative inverse", arb_float', V.multiplicative_inverse
     );
   });
 
   describe("Euclidean Ring", () => {
-    module V = Verify.Euclidean_Ring(Float.Euclidean_Ring);
-    let (zero, degree) = Float.Euclidean_Ring.((zero, degree));
-
+    module V = Verify.Compare.Euclidean_Ring(Float.Euclidean_Ring, CompareFloat);
     it("should be a non zero ring (zero is not one)", () => {
       expect(V.non_zero_ring).to_be(true);
     });
@@ -250,17 +211,7 @@ describe("Float", () => {
     );
     property1("should satisfy non negative degree", arb_float', V.non_negative_degree);
     property2(
-      "should satisfy the properties for remainder",
-      arb_float', arb_float',
-      (a, b) => Float.Infix.({
-        if (b != zero) {
-          let q = a |/| b;
-          let r = a |%| b;
-          Float.approximately_equal(~tolerance, a, q |*| b |+| r) &&
-          (r == zero || (degree(r) < degree(b)))
-        }
-        else { true }
-      })
+      "should satisfy the properties for remainder", arb_float', arb_float', V.remainder
     );
     property2(
       "should satisfy submultiplicative", arb_float', arb_float', V.submultiplicative
