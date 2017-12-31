@@ -6,30 +6,32 @@ let (<.) = Function.Infix.(<.);
 
 
 describe("List", () => {
-  let to_list = ArrayLabels.to_list;
-
   describe("Functor", () => {
     module V = Verify.Functor(List.Functor);
-    property1("should satisfy identity", arb_array(arb_nat), V.identity <. to_list);
-    property1("should satisfy composition", arb_array(arb_nat), (a) => {
-      V.composition((++)("!"), string_of_int, to_list(a))
-    })
+    property1("should satisfy identity", arb_list(arb_nat), V.identity);
+    property1(
+      "should satisfy composition",
+      arb_list(arb_nat),
+      V.composition((++)("!"), string_of_int)
+    )
   });
 
   describe("Apply", () => {
     module V = Verify.Apply(List.Apply);
-    property1("should satisfy associative composition", arb_nat, (n) => {
-      V.associative_composition([(++)("!")], [string_of_int], [n])
-    })
+    property1(
+      "should satisfy associative composition",
+      arb_nat,
+      n => V.associative_composition([(++)("!")], [string_of_int], [n])
+    )
   });
 
   describe("Applicative", () => {
     module V = Verify.Applicative(List.Applicative);
-    property1("should satisfy identity", arb_array(arb_nat), V.identity <. to_list);
+    property1("should satisfy identity", arb_list(arb_nat), V.identity);
     property1(
       "should satisfy homomorphism",
-      arb_array(arb_nat),
-      V.homomorphism(List.Functor.map(string_of_int)) <. to_list
+      arb_list(arb_nat),
+      V.homomorphism(List.Functor.map(string_of_int))
     );
     property1("should satisfy interchange", arb_nat, V.interchange([string_of_int]));
   });
@@ -39,8 +41,8 @@ describe("List", () => {
     let (pure) = List.Applicative.((pure));
     property1(
       "should satisfy associativity",
-      arb_array(arb_nat),
-      V.associativity(pure <. string_of_int, pure <. (++)("!")) <. to_list
+      arb_list(arb_nat),
+      V.associativity(pure <. string_of_int, pure <. (++)("!"))
     );
     property1("should satisfy identity", arb_nat, V.identity(pure <. string_of_int));
   });
@@ -49,16 +51,13 @@ describe("List", () => {
     module V = Verify.Alt(List.Alt);
     property3(
       "should satisfy associativity",
-      arb_array(arb_nat), arb_array(arb_nat), arb_array(arb_nat),
-      (a, b, c) => {
-        let (a', b', c') = (to_list(a), to_list(b), to_list(c));
-        V.associativity(a', b', c')
-      }
+      arb_list(arb_nat), arb_list(arb_nat), arb_list(arb_nat),
+      V.associativity
     );
     property2(
       "should satisfy distributivity",
-      arb_array(arb_nat), arb_array(arb_nat),
-      (a, b) => V.distributivity(string_of_int, to_list(a), to_list(b))
+      arb_list(arb_nat), arb_list(arb_nat),
+      V.distributivity(string_of_int)
     );
   });
 
@@ -67,9 +66,7 @@ describe("List", () => {
     it("should satisfy annihalation", () => {
       expect(V.annihalation(string_of_int)).to_be(true);
     });
-    property1(
-      "should satisfy identity", arb_array(arb_nat), V.identity <. to_list
-    );
+    property1("should satisfy identity", arb_list(arb_nat), V.identity);
   });
 
   describe("Alternative", () => {
@@ -77,8 +74,8 @@ describe("List", () => {
     let (pure) = List.Applicative.((pure));
     property1(
       "should satisfy distributivity",
-      arb_array(arb_nat),
-      V.distributivity(pure((*)(3)), pure((+)(4))) <. to_list
+      arb_list(arb_nat),
+      V.distributivity(pure((*)(3)), pure((+)(4)))
     );
     it("should satisfy annihalation", () => {
       expect(V.annihalation(List.Applicative.pure(string_of_int))).to_be(true);
@@ -124,16 +121,16 @@ describe("List", () => {
     module V = Verify.Eq(ListF.Int.Eq);
     let arb_int' = arb_int(-10000, 10000);
 
-    property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity <. to_list);
+    property1("should satisfy reflexivity", arb_list(arb_int'), V.reflexivity);
     property2(
       "should satisfy symmetry",
-      arb_array(arb_int'), arb_array(arb_int'),
-      (a, b) => V.symmetry(to_list(a), to_list(b))
+      arb_list(arb_int'), arb_list(arb_int'),
+      V.symmetry
     );
     property3(
       "should satisfy transitivity",
-      arb_array(arb_int'), arb_array(arb_int'), arb_array(arb_int'),
-      (a, b, c) => V.transitivity(to_list(a), to_list(b), to_list(c))
+      arb_list(arb_int'), arb_list(arb_int'), arb_list(arb_int'),
+      V.transitivity
     );
   });
 
