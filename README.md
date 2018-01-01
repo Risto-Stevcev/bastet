@@ -52,7 +52,8 @@ See the unit tests for many more examples
 
 ## Side effects / IO
 
-See the [bs-effects][7] package for sync and async implementations of the "IO monad".
+See the [bs-effects][7] package for sync and async implementations of the "IO monad", and 
+the [bs-free][8] package for free monads and other free structures.
 
 
 ## License
@@ -68,3 +69,4 @@ Licensed under the BSD-3-Clause license. See `LICENSE`
 [5]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/Functions.re
 [6]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/Functors.re
 [7]: https://github.com/Risto-Stevcev/bs-effects
+[8]: https://github.com/Risto-Stevcev/bs-free
