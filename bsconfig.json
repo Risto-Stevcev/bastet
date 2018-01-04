@@ -17,7 +17,7 @@
     "in-source": false
   },
   "suffix": ".bs.js",
-  "bs-dependencies": [
+  "bs-dev-dependencies": [
       "bs-jsverify"
   ]
 }
