@@ -1,4 +1,4 @@
-open Mocha;
+open BsMochajs.Mocha;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let ((<.), (>.)) = Function.Infix.((<.), (>.));

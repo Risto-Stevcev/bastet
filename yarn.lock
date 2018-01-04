@@ -17,9 +17,9 @@ browser-stdout@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/browser-stdout/-/browser-stdout-1.3.0.tgz#f351d32969d32fa5d7a5567154263d928ae3bd1f"
 
-bs-jsverify@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/bs-jsverify/-/bs-jsverify-0.5.0.tgz#0250985d0899f1e2699f44ccf1a088a9c22e08cd"
+bs-jsverify@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/bs-jsverify/-/bs-jsverify-0.6.0.tgz#d9e706c53a08ec05479f6030c9f86b8354cc3869"
   dependencies:
     jsverify "^0.8.3"
 

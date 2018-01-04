@@ -18,6 +18,7 @@
   },
   "suffix": ".bs.js",
   "bs-dev-dependencies": [
-      "bs-jsverify"
+      "bs-jsverify",
+      "bs-mochajs"
   ]
 }

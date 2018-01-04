@@ -1,4 +1,4 @@
-open Mocha;
+open BsMochajs.Mocha;
 let (<.) = Function.Infix.(<.);
 
 
