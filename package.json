@@ -24,7 +24,7 @@
   "dependencies": {
   },
   "devDependencies": {
-    "bs-jsverify": "^0.6.0",
-    "bs-mochajs": "^0.2.0"
+    "bs-jsverify": "^0.7.0",
+    "bs-mochajs": "^0.3.0"
   }
 }
