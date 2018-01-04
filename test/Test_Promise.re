@@ -64,5 +64,11 @@ describe("Promise", () => {
     async_property1(
       "should satisfy identity", arb_nat, Obj.magic <. V.identity(pure <. string_of_int)
     );
+    async_property1(
+      "should flatten promises", arb_nat, (n) => Promise.Infix.({
+        module Fn = Functions.Monad(Promise.Monad);
+        Fn.flatten(pure(pure(n))) >>= (flattened_n => pure(flattened_n == n))
+      })
+    );
   });
 });
