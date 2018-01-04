@@ -113,4 +113,7 @@ module Infix = {
   };
   include Infix.Eq(Eq);
   include Infix.Ord(Ord);
+  include Infix.Join_Semilattice(Join_Semilattice);
+  include Infix.Meet_Semilattice(Meet_Semilattice);
+  include Infix.Heyting_Algebra(Heyting_Algebra);
 };

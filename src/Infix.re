@@ -79,3 +79,15 @@ module Biapply = (B: BIAPPLY) => {
   include Bifunctor(B);
   let (<<*>>) = B.biapply;
 };
+
+module Join_Semilattice = (J: JOIN_SEMILATTICE) => {
+  let (<||>) = J.join;
+};
+
+module Meet_Semilattice = (M: MEET_SEMILATTICE) => {
+  let (<&&>) = M.meet;
+};
+
+module Heyting_Algebra = (H: HEYTING_ALGEBRA) => {
+  let (-->) = H.implies;
+};
