@@ -1,6 +1,10 @@
 open Interface;
 let (<.) = Function.Infix.(<.);
 
+/* Note: Promises are not actually Monads because you can't have
+ * Js.Promise.t(Js.Promise.t('a))
+ * Even though it's a valid bucklescript signature. See the unit tests.
+ */
 
 module Functor: FUNCTOR with type t('a) = Js.Promise.t('a) = {
   type t('a) = Js.Promise.t('a);
@@ -20,6 +24,7 @@ module Applicative: APPLICATIVE with type t('a) = Js.Promise.t('a) = {
   let pure = Js.Promise.resolve;
 };
 
+/* It's is NOT a Monad, this is just here for convenience */
 module Monad: MONAD with type t('a) = Js.Promise.t('a) = {
   include Applicative;
   let flat_map = (a, f) => Js.Promise.then_(f, a);

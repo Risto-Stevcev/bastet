@@ -3,6 +3,11 @@ open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let ((<.)) = Function.Infix.((<.));
 
+/* Note: Promises are not actually Monads because you can't have
+ * Js.Promise.t(Js.Promise.t('a))
+ * Even though it's a valid bucklescript signature
+ */
+
 module ComparePromise = {
   type t('a) = Js.Promise.t('a);
   let eq = (a, b) =>
@@ -53,8 +58,9 @@ describe("Promise", () => {
     );
   });
 
-  describe("Monad", () => {
+  describe("Monad (unlawful)", () => {
     module V = Verify.Compare.Monad(Promise.Monad, ComparePromise);
+    module Fn = Functions.Monad(Promise.Monad);
     let pure = Promise.Applicative.pure;
     async_property1(
       "should satisfy associativity",
@@ -65,9 +71,19 @@ describe("Promise", () => {
       "should satisfy identity", arb_nat, Obj.magic <. V.identity(pure <. string_of_int)
     );
     async_property1(
-      "should flatten promises", arb_nat, (n) => Promise.Infix.({
-        module Fn = Functions.Monad(Promise.Monad);
-        Fn.flatten(pure(pure(n))) >>= (flattened_n => pure(flattened_n == n))
+      "will *seemingly* properly flatten (not correct)", arb_nat, (n) => Promise.Infix.({
+        Fn.flatten(pure(pure(n))) >>= (flattened_n => pure(flattened_n == n));
+      })
+    );
+    async_property1(
+      "promises are not actually nested despite the type signature",
+      arb_nat,
+      (n) => Promise.Infix.({
+        pure(pure(n))
+          /* This next line throws a runtime error because the inner value is not a promise */
+          >>= (result => pure(result >>= (pure <. Function.const(false))))
+          >>= Function.Category.id
+          |> Js.Promise.catch(pure <. Function.const(true))
       })
     );
   });
