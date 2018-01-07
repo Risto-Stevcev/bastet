@@ -33,6 +33,11 @@ module Ord: ORD with type t = string = {
   let compare = unsafe_compare;
 };
 
+module Show: SHOW with type t = string = {
+  type t = string;
+  let show = Function.Category.id;
+};
+
 module Infix = {
   include Infix.Magma(Magma);
   include Infix.Eq(Eq);
