@@ -1,3 +1,4 @@
+/* Option is the equivalent of Maybe in Haskell for Ocaml */
 open Interface;
 let (<.) = Function.Infix.(<.);
 

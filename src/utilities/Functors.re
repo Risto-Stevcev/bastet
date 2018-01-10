@@ -200,6 +200,144 @@ module OptionF = {
 };
 
 
+
+module ResultF = {
+  module Int = {
+    module Functor = Result.Functor({type t = int});
+    module Apply = Result.Apply({type t = int});
+    module Applicative = Result.Applicative({type t = int});
+    module Monad = Result.Monad({type t = int});
+    module Extend = Result.Extend({type t = int});
+    module Alt = Result.Alt({type t = int});
+    module Foldable = Result.Foldable({type t = int});
+    module List = {
+      module Traversable = Result.Traversable({type t = int}, List.Applicative);
+    };
+    module Array = {
+      module Traversable = Result.Traversable({type t = int}, Array.Applicative);
+    };
+    module Option = {
+      module Traversable = Result.Traversable({type t = int}, Option.Applicative);
+    };
+    module Bool = {
+      module Eq = Result.Eq(BsAbstract.Int.Eq, BsAbstract.Bool.Eq);
+      module Ord = Result.Ord(BsAbstract.Int.Ord, BsAbstract.Bool.Ord);
+      module Show = Result.Show(BsAbstract.Int.Show, BsAbstract.Bool.Show);
+    };
+    module Float = {
+      module Eq = Result.Eq(BsAbstract.Int.Eq, BsAbstract.Float.Eq);
+      module Ord = Result.Ord(BsAbstract.Int.Ord, BsAbstract.Float.Ord);
+      module Show = Result.Show(BsAbstract.Int.Show, BsAbstract.Float.Show);
+    };
+    module String = {
+      module Eq = Result.Eq(BsAbstract.Int.Eq, BsAbstract.String.Eq);
+      module Ord = Result.Ord(BsAbstract.Int.Ord, BsAbstract.String.Ord);
+      module Show = Result.Show(BsAbstract.Int.Show, BsAbstract.String.Show);
+    };
+  };
+  module Float = {
+    module Functor = Result.Functor({type t = float});
+    module Apply = Result.Apply({type t = float});
+    module Applicative = Result.Applicative({type t = float});
+    module Monad = Result.Monad({type t = float});
+    module Extend = Result.Extend({type t = float});
+    module Alt = Result.Alt({type t = float});
+    module Foldable = Result.Foldable({type t = float});
+    module List = {
+      module Traversable = Result.Traversable({type t = float}, List.Applicative);
+    };
+    module Array = {
+      module Traversable = Result.Traversable({type t = float}, Array.Applicative);
+    };
+    module Option = {
+      module Traversable = Result.Traversable({type t = float}, Option.Applicative);
+    };
+    module Bool = {
+      module Eq = Result.Eq(BsAbstract.Float.Eq, BsAbstract.Bool.Eq);
+      module Ord = Result.Ord(BsAbstract.Float.Ord, BsAbstract.Bool.Ord);
+      module Show = Result.Show(BsAbstract.Float.Show, BsAbstract.Bool.Show);
+    };
+    module Int = {
+      module Eq = Result.Eq(BsAbstract.Float.Eq, BsAbstract.Int.Eq);
+      module Ord = Result.Ord(BsAbstract.Float.Ord, BsAbstract.Int.Ord);
+      module Show = Result.Show(BsAbstract.Float.Show, BsAbstract.Int.Show);
+    };
+    module String = {
+      module Eq = Result.Eq(BsAbstract.Float.Eq, BsAbstract.String.Eq);
+      module Ord = Result.Ord(BsAbstract.Float.Ord, BsAbstract.String.Ord);
+      module Show = Result.Show(BsAbstract.Float.Show, BsAbstract.String.Show);
+    };
+  };
+  module Bool = {
+    module Functor = Result.Functor({type t = bool});
+    module Apply = Result.Apply({type t = bool});
+    module Applicative = Result.Applicative({type t = bool});
+    module Monad = Result.Monad({type t = bool});
+    module Extend = Result.Extend({type t = bool});
+    module Alt = Result.Alt({type t = bool});
+    module Foldable = Result.Foldable({type t = bool});
+    module List = {
+      module Traversable = Result.Traversable({type t = bool}, List.Applicative);
+    };
+    module Array = {
+      module Traversable = Result.Traversable({type t = bool}, Array.Applicative);
+    };
+    module Option = {
+      module Traversable = Result.Traversable({type t = bool}, Option.Applicative);
+    };
+    module Int = {
+      module Eq = Result.Eq(BsAbstract.Bool.Eq, BsAbstract.Int.Eq);
+      module Ord = Result.Ord(BsAbstract.Bool.Ord, BsAbstract.Int.Ord);
+      module Show = Result.Show(BsAbstract.Bool.Show, BsAbstract.Int.Show);
+    };
+    module Float = {
+      module Eq = Result.Eq(BsAbstract.Bool.Eq, BsAbstract.Float.Eq);
+      module Ord = Result.Ord(BsAbstract.Bool.Ord, BsAbstract.Float.Ord);
+      module Show = Result.Show(BsAbstract.Bool.Show, BsAbstract.Float.Show);
+    };
+    module String = {
+      module Eq = Result.Eq(BsAbstract.Bool.Eq, BsAbstract.String.Eq);
+      module Ord = Result.Ord(BsAbstract.Bool.Ord, BsAbstract.String.Ord);
+      module Show = Result.Show(BsAbstract.Bool.Show, BsAbstract.String.Show);
+    };
+  };
+  module String = {
+    module Functor = Result.Functor({type t = string});
+    module Apply = Result.Apply({type t = string});
+    module Applicative = Result.Applicative({type t = string});
+    module Monad = Result.Monad({type t = string});
+    module Extend = Result.Extend({type t = string});
+    module Alt = Result.Alt({type t = string});
+    module Foldable = Result.Foldable({type t = string});
+    module List = {
+      module Traversable = Result.Traversable({type t = string}, List.Applicative);
+    };
+    module Array = {
+      module Traversable = Result.Traversable({type t = string}, Array.Applicative);
+    };
+    module Option = {
+      module Traversable = Result.Traversable({type t = string}, Option.Applicative);
+    };
+    module Int = {
+      module Eq = Result.Eq(BsAbstract.String.Eq, BsAbstract.Int.Eq);
+      module Ord = Result.Ord(BsAbstract.String.Ord, BsAbstract.Int.Ord);
+      module Show = Result.Show(BsAbstract.String.Show, BsAbstract.Int.Show);
+    };
+    module Float = {
+      module Eq = Result.Eq(BsAbstract.String.Eq, BsAbstract.Float.Eq);
+      module Ord = Result.Ord(BsAbstract.String.Ord, BsAbstract.Float.Ord);
+      module Show = Result.Show(BsAbstract.String.Show, BsAbstract.Float.Show);
+    };
+    module Bool = {
+      module Eq = Result.Eq(BsAbstract.String.Eq, BsAbstract.Bool.Eq);
+      module Ord = Result.Ord(BsAbstract.String.Ord, BsAbstract.Bool.Ord);
+      module Show = Result.Show(BsAbstract.String.Show, BsAbstract.Bool.Show);
+    };
+  };
+};
+
+
+
 module TupleF = {
   module Int = {
     module Functor = Tuple.Functor({type t = int});

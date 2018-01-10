@@ -166,6 +166,10 @@ module type EQ = {
   let eq: (t, t) => bool;
 };
 
+module type QUASIREFLEXIVE_EQ = {
+  include EQ;
+};
+
 module type EQ1 = {
   type t('a);
   let eq: (t('a), t('a)) => bool;

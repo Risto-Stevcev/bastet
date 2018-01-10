@@ -140,6 +140,13 @@ module Compare = {
     let transitivity: (E.t, E.t, E.t) => bool =
       (a, b, c) => I.(!(a =|= b && (b =|= c)) || (a =|= c));
   };
+  module Quasireflexive_Eq = (E: QUASIREFLEXIVE_EQ) => {
+    module I = Infix.Eq(E);
+    let quasireflexivity: (E.t, E.t) => bool = (a, b) => I.(!(a =|= b) || (a =|= a && b =|= b));
+    let symmetry: (E.t, E.t) => bool = (a, b) => I.(a =|= b == (b =|= a));
+    let transitivity: (E.t, E.t, E.t) => bool =
+      (a, b, c) => I.(!(a =|= b && (b =|= c)) || (a =|= c));
+  };
   module Ord = (E: ORD) => {
     module Ordering_Functions = Infix.Ord(E);
     let ((<|=), (>|=)) = Ordering_Functions.((<|=), (>|=));
