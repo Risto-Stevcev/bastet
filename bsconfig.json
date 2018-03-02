@@ -19,6 +19,7 @@
   "suffix": ".bs.js",
   "bs-dev-dependencies": [
       "bs-jsverify",
-      "bs-mochajs"
+      "bs-mocha",
+      "bs-chai"
   ]
 }

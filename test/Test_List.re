@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
@@ -64,7 +66,7 @@ describe("List", () => {
   describe("Plus", () => {
     module V = Verify.Plus(List.Plus);
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(string_of_int)).to_be(true);
+      expect(V.annihalation(string_of_int)) |> to_be(true);
     });
     property1("should satisfy identity", arb_list(arb_nat), V.identity);
   });
@@ -78,28 +80,28 @@ describe("List", () => {
       V.distributivity(pure((*)(3)), pure((+)(4)))
     );
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(List.Applicative.pure(string_of_int))).to_be(true);
+      expect(V.annihalation(List.Applicative.pure(string_of_int))) |> to_be(true);
     });
   });
 
   describe("Foldable", () => List.Foldable.({
     it("should do a left fold", () => {
-      expect(fold_left((+), 0, [1,2,3,4,5])).to_be(15);
-      expect(fold_left((-), 10, [3,2,1])).to_be(4);
+      expect(fold_left((+), 0, [1,2,3,4,5])) |> to_be(15);
+      expect(fold_left((-), 10, [3,2,1])) |> to_be(4);
     });
 
     it("should do a right fold", () => {
-      expect(fold_right((-), 10, [3,2,1])).to_be(-8);
+      expect(fold_right((-), 10, [3,2,1])) |> to_be(-8);
     });
 
     it("should do a map fold (int)", () => {
       let fold_map = ListF.Int.Additive.Fold_Map.fold_map;
-      expect(fold_map(Function.Category.id, [1,2,3])).to_be(6);
+      expect(fold_map(Function.Category.id, [1,2,3])) |> to_be(6);
     });
 
     it("should do a map fold (list)", () => {
       let fold_map = ListF.List.Fold_Map_Plus.fold_map;
-      expect(fold_map(List.Applicative.pure, [[1,2,3],[4,5]])).to_be([[1,2,3],[4,5]]);
+      expect(fold_map(List.Applicative.pure, [[1,2,3],[4,5]])) |> to_be([[1,2,3],[4,5]]);
     });
   }));
 
@@ -108,12 +110,12 @@ describe("List", () => {
 
     it("should traverse the list", () => T.({
       let positive_int = (x) => x >= 0 ? Some(x) : None;
-      expect(traverse(positive_int, [1,2,3])).to_be(Some([1,2,3]));
-      expect(traverse(positive_int, [1,2,-3])).to_be(None);
+      expect(traverse(positive_int, [1,2,3])) |> to_be(Some([1,2,3]));
+      expect(traverse(positive_int, [1,2,-3])) |> to_be(None);
     }));
     it("should sequence the list", () => T.({
-      expect(sequence([Some(3), Some(4), Some(5)])).to_be(Some([3,4,5]));
-      expect(sequence([Some(3), Some(4), None])).to_be(None);
+      expect(sequence([Some(3), Some(4), Some(5)])) |> to_be(Some([3,4,5]));
+      expect(sequence([Some(3), Some(4), None])) |> to_be(None);
     }));
   });
 
@@ -138,7 +140,7 @@ describe("List", () => {
   describe("Show", () => {
     module S = List.Show(Int.Show);
     it("should convert the array to a string", () => {
-      expect(S.show([1, 1, 2, 3, 5, 8, 13])).to_be("[1, 1, 2, 3, 5, 8, 13]")
+      expect(S.show([1, 1, 2, 3, 5, 8, 13])) |> to_be("[1, 1, 2, 3, 5, 8, 13]")
     });
   });
 });

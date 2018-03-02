@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 
@@ -163,7 +165,7 @@ describe("Int", () => {
   describe("Euclidean Ring", () => {
     module V = Verify.Euclidean_Ring(Int.Euclidean_Ring);
     it("should be a non zero ring (zero is not one)", () => {
-      expect(V.non_zero_ring).to_be(true);
+      expect(V.non_zero_ring) |> to_be(true);
     });
     property2(
       "should satisfy integral domain", arb_int', arb_int', V.integral_domain

@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open Functors;
 
 
@@ -10,14 +12,14 @@ describe("Functions", () => {
 
         describe("scan_left", () => {
           it("should scan from the left", () => {
-            expect(scan_left((+), 0, [|1,2,3|])).to_be([|1,3,6|]);
-            expect(scan_left((-), 10, [|1,2,3|])).to_be([|9,7,4|]);
+            expect(scan_left((+), 0, [|1,2,3|])) |> to_be([|1,3,6|]);
+            expect(scan_left((-), 10, [|1,2,3|])) |> to_be([|9,7,4|]);
           });
         });
         describe("scan_right", () => {
           it("should scan from the right (array)", () => {
-            expect(scan_right((+), 0, [|1,2,3|])).to_be([|6,5,3|]);
-            expect(scan_right(Function.flip((-)), 10, [|1,2,3|])).to_be([|4,5,7|]);
+            expect(scan_right((+), 0, [|1,2,3|])) |> to_be([|6,5,3|]);
+            expect(scan_right(Function.flip((-)), 10, [|1,2,3|])) |> to_be([|4,5,7|]);
           });
         });
       });
@@ -30,14 +32,14 @@ describe("Functions", () => {
 
         describe("scan_left", () => {
           it("should scan from the left", () => {
-            expect(scan_left((+), 0, [1,2,3])).to_be([1,3,6]);
-            expect(scan_left((-), 10, [1,2,3])).to_be([9,7,4]);
+            expect(scan_left((+), 0, [1,2,3])) |> to_be([1,3,6]);
+            expect(scan_left((-), 10, [1,2,3])) |> to_be([9,7,4]);
           });
         });
         describe("scan_right", () => {
           it("should scan from the right (array)", () => {
-            expect(scan_right((+), 0, [1,2,3])).to_be([6,5,3]);
-            expect(scan_right(Function.flip((-)), 10, [1,2,3])).to_be([4,5,7]);
+            expect(scan_right((+), 0, [1,2,3])) |> to_be([6,5,3]);
+            expect(scan_right(Function.flip((-)), 10, [1,2,3])) |> to_be([4,5,7]);
           });
         });
       });

@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
@@ -13,16 +15,16 @@ describe("Array", () => {
     describe("zip_with", () => {
       it("should zip two arrays", () => {
         expect(Array.zip_with((a, b) => (a, b), [|1,2,3|], [|"a","b","c"|]))
-          .to_be([|(1,"a"), (2, "b"), (3, "c")|]);
+          |> to_be([|(1,"a"), (2, "b"), (3, "c")|]);
 
-        expect(Array.zip_with((*), [|1,2,3|], [|4,5,6|])).to_be([|4,10,18|]);
+        expect(Array.zip_with((*), [|1,2,3|], [|4,5,6|])) |> to_be([|4,10,18|]);
       })
     });
 
     describe("zip", () => {
       it("should zip two arrays", () => {
         expect(Array.zip([|1,2,3|], [|"a","b","c"|]))
-          .to_be([|(1,"a"), (2, "b"), (3, "c")|]);
+          |> to_be([|(1,"a"), (2, "b"), (3, "c")|]);
       })
     });
   });
@@ -81,7 +83,7 @@ describe("Array", () => {
   describe("Plus", () => {
     module V = Verify.Plus(Array.Plus);
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(string_of_int)).to_be(true);
+      expect(V.annihalation(string_of_int)) |> to_be(true);
     });
     property1("should satisfy identity", arb_array(arb_nat), V.identity);
   });
@@ -95,28 +97,28 @@ describe("Array", () => {
       V.distributivity(pure((*)(3)), pure((+)(4)))
     );
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(pure(string_of_int))).to_be(true);
+      expect(V.annihalation(pure(string_of_int))) |> to_be(true);
     });
   });
 
   describe("Foldable", () => Array.Foldable.({
     it("should do a left fold", () => {
-      expect(fold_left((+), 0, [|1,2,3,4,5|])).to_be(15);
-      expect(fold_left((-), 10, [|3,2,1|])).to_be(4);
+      expect(fold_left((+), 0, [|1,2,3,4,5|])) |> to_be(15);
+      expect(fold_left((-), 10, [|3,2,1|])) |> to_be(4);
     });
 
     it("should do a right fold", () => {
-      expect(fold_right((-), 10, [|3,2,1|])).to_be(-8);
+      expect(fold_right((-), 10, [|3,2,1|])) |> to_be(-8);
     });
 
     it("should do a map fold (int)", () => {
       let fold_map = ArrayF.Int.Additive.Fold_Map.fold_map;
-      expect(fold_map(Function.Category.id, [|1,2,3|])).to_be(6);
+      expect(fold_map(Function.Category.id, [|1,2,3|])) |> to_be(6);
     });
 
     it("should do a map fold (list)", () => {
       let fold_map = ArrayF.List.Fold_Map_Plus.fold_map;
-      expect(fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])).to_be([[1,2,3],[4,5]]);
+      expect(fold_map(List.Applicative.pure, [|[1,2,3],[4,5]|])) |> to_be([[1,2,3],[4,5]]);
     });
   }));
 
@@ -124,12 +126,12 @@ describe("Array", () => {
     let (traverse, sequence) = ArrayF.Option.Traversable.(traverse, sequence);
     it("should traverse the array", () => {
       let positive_int = (x) => x >= 0 ? Some(x) : None;
-      expect(traverse(positive_int, [|1,2,3|])).to_be(Some([|1,2,3|]));
-      expect(traverse(positive_int, [|1,2,-3|])).to_be(None);
+      expect(traverse(positive_int, [|1,2,3|])) |> to_be(Some([|1,2,3|]));
+      expect(traverse(positive_int, [|1,2,-3|])) |> to_be(None);
     });
     it("should sequence the array", () => {
-      expect(sequence([|Some(3), Some(4), Some(5)|])).to_be(Some([|3,4,5|]));
-      expect(sequence([|Some(3), Some(4), None|])).to_be(None);
+      expect(sequence([|Some(3), Some(4), Some(5)|])) |> to_be(Some([|3,4,5|]));
+      expect(sequence([|Some(3), Some(4), None|])) |> to_be(None);
     });
   });
 
@@ -151,9 +153,9 @@ describe("Array", () => {
     module V = Verify.Ord(ArrayF.Int.Ord);
     it("should compare two arrays", () => {
       let compare = ArrayF.Int.Ord.compare;
-      expect(compare([|5,6,7|], [|1,2,3,4|])).to_be(`less_than);
-      expect(compare([|1,2,3|], [|1,2,3|])).to_be(`equal_to);
-      expect(compare([|1,2,4|], [|1,2,3|])).to_be(`greater_than);
+      expect(compare([|5,6,7|], [|1,2,3,4|])) |> to_be(`less_than);
+      expect(compare([|1,2,3|], [|1,2,3|])) |> to_be(`equal_to);
+      expect(compare([|1,2,4|], [|1,2,3|])) |> to_be(`greater_than);
     });
     property1("should satisfy reflexivity", arb_array(arb_int'), V.reflexivity);
     property2(
@@ -171,7 +173,7 @@ describe("Array", () => {
   describe("Show", () => {
     module S = Array.Show(Int.Show);
     it("should convert the array to a string", () => {
-      expect(S.show([|1, 1, 2, 3, 5, 8, 13|])).to_be("[1, 1, 2, 3, 5, 8, 13]")
+      expect(S.show([|1, 1, 2, 3, 5, 8, 13|])) |> to_be("[1, 1, 2, 3, 5, 8, 13]")
     });
   });
 
@@ -191,7 +193,7 @@ describe("Array", () => {
   describe("Monad_Zero", () => {
     module V = Verify.Monad_Zero(Array.Monad_Zero);
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(Array.Applicative.pure <. string_of_int)).to_be(true);
+      expect(V.annihalation(Array.Applicative.pure <. string_of_int)) |> to_be(true);
     });
   });
 

@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 
@@ -194,7 +196,7 @@ describe("Float", () => {
   describe("Division Ring", () => {
     module V = Verify.Compare.Division_Ring(Float.Division_Ring, CompareFloat);
     it("should be a non-zero ring (one is not zero)", () => {
-      expect(V.non_zero_ring).to_be(true);
+      expect(V.non_zero_ring) |> to_be(true);
     });
     property1(
       "should satisfy multiplicative inverse", arb_float', V.multiplicative_inverse
@@ -204,7 +206,7 @@ describe("Float", () => {
   describe("Euclidean Ring", () => {
     module V = Verify.Compare.Euclidean_Ring(Float.Euclidean_Ring, CompareFloat);
     it("should be a non zero ring (zero is not one)", () => {
-      expect(V.non_zero_ring).to_be(true);
+      expect(V.non_zero_ring) |> to_be(true);
     });
     property2(
       "should satisfy integral domain", arb_float', arb_float', V.integral_domain

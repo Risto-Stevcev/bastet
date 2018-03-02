@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
@@ -72,22 +74,22 @@ describe("Tuple", () => {
   describe("Foldable", () => TupleF.String.Foldable.({
     let empty = String.Monoid.empty;
     it("should do a left fold", () => {
-      expect(fold_left((+), 0, (empty, 123))).to_be(123);
-      expect(fold_left((-), 10, (empty, 321))).to_be(-311);
+      expect(fold_left((+), 0, (empty, 123))) |> to_be(123);
+      expect(fold_left((-), 10, (empty, 321))) |> to_be(-311);
     });
 
     it("should do a right fold", () => {
-      expect(fold_right((-), 10, (empty, 321))).to_be(311);
+      expect(fold_right((-), 10, (empty, 321))) |> to_be(311);
     });
 
     it("should do a map fold (int)", () => {
       module F = Fold_Map(Int.Additive.Monoid);
-      expect(F.fold_map(Function.Category.id, (empty, 123))).to_be(123);
+      expect(F.fold_map(Function.Category.id, (empty, 123))) |> to_be(123);
     });
 
     it("should do a map fold (list)", () => {
       module F = Fold_Map_Plus(List.Plus);
-      expect(F.fold_map(List.Applicative.pure, (empty, [1,2,3]))).to_be([[1,2,3]]);
+      expect(F.fold_map(List.Applicative.pure, (empty, [1,2,3]))) |> to_be([[1,2,3]]);
     });
   }));
 
@@ -95,12 +97,12 @@ describe("Tuple", () => {
     let (traverse, sequence) = TupleF.String.List.Traversable.(traverse, sequence);
     it("should traverse the array", () => {
       let positive_int = (x) => x >= 0 ? [x] : [];
-      expect(traverse(positive_int, ("foo", 123))).to_be(([("foo", 123)]));
-      expect(traverse(positive_int, ("bar", -123))).to_be([]);
+      expect(traverse(positive_int, ("foo", 123))) |> to_be(([("foo", 123)]));
+      expect(traverse(positive_int, ("bar", -123))) |> to_be([]);
     });
     it("should sequence the array", () => {
-      expect(sequence(("foo", [123]))).to_be([("foo", 123)]);
-      expect(sequence(("bar", []))).to_be([]);
+      expect(sequence(("foo", [123]))) |> to_be([("foo", 123)]);
+      expect(sequence(("bar", []))) |> to_be([]);
     });
   });
 

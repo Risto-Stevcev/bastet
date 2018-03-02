@@ -21,10 +21,10 @@
   ],
   "author": "Risto Stevcev",
   "license": "BSD-3-Clause",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
+    "bs-chai": "^0.2.0",
     "bs-jsverify": "^0.7.0",
-    "bs-mochajs": "^0.3.0"
+    "bs-mocha": "^0.2.0"
   }
 }

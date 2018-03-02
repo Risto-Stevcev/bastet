@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
@@ -78,7 +80,7 @@ describe("Option", () => {
   describe("Plus", () => {
     module V = Verify.Plus(Option.Plus);
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(string_of_int)).to_be(true);
+      expect(V.annihalation(string_of_int)) |> to_be(true);
     });
     property1("should satisfy identity", arb_option(arb_nat), V.identity);
   });
@@ -91,27 +93,27 @@ describe("Option", () => {
       V.distributivity(pure((*)(2)), pure((+)(3)))
     );
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(string_of_int |> pure)).to_be(true)
+      expect(V.annihalation(string_of_int |> pure)) |> to_be(true)
     })
   }));
 
   describe("Foldable", () => {
     let (fold_left, fold_right) = Option.Foldable.(fold_left, fold_right);
     it("should do a left fold", () => {
-      expect(fold_left((+), 0, Some(1))).to_be(1);
+      expect(fold_left((+), 0, Some(1))) |> to_be(1);
     });
     it("should do a right fold", () => {
-      expect(fold_right((+), 0, Some(1))).to_be(1);
-      expect(fold_right((+), 0, None)).to_be(0);
+      expect(fold_right((+), 0, Some(1))) |> to_be(1);
+      expect(fold_right((+), 0, None)) |> to_be(0);
     });
     it("should do a map fold (int)", () => {
       let fold_map = OptionF.Int.Additive.Fold_Map.(fold_map);
-      expect(fold_map((*)(2), Some(3))).to_be(6);
-      expect(fold_map((+)(1), None)).to_be(Int.Additive.Monoid.empty);
+      expect(fold_map((*)(2), Some(3))) |> to_be(6);
+      expect(fold_map((+)(1), None)) |> to_be(Int.Additive.Monoid.empty);
     });
     it("should do a map fold (list)", () => {
       let fold_map = OptionF.List.Fold_Map_Plus.(fold_map);
-      expect(fold_map(List.Applicative.pure, Some(123))).to_be([123]);
+      expect(fold_map(List.Applicative.pure, Some(123))) |> to_be([123]);
     });
   });
 
@@ -119,12 +121,12 @@ describe("Option", () => {
     let (traverse, sequence) = OptionF.List.Traversable.(traverse, sequence);
     it("should traverse the list", () => {
       let positive_int = (x) => x >= 0 ? [x] : [];
-      expect(traverse(positive_int, Some(123))).to_be([Some(123)]);
-      expect(traverse(positive_int, Some(-123))).to_be([]);
+      expect(traverse(positive_int, Some(123))) |> to_be([Some(123)]);
+      expect(traverse(positive_int, Some(-123))) |> to_be([]);
     });
     it("should sequence the list", () => {
-      expect(sequence(Some([3, 4, 5]))).to_be([Some(3), Some(4), Some(5)]);
-      expect(sequence(None)).to_be([None]);
+      expect(sequence(Some([3, 4, 5]))) |> to_be([Some(3), Some(4), Some(5)]);
+      expect(sequence(None)) |> to_be([None]);
     });
   });
 

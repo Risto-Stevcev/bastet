@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open Interface;
 
 
@@ -56,11 +58,11 @@ describe("Default", () => {
 
   describe("Foldable", () => Foldable.({
     it("should do a left fold", () => {
-      expect(fold_left((+), 0, [1,2,3,4,5])).to_be(15);
-      expect(fold_left((-), 10, [3,2,1])).to_be(4);
+      expect(fold_left((+), 0, [1,2,3,4,5])) |> to_be(15);
+      expect(fold_left((-), 10, [3,2,1])) |> to_be(4);
     });
     it("should do a right fold", () => {
-      expect(fold_right((-), 10, [3,2,1])).to_be(-8);
+      expect(fold_right((-), 10, [3,2,1])) |> to_be(-8);
     });
   }));
 
@@ -68,12 +70,12 @@ describe("Default", () => {
     module T = Traversable(Option.Applicative);
     it("should traverse the list", () => T.({
       let positive_int = (x) => x >= 0 ? Some(x) : None;
-      expect(traverse(positive_int, [1,2,3])).to_be(Some([1,2,3]));
-      expect(traverse(positive_int, [1,2,-3])).to_be(None);
+      expect(traverse(positive_int, [1,2,3])) |> to_be(Some([1,2,3]));
+      expect(traverse(positive_int, [1,2,-3])) |> to_be(None);
     }));
     it("should sequence the list", () => T.({
-      expect(sequence([Some(3), Some(4), Some(5)])).to_be(Some([3,4,5]));
-      expect(sequence([Some(3), Some(4), None])).to_be(None);
+      expect(sequence([Some(3), Some(4), Some(5)])) |> to_be(Some([3,4,5]));
+      expect(sequence([Some(3), Some(4), None])) |> to_be(None);
     }));
   });
 });

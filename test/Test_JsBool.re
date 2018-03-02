@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let (<.) = Function.Infix.(<.);
@@ -7,27 +9,27 @@ let (<.) = Function.Infix.(<.);
 describe("JsBool", () => JsBool.Infix.({
   describe("Example Usage", () => {
     it("should `and` two values together", () => {
-      expect(Js.true_ <&&> Js.true_).to_be(Js.true_);
-      expect(Js.true_ <&&> Js.false_).to_be(Js.false_);
-      expect(Js.false_ <&&> Js.true_).to_be(Js.false_);
-      expect(Js.false_ <&&> Js.false_).to_be(Js.false_);
+      expect(Js.true_ <&&> Js.true_) |> to_be(Js.true_);
+      expect(Js.true_ <&&> Js.false_) |> to_be(Js.false_);
+      expect(Js.false_ <&&> Js.true_) |> to_be(Js.false_);
+      expect(Js.false_ <&&> Js.false_) |> to_be(Js.false_);
     });
     it("should `or` two values together", () => {
-      expect(Js.true_ <||> Js.true_).to_be(Js.true_);
-      expect(Js.true_ <||> Js.false_).to_be(Js.true_);
-      expect(Js.false_ <||> Js.true_).to_be(Js.true_);
-      expect(Js.false_ <||> Js.false_).to_be(Js.false_);
+      expect(Js.true_ <||> Js.true_) |> to_be(Js.true_);
+      expect(Js.true_ <||> Js.false_) |> to_be(Js.true_);
+      expect(Js.false_ <||> Js.true_) |> to_be(Js.true_);
+      expect(Js.false_ <||> Js.false_) |> to_be(Js.false_);
     });
     it("should `not` a value", () => {
       let not = JsBool.Heyting_Algebra.not;
-      expect(not(Js.true_)).to_be(Js.false_);
-      expect(not(Js.false_)).to_be(Js.true_);
+      expect(not(Js.true_)) |> to_be(Js.false_);
+      expect(not(Js.false_)) |> to_be(Js.true_);
     });
     it("should `implies` a value", () => {
-      expect(Js.true_ --> Js.true_).to_be(Js.true_);
-      expect(Js.true_ --> Js.false_).to_be(Js.false_);
-      expect(Js.false_ --> Js.true_).to_be(Js.true_);
-      expect(Js.false_ --> Js.false_).to_be(Js.true_);
+      expect(Js.true_ --> Js.true_) |> to_be(Js.true_);
+      expect(Js.true_ --> Js.false_) |> to_be(Js.false_);
+      expect(Js.false_ --> Js.true_) |> to_be(Js.true_);
+      expect(Js.false_ --> Js.false_) |> to_be(Js.true_);
     })
   });
   describe("Conjunctive", () => {

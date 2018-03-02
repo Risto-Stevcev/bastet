@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let id = Function.Category.id;
@@ -41,7 +43,7 @@ describe("JsDict", () => {
   describe("Plus", () => {
     module V = Verify.Plus(JsDict.Plus);
     it("should satisfy annihalation", () => {
-      expect(V.annihalation(string_of_int)).to_be(true);
+      expect(V.annihalation(string_of_int)) |> to_be(true);
     });
     property1("should satisfy identity", arb_dict(arb_nat), V.identity);
   });
@@ -50,10 +52,10 @@ describe("JsDict", () => {
     it("should do a left fold", () => {
       expect(
         JsDict.Foldable.fold_left((+), 0, JsDict.unsafe_from_object({"a":1,"b":2,"c":3}))
-      ).to_be(6);
+      ) |> to_be(6);
       expect(
         JsDict.Foldable.fold_left((-), 10, JsDict.unsafe_from_object({"a":1,"b":3,"c":4}))
-      ).to_be(2);
+      ) |> to_be(2);
     });
   });
 
@@ -63,11 +65,11 @@ describe("JsDict", () => {
     it("should sequence the dict", () => {
       expect(
         T.sequence(JsDict.unsafe_from_object({"a":Some(123), "b":Some(456), "c":Some(789)}))
-      ).to_be(Some(JsDict.unsafe_from_object({"a":123,"b":456,"c":789})));
+      ) |> to_be(Some(JsDict.unsafe_from_object({"a":123,"b":456,"c":789})));
 
       expect(
         T.sequence(JsDict.unsafe_from_object({"a":Some(123), "b":None, "c":Some(789)}))
-      ).to_be(None);
+      ) |> to_be(None);
     });
   });
 });

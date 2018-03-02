@@ -1,4 +1,6 @@
-open BsMochajs.Mocha;
+open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Js.Result;
@@ -146,8 +148,8 @@ describe("Result", () => {
 
   describe("Show", () => {
     it("should show the either value", () => {
-      expect(Functors.ResultF.Bool.Int.Show.show(Ok(true))).to_be("true");
-      expect(Functors.ResultF.Bool.Int.Show.show(Error(123))).to_be("123");
+      expect(Functors.ResultF.Bool.Int.Show.show(Ok(true))) |> to_be("true");
+      expect(Functors.ResultF.Bool.Int.Show.show(Error(123))) |> to_be("123");
     })
   });
 
@@ -155,13 +157,13 @@ describe("Result", () => {
     it("should compare two either values for equality", () => {
       module E = Result.Eq(Int.Eq, Int.Eq);
       let eq = Functors.ResultF.Float.Int.Eq.eq;
-      expect(eq(Error(123), Error(123))).to_be(true);
-      expect(eq(Error(123), Error(456))).to_be(false);
-      expect(eq(Ok(12.3), Ok(12.3))).to_be(true);
-      expect(eq(Ok(12.3), Ok(45.6))).to_be(false);
-      expect(eq(Error(123), Ok(45.6))).to_be(false);
-      expect(E.eq(Error(123), Ok(123))).to_be(false);
-      expect(E.eq(Ok(123), Error(123))).to_be(false);
+      expect(eq(Error(123), Error(123))) |> to_be(true);
+      expect(eq(Error(123), Error(456))) |> to_be(false);
+      expect(eq(Ok(12.3), Ok(12.3))) |> to_be(true);
+      expect(eq(Ok(12.3), Ok(45.6))) |> to_be(false);
+      expect(eq(Error(123), Ok(45.6))) |> to_be(false);
+      expect(E.eq(Error(123), Ok(123))) |> to_be(false);
+      expect(E.eq(Ok(123), Error(123))) |> to_be(false);
     })
   });
 
@@ -169,13 +171,13 @@ describe("Result", () => {
     it("should compare two either values for equality", () => {
       module E = Result.Ord(Int.Ord, Int.Ord);
       let compare = Functors.ResultF.Float.Int.Ord.compare;
-      expect(compare(Error(123), Error(123))).to_be(`equal_to); 
-      expect(compare(Error(123), Error(456))).to_be(`less_than);
-      expect(compare(Ok(12.3), Ok(12.3))).to_be(`equal_to);
-      expect(compare(Ok(12.3), Ok(45.6))).to_be(`less_than);
-      expect(compare(Error(123), Ok(45.6))).to_be(`less_than);
-      expect(E.compare(Error(123), Ok(123))).to_be(`less_than);
-      expect(E.compare(Ok(123), Error(123))).to_be(`greater_than);
+      expect(compare(Error(123), Error(123))) |> to_be(`equal_to); 
+      expect(compare(Error(123), Error(456))) |> to_be(`less_than);
+      expect(compare(Ok(12.3), Ok(12.3))) |> to_be(`equal_to);
+      expect(compare(Ok(12.3), Ok(45.6))) |> to_be(`less_than);
+      expect(compare(Error(123), Ok(45.6))) |> to_be(`less_than);
+      expect(E.compare(Error(123), Ok(123))) |> to_be(`less_than);
+      expect(E.compare(Ok(123), Error(123))) |> to_be(`greater_than);
     })
   });
 
