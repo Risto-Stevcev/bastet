@@ -1,6 +1,6 @@
 {
   "name": "bs-abstract",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "refmt": 3,
   "namespace": true,
   "bsc-flags": ["-bs-super-errors"],

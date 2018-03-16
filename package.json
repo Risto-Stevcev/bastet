@@ -1,6 +1,6 @@
 {
   "name": "bs-abstract",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Bucklescript interfaces and implementations for category theory and abstract algebra",
   "repository": {
     "type": "git",
@@ -23,8 +23,9 @@
   "license": "BSD-3-Clause",
   "dependencies": {},
   "devDependencies": {
-    "bs-chai": "^0.2.0",
-    "bs-jsverify": "^0.7.0",
-    "bs-mocha": "^0.2.0"
+    "bs-chai": "^0.3.0",
+    "bs-jsverify": "^0.9.0",
+    "bs-mocha": "^0.3.0",
+    "bs-platform": "^2.2.2"
   }
 }
