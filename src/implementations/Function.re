@@ -13,6 +13,15 @@ module Functor = (T: TYPE) => {
   include Function_Functor_;
 };
 
+module Apply = (T: TYPE) => {
+  module Function_Apply_: APPLY with type t('b) = T.t => 'b = {
+    module Functor = Functor(T);
+    include Functor;
+    let apply = (f, g, x) => f(x, g(x));
+  };
+  include Function_Apply_;
+};
+
 module Semigroupoid: SEMIGROUPOID with type t('a, 'b) = 'a => 'b = {
   type t('a, 'b) = 'a => 'b;
   let compose = (f, g, x) => f(g(x));

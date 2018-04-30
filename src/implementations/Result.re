@@ -396,7 +396,7 @@ let is_ok = a => result(const(true), const(false))(a);
 let is_error = a => result(const(false), const(true))(a);
 
 let note: ('a, option('b)) => Js.Result.t('a, 'b) =
-  default => BsAbstract.Option.maybe(~f=x => Ok(x), ~default=Error(default));
+  default => Option.maybe(~f=x => Ok(x), ~default=Error(default));
 
 let hush: Js.Result.t('a, 'b) => option('b) =
-  e => result(BsAbstract.Option.Applicative.pure, const(None))(e);
+  e => result(Option.Applicative.pure, const(None))(e);
