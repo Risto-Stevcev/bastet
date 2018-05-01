@@ -1,6 +1,6 @@
 {
   "name": "bs-abstract",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Bucklescript interfaces and implementations for category theory and abstract algebra",
   "repository": {
     "type": "git",
