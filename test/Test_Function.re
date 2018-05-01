@@ -1,4 +1,6 @@
 open BsMocha.Mocha;
+open BsChai.Expect.Expect;
+open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let ((<.), (>.)) = Function.Infix.((<.), (>.));
@@ -29,6 +31,14 @@ describe("Function", () => {
         let eq = Obj.magic((a, b) => a(n) == b(n));
       });
       V.associative_composition((+), (-), (+)(1))
+    });
+
+    it("should compose two infix functions (x - x * y)", () => {
+      module Apply_Fn_Int = Function.Apply({ type t = int });
+      module Apply_Util = Functions.Apply(Apply_Fn_Int);
+
+      let fn = Apply_Util.lift2(Function.Semigroupoid.compose, (-), (*));
+      expect(fn(3, 4)) |> to_be(-9);
     });
   });
 
