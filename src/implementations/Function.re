@@ -1,51 +1,44 @@
 open Interface;
 
-let flip: (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b);
+let flip: (('a, 'b) => 'c, 'b, 'a) => 'c = (f, b, a) => f(a, b)
+and const: ('a, 'b) => 'a = (a, _) => a;
 
-let const: ('a, 'b) => 'a = (a, _) => a;
+module type FUNCTOR_F   = (T: TYPE) => FUNCTOR   with type t('a) = T.t => 'a;
+module type APPLY_F     = (T: TYPE) => APPLY     with type t('a) = T.t => 'a;
+module type INVARIANT_F = (T: TYPE) => INVARIANT with type t('a) = T.t => 'a;
 
-
-module Functor = (T: TYPE) => {
-  module Function_Functor_: FUNCTOR with type t('b) = T.t => 'b = {
-    type t('b) = T.t => 'b;
-    let map = (f, g, x) => f(g(x));
-  };
-  include Function_Functor_;
+module Functor: FUNCTOR_F = (T: TYPE) => {
+  type t('b) = T.t => 'b;
+  let map = (f, g, x) => f(g(x))
 };
 
-module Apply = (T: TYPE) => {
-  module Function_Apply_: APPLY with type t('b) = T.t => 'b = {
-    module Functor = Functor(T);
-    include Functor;
-    let apply = (f, g, x) => f(x, g(x));
-  };
-  include Function_Apply_;
+module Apply: APPLY_F = (T: TYPE) => {
+  module Functor = Functor(T);
+  include Functor;
+  let apply = (f, g, x) => f(x, g(x))
 };
 
 module Semigroupoid: SEMIGROUPOID with type t('a, 'b) = 'a => 'b = {
   type t('a, 'b) = 'a => 'b;
-  let compose = (f, g, x) => f(g(x));
+  let compose = (f, g, x) => f(g(x))
 };
 
 module Category: CATEGORY with type t('a, 'b) = 'a => 'b = {
   include Semigroupoid;
-  let id = (a) => a;
+  let id = (a) => a
 };
 
-module Invariant = (T: TYPE) => {
+module Invariant: INVARIANT_F = (T: TYPE) => {
   module F = Functor(T);
-  module Function_Invariant_: INVARIANT with type t('b) = T.t => 'b = {
-    type t('b) = T.t => 'b;
-    let imap = (f, _) => F.map(f);
-  };
-  include Function_Invariant_;
+  type t('b) = T.t => 'b;
+  let imap = (f, _) => F.map(f)
 };
 
 module Profunctor: PROFUNCTOR with type t('a, 'b) = 'a => 'b = {
   module I = Infix.Semigroupoid(Semigroupoid);
   let (>.) = I.(>.);
   type t('a, 'b) = 'a => 'b;
-  let dimap = (a_to_b, c_to_d, b_to_c) => a_to_b >. b_to_c >. c_to_d;
+  let dimap = (a_to_b, c_to_d, b_to_c) => a_to_b >. b_to_c >. c_to_d
 };
 
 module Infix = {

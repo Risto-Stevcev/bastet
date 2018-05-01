@@ -8,39 +8,45 @@ let result: ('a => 'c, 'b => 'c, Js.Result.t('a, 'b)) => 'c = (f, g, a) => switc
   | (_, g, Error(a')) => g(a')
   };
 
-module Magma = (T: TYPE, M: MAGMA) => {
-  module Result_Magma_: MAGMA with type t = Js.Result.t(M.t, T.t) = {
-    type t = Js.Result.t(M.t, T.t);
-    let append = (a, b) => switch (a, b) {
-      | (Ok(a'), Ok(b')) => Ok(M.append(a', b'))
-      | (_, Ok(b')) => Ok(b')
-      | (Ok(a'), _) => Ok(a')
-      | (Error(a'), _) => Error(a')
-      }
-  };
-  include Result_Magma_
+
+module type MAGMA_F         = (T: TYPE, M: MAGMA)           => MAGMA         with type t = Js.Result.t(M.t, T.t);
+module type MEDIAL_MAGMA_F  = (T: TYPE, M: MAGMA)           => MEDIAL_MAGMA  with type t = Js.Result.t(M.t, T.t);
+module type SEMIGROUP_F     = (T: TYPE, S: SEMIGROUP)       => SEMIGROUP     with type t = Js.Result.t(S.t, T.t);
+module type FUNCTOR_F       = (T: TYPE)                     => FUNCTOR       with type t('a) = Js.Result.t('a, T.t);
+module type APPLY_F         = (T: TYPE)                     => APPLY         with type t('a) = Js.Result.t('a, T.t);
+module type APPLICATIVE_F   = (T: TYPE)                     => APPLICATIVE   with type t('a) = Js.Result.t('a, T.t);
+module type MONAD_F         = (T: TYPE)                     => MONAD         with type t('a) = Js.Result.t('a, T.t);
+module type ALT_F           = (T: TYPE)                     => ALT           with type t('a) = Js.Result.t('a, T.t);
+module type EXTEND_F        = (T: TYPE)                     => EXTEND        with type t('a) = Js.Result.t('a, T.t);
+module type SHOW_F          = (Ok: SHOW, Error: SHOW)       => SHOW          with type t = Js.Result.t(Ok.t, Error.t);
+module type EQ_F            = (Ok: EQ, Error: EQ)           => EQ            with type t = Js.Result.t(Ok.t, Error.t);
+module type ORD_F           = (Ok: ORD, Error: ORD)         => ORD           with type t = Js.Result.t(Ok.t, Error.t);
+module type BOUNDED_F       = (Ok: BOUNDED, Error: BOUNDED) => BOUNDED       with type t = Js.Result.t(Ok.t, Error.t);
+module type FOLDABLE_F      = (T: TYPE)                     => FOLDABLE      with type t('a) = Js.Result.t('a, T.t);
+module type TRAVERSABLE_F   = (T: TYPE, A: APPLICATIVE)     => TRAVERSABLE   with type t('a) = Js.Result.t('a, T.t);
+module type BITRAVERSABLE_F = (A: APPLICATIVE)              => BITRAVERSABLE with type t('a, 'b) = Js.Result.t('a, 'b)
+  and type applicative_t('a) = A.t('a);
+
+module Magma: MAGMA_F = (T: TYPE, M: MAGMA) => {
+  type t = Js.Result.t(M.t, T.t);
+  let append = (a, b) => switch (a, b) {
+    | (Ok(a'), Ok(b')) => Ok(M.append(a', b'))
+    | (_, Ok(b')) => Ok(b')
+    | (Ok(a'), _) => Ok(a')
+    | (Error(a'), _) => Error(a')
+    }
 };
 
-module Medial_Magma = (T: TYPE, M: MAGMA) => {
-  module Result_Medial_Magma_: MEDIAL_MAGMA with type t = Js.Result.t(M.t, T.t) = {
-    include Magma(T, M);
-  };
-  include Result_Medial_Magma_
-};
+module Medial_Magma: MEDIAL_MAGMA_F = (T: TYPE, M: MAGMA) => { include Magma(T, M) };
 
-module Semigroup = (T: TYPE, S: SEMIGROUP) => {
-  include Magma(T, S);
-};
+module Semigroup: SEMIGROUP_F = (T: TYPE, S: SEMIGROUP) => { include Magma(T, S) };
 
-module Functor = (T: TYPE) => {
-  module Result_Functor_: FUNCTOR with type t('a) = Js.Result.t('a, T.t) = {
-    type t('a) = Js.Result.t('a, T.t);
-    let map = (f, a) => switch a {
+module Functor: FUNCTOR_F = (T: TYPE) => {
+  type t('a) = Js.Result.t('a, T.t);
+  let map = (f, a) => switch a {
     | Ok(r) => Ok(f(r))
     | Error(l) => Error(l)
     }
-  };
-  include Result_Functor_
 };
 
 module Bifunctor: BIFUNCTOR with type t('a, 'b) = Js.Result.t('a, 'b) = {
@@ -51,98 +57,71 @@ module Bifunctor: BIFUNCTOR with type t('a, 'b) = Js.Result.t('a, 'b) = {
     }
 };
 
-module Apply = (T: TYPE) => {
-  module Result_Apply_: APPLY with type t('a) = Js.Result.t('a, T.t) = {
-    include Functor(T);
-    let apply = (f, a) => switch (f, a) {
-      | (Ok(f'), a') => map(f', a')
-      | (Error(f'), _) => Error(f')
-      }
-  };
-  include Result_Apply_
+module Apply: APPLY_F = (T: TYPE) => {
+  include Functor(T);
+  let apply = (f, a) => switch (f, a) {
+    | (Ok(f'), a') => map(f', a')
+    | (Error(f'), _) => Error(f')
+    }
 };
 
-module Applicative = (T: TYPE) => {
-  module Result_Applicative_: APPLICATIVE with type t('a) = Js.Result.t('a, T.t) = {
-    include Apply(T);
-    let pure = a => Ok(a)
-  };
-  include Result_Applicative_
+module Applicative: APPLICATIVE_F = (T: TYPE) => {
+  include Apply(T);
+  let pure = a => Ok(a)
 };
 
-module Monad = (T: TYPE) => {
-  module Result_Monad_: MONAD with type t('a) = Js.Result.t('a, T.t) = {
-    include Applicative(T);
-    let flat_map = (a, f) => switch a {
-      | Ok(a') => f(a')
-      | Error(a') => Error(a')
-      };
-  };
-  include Result_Monad_
+module Monad: MONAD_F = (T: TYPE) => {
+  include Applicative(T);
+  let flat_map = (a, f) => switch a {
+    | Ok(a') => f(a')
+    | Error(a') => Error(a')
+    }
 };
 
-module Alt = (T: TYPE) => {
-  module Result_Alt_: ALT with type t('a) = Js.Result.t('a, T.t) = {
-    include Functor(T);
-    let alt = (a, b) => switch (a, b) {
-      | (Error(_), b') => b'
-      | (a', _) => a'
-      };
-  };
-  include Result_Alt_
+module Alt: ALT_F = (T: TYPE) => {
+  include Functor(T);
+  let alt = (a, b) => switch (a, b) {
+    | (Error(_), b') => b'
+    | (a', _) => a'
+    }
 };
 
-module Extend = (T: TYPE) => {
-  module Result_Extend_: EXTEND with type t('a) = Js.Result.t('a, T.t) = {
-    include Monad(T);
-    let extend = (f, a) => switch (f, a) {
-      | (_, Error(a')) => Error(a')
-      | (f', a') => Ok(f'(a'))
-      };
-  };
-  include Result_Extend_;
+module Extend: EXTEND_F = (T: TYPE) => {
+  include Monad(T);
+  let extend = (f, a) => switch (f, a) {
+    | (_, Error(a')) => Error(a')
+    | (f', a') => Ok(f'(a'))
+    }
 };
 
-module Show = (Ok: SHOW, Error: SHOW) => {
-  module Result_Show_: SHOW with type t = Js.Result.t(Ok.t, Error.t) = {
-    type t = Js.Result.t(Ok.t, Error.t);
-    let show = result(Ok.show, Error.show)
-  };
-  include Result_Show_
+module Show: SHOW_F = (Ok: SHOW, Error: SHOW) => {
+  type t = Js.Result.t(Ok.t, Error.t);
+  let show = result(Ok.show, Error.show)
 };
 
-module Eq = (Ok: EQ, Error: EQ) => {
-  module Result_Eq_: EQ with type t = Js.Result.t(Ok.t, Error.t) = {
-    type t = Js.Result.t(Ok.t, Error.t);
-    let eq = (a, b) => switch (a, b) {
-      | (Ok(a'), Ok(b')) => Ok.eq(a', b')
-      | (Error(a'), Error(b')) => Error.eq(a', b')
-      | _ => false
-      }
-  };
-  include Result_Eq_;
+module Eq: EQ_F = (Ok: EQ, Error: EQ) => {
+  type t = Js.Result.t(Ok.t, Error.t);
+  let eq = (a, b) => switch (a, b) {
+    | (Ok(a'), Ok(b')) => Ok.eq(a', b')
+    | (Error(a'), Error(b')) => Error.eq(a', b')
+    | _ => false
+    }
 };
 
-module Ord = (Ok: ORD, Error: ORD) => {
-  module Result_Ord_: ORD with type t = Js.Result.t(Ok.t, Error.t) = {
-    include Eq(Ok, Error);
-    let compare = (a, b) => switch (a, b) {
-      | (Ok(a'), Ok(b')) => Ok.compare(a', b')
-      | (Error(a'), Error(b')) => Error.compare(a', b')
-      | (Error(_), Ok(_)) => `less_than
-      | (Ok(_), Error(_)) => `greater_than
-      }
-  };
-  include Result_Ord_
+module Ord: ORD_F = (Ok: ORD, Error: ORD) => {
+  include Eq(Ok, Error);
+  let compare = (a, b) => switch (a, b) {
+    | (Ok(a'), Ok(b')) => Ok.compare(a', b')
+    | (Error(a'), Error(b')) => Error.compare(a', b')
+    | (Error(_), Ok(_)) => `less_than
+    | (Ok(_), Error(_)) => `greater_than
+    }
 };
 
-module Bounded = (Ok: BOUNDED, Error: BOUNDED) => {
-  module Result_Bounded_: BOUNDED with type t = Js.Result.t(Ok.t, Error.t) = {
-    include Ord(Ok, Error);
-    let top = Ok(Ok.top);
-    let bottom = Error(Error.bottom);
-  };
-  include Result_Bounded_
+module Bounded: BOUNDED_F = (Ok: BOUNDED, Error: BOUNDED) => {
+  include Ord(Ok, Error);
+  let top = Ok(Ok.top);
+  let bottom = Error(Error.bottom)
 };
 
 module Many_Valued_Logic = {
@@ -151,229 +130,195 @@ module Many_Valued_Logic = {
    * - The reflexivity conditions of equivalence and implication (may be quasi-reflexive)
    * - The law of excluded middle
    */
-  module Quasireflexive_Eq = (Ok: TYPE, Error: TYPE) => {
-    module Result_Quasireflexive_Eq_: EQ with type t = Js.Result.t(Ok.t, Error.t) = {
-      type t = Js.Result.t(Ok.t, Error.t);
-      /* Quasi-reflexive */
-      let eq = (a, b) => switch (a, b) {
-        | (Ok(_), Ok(_)) | (Error(_), Error(_)) => true 
-        | _ => false
-        }
-    };
-    include Result_Quasireflexive_Eq_;
+
+  module type EQ_F  = (Ok: TYPE, Error: TYPE) => EQ  with type t = Js.Result.t(Ok.t, Error.t);
+  module type ORD_F = (Ok: TYPE, Error: TYPE) => ORD with type t = Js.Result.t(Ok.t, Error.t);
+  module type JOIN_SEMILATTICE_F = (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) =>
+    JOIN_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+  module type MEET_SEMILATTICE_F = (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) =>
+    MEET_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+  module type BOUNDED_JOIN_SEMILATTICE_F = (Ok: BOUNDED_JOIN_SEMILATTICE, Error: BOUNDED_JOIN_SEMILATTICE) => 
+    BOUNDED_JOIN_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+  module type BOUNDED_MEET_SEMILATTICE_F = (Ok: BOUNDED_MEET_SEMILATTICE, Error: BOUNDED_MEET_SEMILATTICE) =>
+    BOUNDED_MEET_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+  module type HEYTING_ALGEBRA_F = (Ok: HEYTING_ALGEBRA, Error: HEYTING_ALGEBRA) => 
+    HEYTING_ALGEBRA with type t = Js.Result.t(Ok.t, Error.t);
+
+  module Quasireflexive_Eq: EQ_F = (Ok: TYPE, Error: TYPE) => {
+    type t = Js.Result.t(Ok.t, Error.t);
+    /* Quasi-reflexive */
+    let eq = (a, b) => switch (a, b) {
+      | (Ok(_), Ok(_)) | (Error(_), Error(_)) => true 
+      | _ => false
+      }
   };
 
-  module Quasireflexive_Ord = (Ok: TYPE, Error: TYPE) => {
-    module Result_Quasireflexive_Ord_: ORD with type t = Js.Result.t(Ok.t, Error.t) = {
-      include Quasireflexive_Eq(Ok, Error);
-      /* Quasi-reflexive */
-      let compare = (a, b) => switch (a, b) {
-        | (Ok(_), Ok(_)) | (Error(_), Error(_)) => `equal_to 
-        | (Error(_), Ok(_)) => `less_than
-        | (Ok(_), Error(_)) => `greater_than
-        }
-    };
-    include Result_Quasireflexive_Ord_
+  module Quasireflexive_Ord: ORD_F = (Ok: TYPE, Error: TYPE) => {
+    include Quasireflexive_Eq(Ok, Error);
+    /* Quasi-reflexive */
+    let compare = (a, b) => switch (a, b) {
+      | (Ok(_), Ok(_)) | (Error(_), Error(_)) => `equal_to 
+      | (Error(_), Ok(_)) => `less_than
+      | (Ok(_), Error(_)) => `greater_than
+      }
   };
 
-  module Join_Semilattice = (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) => {
-    module Result_Join_Semilattice_:
-      JOIN_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t) = {
-      type t = Js.Result.t(Ok.t, Error.t);
-      let join = (a, b) => switch (a, b) {
-        | (Ok(a'), Ok(b')) => Ok(Ok.join(a', b'))
-        | (Ok(a'), _) | (_, Ok(a')) => Ok(a')
-        | (Error(a'), Error(b')) => Error(Error.join(a', b'))
-        }
-    };
-    include Result_Join_Semilattice_
+  module Join_Semilattice: JOIN_SEMILATTICE_F = (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) => {
+    type t = Js.Result.t(Ok.t, Error.t);
+    let join = (a, b) => switch (a, b) {
+      | (Ok(a'), Ok(b')) => Ok(Ok.join(a', b'))
+      | (Ok(a'), _) | (_, Ok(a')) => Ok(a')
+      | (Error(a'), Error(b')) => Error(Error.join(a', b'))
+      }
   };
 
-  module Meet_Semilattice = (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) => {
-    module Result_Meet_Semilattice_:
-      MEET_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t) = {
-      type t = Js.Result.t(Ok.t, Error.t);
-      let meet = (a, b) => switch (a, b) {
-        | (Ok(a'), Ok(b')) => Ok(Ok.meet(a', b'))
-        | (Error(a'), Error(b')) => Error(Error.meet(a', b'))
-        | (Error(a'), _) | (_, Error(a')) => Error(a')
-        }
-    };
-    include Result_Meet_Semilattice_
+  module Meet_Semilattice: MEET_SEMILATTICE_F = (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) => {
+    type t = Js.Result.t(Ok.t, Error.t);
+    let meet = (a, b) => switch (a, b) {
+      | (Ok(a'), Ok(b')) => Ok(Ok.meet(a', b'))
+      | (Error(a'), Error(b')) => Error(Error.meet(a', b'))
+      | (Error(a'), _) | (_, Error(a')) => Error(a')
+      }
   };
 
-  module Bounded_Join_Semilattice =
+  module Bounded_Join_Semilattice: BOUNDED_JOIN_SEMILATTICE_F =
     (Ok: BOUNDED_JOIN_SEMILATTICE, Error: BOUNDED_JOIN_SEMILATTICE) => {
-    module Result_Bounded_Join_Semilattice_:
-      BOUNDED_JOIN_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t) = {
-      include Join_Semilattice(Ok, Error);
-      let bottom = Error(Error.bottom);
-    };
-    include Result_Bounded_Join_Semilattice_
+    include Join_Semilattice(Ok, Error);
+    let bottom = Error(Error.bottom)
   };
 
-  module Bounded_Meet_Semilattice =
+  module Bounded_Meet_Semilattice: BOUNDED_MEET_SEMILATTICE_F =
     (Ok: BOUNDED_MEET_SEMILATTICE, Error: BOUNDED_MEET_SEMILATTICE) => {
-    module Result_Bounded_Meet_Semilattice_:
-      BOUNDED_MEET_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t) = {
-      include Meet_Semilattice(Ok, Error);
-      let top = Ok(Ok.top);
-    };
-    include Result_Bounded_Meet_Semilattice_
+    include Meet_Semilattice(Ok, Error);
+    let top = Ok(Ok.top)
   };
 
   module Lattice = (Ok: LATTICE, Error: LATTICE) => {
     include Join_Semilattice(Ok, Error);
-    include (
-      Meet_Semilattice(Ok, Error):
-        (module type of Meet_Semilattice(Ok, Error)) with type t := t
-    );
+    include (Meet_Semilattice(Ok, Error): (module type of Meet_Semilattice(Ok, Error)) with type t := t)
   };
 
   module Bounded_Lattice = (Ok: BOUNDED_LATTICE, Error: BOUNDED_LATTICE) => {
     include Bounded_Join_Semilattice(Ok, Error);
     include (
-      Bounded_Meet_Semilattice(Ok, Error):
-        (module type of Bounded_Meet_Semilattice(Ok, Error)) with type t := t
-    );
+      Bounded_Meet_Semilattice(Ok, Error): (module type of Bounded_Meet_Semilattice(Ok, Error)) with type t := t
+    )
   };
 
-  module Distributive_Lattice = (Ok: LATTICE, Error: LATTICE) => {
-    include Lattice(Ok, Error);
-  };
+  module Distributive_Lattice = (Ok: LATTICE, Error: LATTICE) => { include Lattice(Ok, Error) };
 
   module Bounded_Distributive_Lattice = (Ok: BOUNDED_LATTICE, Error: BOUNDED_LATTICE) => {
-    include Bounded_Lattice(Ok, Error);
+    include Bounded_Lattice(Ok, Error)
   };
 
-  module Heyting_Algebra = (Ok: HEYTING_ALGEBRA, Error: HEYTING_ALGEBRA) => {
-    module Result_Heyting_Algebra_: HEYTING_ALGEBRA with type t = Js.Result.t(Ok.t, Error.t) = {
-      include Quasireflexive_Ord(Ok, Error);
-      include (
-        Bounded_Distributive_Lattice(Ok, Error):
-          (module type of Bounded_Distributive_Lattice(Ok, Error)) with type t := t
-      );
-      let not = a => switch a {
-        | Ok(a') when a' == Ok.top => Error(Error.bottom)
-        | Ok(a') when a' == Ok.bottom => Error(Error.top)
-        | Error(a') when a' == Error.top => Ok(Ok.bottom) 
-        | Error(a') when a' == Error.bottom => Ok(Ok.top) 
-        | a' => a'
+  module Heyting_Algebra: HEYTING_ALGEBRA_F = (Ok: HEYTING_ALGEBRA, Error: HEYTING_ALGEBRA) => {
+    include Quasireflexive_Ord(Ok, Error);
+    include (
+      Bounded_Distributive_Lattice(Ok, Error):
+        (module type of Bounded_Distributive_Lattice(Ok, Error)) with type t := t
+    );
+
+    let not = a => switch a {
+      | Ok(a') when a' == Ok.top => Error(Error.bottom)
+      | Ok(a') when a' == Ok.bottom => Error(Error.top)
+      | Error(a') when a' == Error.top => Ok(Ok.bottom) 
+      | Error(a') when a' == Error.bottom => Ok(Ok.top) 
+      | a' => a'
       };
-      let implies = (a, b) => join(not(a), b);
-    };
-    include Result_Heyting_Algebra_
+
+    let implies = (a, b) => join(not(a), b)
   };
 
-  module Involutive_Heyting_Algebra =
-    (Ok: INVOLUTIVE_HEYTING_ALGEBRA, Error: INVOLUTIVE_HEYTING_ALGEBRA) => {
-    include Heyting_Algebra(Ok, Error);
+  module Involutive_Heyting_Algebra = (Ok: INVOLUTIVE_HEYTING_ALGEBRA, Error: INVOLUTIVE_HEYTING_ALGEBRA) => {
+    include Heyting_Algebra(Ok, Error)
   };
 
-  module Boolean_Algebra =
-    (Ok: BOOLEAN_ALGEBRA, Error: BOOLEAN_ALGEBRA) => {
-    include Heyting_Algebra(Ok, Error);
-  };
+  module Boolean_Algebra = (Ok: BOOLEAN_ALGEBRA, Error: BOOLEAN_ALGEBRA) => { include Heyting_Algebra(Ok, Error) };
 };
 
-module Foldable = (T: TYPE) => {
-  module Result_Foldable_: FOLDABLE with type t('a) = Js.Result.t('a, T.t) = {
-    type t('a) = Js.Result.t('a, T.t);
-    let fold_left = (f, initial, a) => switch a {
-      | Ok(a') => f(initial, a')
-      | Error(_) => initial
-      };
-    let fold_right = (f, initial, a) => switch a {
-      | Ok(a') => f(a', initial)
-      | Error(_) => initial
-      };
-    module Fold_Map = (M: MONOID) => {
-      let fold_map = (f, a) => switch a {
-        | Ok(a') => f(a')
-        | Error(_) => M.empty
-        }
+module Foldable: FOLDABLE_F = (T: TYPE) => {
+  type t('a) = Js.Result.t('a, T.t);
+
+  let fold_left = (f, initial, a) => switch a {
+    | Ok(a') => f(initial, a')
+    | Error(_) => initial
+    }
+
+  and fold_right = (f, initial, a) => switch a {
+    | Ok(a') => f(a', initial)
+    | Error(_) => initial
     };
-    module Fold_Map_Plus = (P: PLUS) => {
-      let fold_map = (f, a) => switch a {
-        | Ok(a') => f(a')
-        | Error(_) => P.empty
-        }
-    };
-    module Fold_Map_Any = (M: MONOID_ANY) => {
-      let fold_map = (f, a) => switch a {
-        | Ok(a') => f(a')
-        | Error(_) => M.empty
-        }
-    };
+
+  module Fold_Map = (M: MONOID) => {
+    let fold_map = (f, a) => switch a { | Ok(a') => f(a') | Error(_) => M.empty }
   };
-  include Result_Foldable_
+  module Fold_Map_Plus = (P: PLUS) => {
+    let fold_map = (f, a) => switch a { | Ok(a') => f(a') | Error(_) => P.empty }
+  };
+  module Fold_Map_Any = (M: MONOID_ANY) => {
+    let fold_map = (f, a) => switch a { | Ok(a') => f(a') | Error(_) => M.empty }
+  };
 };
 
 module Bifoldable: BIFOLDABLE with type t('a, 'b) = Js.Result.t('a, 'b) = {
   type t('a, 'b) = Js.Result.t('a, 'b);
+
   let bifold_left = (f, g, initial, a) => switch a {
     | Ok(a') => f(initial, a')
     | Error(a') => g(initial, a')
-    };
-  let bifold_right = (f, g, initial, a) => switch a {
+    }
+
+  and bifold_right = (f, g, initial, a) => switch a {
     | Ok(a') => f(a', initial)
     | Error(a') => g(a', initial)
     };
-  module Fold_Map = (M: MONOID) => {
-    let fold_map = result
-  };
-  module Fold_Map_Any = (M: MONOID_ANY) => {
-    let fold_map = result
-  };
-  module Fold_Map_Plus = (P: PLUS) => {
-    let fold_map = result
-  };
+
+  module Fold_Map      = (M: MONOID)     => { let fold_map = result };
+  module Fold_Map_Any  = (M: MONOID_ANY) => { let fold_map = result };
+  module Fold_Map_Plus = (P: PLUS)       => { let fold_map = result };
 };
 
-module Traversable = (T: TYPE, A: APPLICATIVE) => {
+module Traversable: TRAVERSABLE_F = (T: TYPE, A: APPLICATIVE) => {
   module I = Infix.Apply(A);
   module E = Applicative(T);
-  module Result_Traversable_: TRAVERSABLE with type t('a) = Js.Result.t('a, T.t) = {
-    type t('a) = Js.Result.t('a, T.t);
-    type applicative_t('a) = A.t('a);
-    include (Functor(T): FUNCTOR with type t('a) := t('a));
-    include (Foldable(T): FOLDABLE with type t('a) := t('a));
 
-    let traverse = (f, a) => switch a {
-      | Ok(a') => A.map(E.pure, f(a'))
-      | Error(a') => A.pure(Error(a'))
-      };
-    let sequence = a => switch a {
-      | Ok(a') => A.map(E.pure, a')
-      | Error(a') => A.pure(Error(a'))
-      };
-  };
-  include Result_Traversable_;
+  type t('a) = Js.Result.t('a, T.t) and applicative_t('a) = A.t('a);
+
+  include (Functor(T): FUNCTOR with type t('a) := t('a));
+  include (Foldable(T): FOLDABLE with type t('a) := t('a));
+
+  let traverse = (f, a) => switch a {
+    | Ok(a') => A.map(E.pure, f(a'))
+    | Error(a') => A.pure(Error(a'))
+    }
+
+  and sequence = a => switch a {
+    | Ok(a') => A.map(E.pure, a')
+    | Error(a') => A.pure(Error(a'))
+    }
 };
 
 module Bitraversable = (A: APPLICATIVE) => {
   module I = Infix.Apply(A);
-  module Result_Bitraversable_: BITRAVERSABLE
-    with type applicative_t('a) = A.t('a) and type t('a, 'b) = Js.Result.t('a, 'b) = {
-    type t('a, 'b) = Js.Result.t('a, 'b);
-    type applicative_t('a) = A.t('a);
-    include (Bifunctor: BIFUNCTOR with type t('a, 'b) := t('a, 'b));
-    include (Bifoldable: BIFOLDABLE with type t('a, 'b) := t('a, 'b));
 
-    let bitraverse = (f, g, a) => switch a {
-      | Ok(a') => A.map(x => Ok(x), f(a'))
-      | Error(a') => A.map(x => Error(x), g(a'))
-      };
-    let bisequence = a => switch a {
-      | Ok(a') => A.map(x => Ok(x), a')
-      | Error(a') => A.map(x => Error(x), a')
-      };
-  };
-  include Result_Bitraversable_
+  type t('a, 'b) = Js.Result.t('a, 'b) and applicative_t('a) = A.t('a);
+
+  include (Bifunctor: BIFUNCTOR with type t('a, 'b) := t('a, 'b));
+  include (Bifoldable: BIFOLDABLE with type t('a, 'b) := t('a, 'b));
+
+  let bitraverse = (f, g, a) => switch a {
+    | Ok(a') => A.map(x => Ok(x), f(a'))
+    | Error(a') => A.map(x => Error(x), g(a'))
+    }
+
+  and bisequence = a => switch a {
+    | Ok(a') => A.map(x => Ok(x), a')
+    | Error(a') => A.map(x => Error(x), a')
+    }
 };
 
 module Infix = {
-  include Infix.Bifunctor(Bifunctor);
+  include Infix.Bifunctor(Bifunctor)
 };
 
 module Choose = (A: ALT) => {
@@ -385,18 +330,19 @@ module Unsafe = {
   let from_ok = a => switch a {
     | Ok(a') => a'
     | _ => Js.Exn.raiseTypeError("You passed in an `Error` value to `from_ok`")
-    };
-  let from_error = a => switch a {
+    }
+
+  and from_error = a => switch a {
     | Error(a') => a'
     | _ => Js.Exn.raiseTypeError("You passed in an `Ok` value to `from_error`")
-    };
+    }
 };
 
-let is_ok = a => result(const(true), const(false))(a);
-let is_error = a => result(const(false), const(true))(a);
+let is_ok    = a => result(const(true), const(false))(a)
+and is_error = a => result(const(false), const(true))(a)
 
-let note: ('a, option('b)) => Js.Result.t('a, 'b) =
-  default => Option.maybe(~f=x => Ok(x), ~default=Error(default));
+and note: ('a, option('b)) => Js.Result.t('a, 'b) =
+  default => Option.maybe(~f=x => Ok(x), ~default=Error(default))
 
-let hush: Js.Result.t('a, 'b) => option('b) =
-  e => result(Option.Applicative.pure, const(None))(e);
+and hush: Js.Result.t('a, 'b) => option('b) =
+  e => result(Option.Applicative.pure, const(None))(e)

@@ -3,7 +3,6 @@ open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let ((<.), (>.)) = Function.Infix.((<.), (>.));
 
-
 describe("Function", () => {
   describe("Functor", () => {
     property1("should satisfy identity", arb_nat, (n) => {
@@ -11,7 +10,6 @@ describe("Function", () => {
         type t('a) = int => 'a;
         let eq = Obj.magic((a, b) => a(n) == b(n));
       });
-
       V.identity(string_of_int)
     });
 
@@ -20,7 +18,6 @@ describe("Function", () => {
         type t('a) = int => 'a;
         let eq = Obj.magic((a, b) => a(n) == b(n));
       });
-
       V.composition((++)("!"), string_of_int, (+)(1))
     });
   });
@@ -31,7 +28,6 @@ describe("Function", () => {
         type t('a) = int => 'a;
         let eq = Obj.magic((a, b) => a(n) == b(n));
       });
-
       V.associative_composition((+), (-), (+)(1))
     });
   });
