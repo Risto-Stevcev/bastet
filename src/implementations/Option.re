@@ -141,4 +141,5 @@ module Show: SHOW_F = (S: SHOW) => {
 module Infix = {
   include Infix.Monad(Monad);
   include Infix.Alternative(Alternative);
+  let (|?) = Js.Option.getWithDefault
 };

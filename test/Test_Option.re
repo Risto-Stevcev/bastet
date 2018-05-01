@@ -4,10 +4,18 @@ open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 open Functors;
-let ((<.)) = Function.Infix.((<.));
+let (<.) = Function.Infix.(<.);
+let (|?) = Option.Infix.(|?);
 
 
 describe("Option", () => {
+  describe("Infix.(|?)", () => {
+    it("should apply a default value if it's None", () => {
+      expect("foo" |? Some("bar")) |> to_be("bar");
+      expect("foo" |? None) |> to_be("foo")
+    })
+  });
+
   describe("Semigroup", () => {
     module V = Verify.Semigroup(OptionF.Int.Additive.Semigroup);
     property3(
