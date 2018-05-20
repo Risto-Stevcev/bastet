@@ -346,5 +346,9 @@ module type BITRAVERSABLE = {
   let bisequence: t(applicative_t('a), applicative_t('b)) => applicative_t(t('a, 'b))
 };
 
-
 module type BITRAVERSABLE_F = (A: APPLICATIVE) => BITRAVERSABLE with type applicative_t('a) = A.t('a);
+
+module type BICONTRAVARIANT = {
+  type t('a, 'b);
+  let bicmap: ('b => 'a, 'd => 'c, t('a, 'c)) => t('b, 'd)
+};

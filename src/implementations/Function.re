@@ -6,6 +6,8 @@ and const: ('a, 'b) => 'a = (a, _) => a;
 module type FUNCTOR_F   = (T: TYPE) => FUNCTOR   with type t('a) = T.t => 'a;
 module type APPLY_F     = (T: TYPE) => APPLY     with type t('a) = T.t => 'a;
 module type INVARIANT_F = (T: TYPE) => INVARIANT with type t('a) = T.t => 'a;
+module type CONTRAVARIANT_F = (T: TYPE) => CONTRAVARIANT with type t('a) = 'a => T.t;
+module type BICONTRAVARIANT_F = (T: TYPE) => BICONTRAVARIANT with type t('a, 'b) = ('a, 'b) => T.t;
 
 module Functor: FUNCTOR_F = (T: TYPE) => {
   type t('b) = T.t => 'b;
@@ -39,6 +41,16 @@ module Profunctor: PROFUNCTOR with type t('a, 'b) = 'a => 'b = {
   let (>.) = I.(>.);
   type t('a, 'b) = 'a => 'b;
   let dimap = (a_to_b, c_to_d, b_to_c) => a_to_b >. b_to_c >. c_to_d
+};
+
+module Contravariant: CONTRAVARIANT_F = (T: TYPE) => {
+  type t('a) = 'a => T.t;
+  let cmap = (f, g, x) => g(f(x))
+};
+
+module Bicontravariant: BICONTRAVARIANT_F = (T: TYPE) => {
+  type t('a, 'b) = ('a, 'b) => T.t;
+  let bicmap = (f, g, h) => (a, b) => h(f(a), g(b))
 };
 
 module Infix = {

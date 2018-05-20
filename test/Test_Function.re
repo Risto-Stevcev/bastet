@@ -78,4 +78,40 @@ describe("Function", () => {
       V.composition(float_of_int, string_of_float, (*)(4), (++)("!"), (*.)(2.0));
     });
   });
+
+  describe("Contravariant", () => {
+    property1("should satisfy identity", arb_nat, (n) => {
+      module V = Verify.Compare.Contravariant(Function.Contravariant({ type t = string }), {
+        type t('a) = 'a => string;
+        let eq = Obj.magic((a, b) => a(n) == b(n));
+      });
+      V.identity(string_of_int)
+    });
+
+    property1("should satisfy composition", arb_nat, (n) => {
+      module V = Verify.Compare.Contravariant(Function.Contravariant({ type t = string }), {
+        type t('a) = 'a => string;
+        let eq = Obj.magic((a, b) => a(n) == b(n));
+      });
+      V.composition((+)(1), string_of_int, (++)("!"))
+    });
+  });
+
+  describe("Bicontravariant", () => {
+    property2("should satisfy identity", arb_nat, arb_nat, (n1, n2) => {
+      module V = Verify.Compare.Bicontravariant(Function.Bicontravariant({ type t = int }), {
+        type t('a, 'b) = ('a, 'b) => int;
+        let eq = Obj.magic((a, b) => a(n1, n2) == b(n1, n2));
+      });
+      V.identity((+))
+    });
+
+    property2("should satisfy composition", arb_nat, arb_nat, (n1, n2) => {
+      module V = Verify.Compare.Bicontravariant(Function.Bicontravariant({ type t = int }), {
+        type t('a, 'b) = ('a, 'b) => int;
+        let eq = Obj.magic((a, b) => a(n1, n2) == b(n1, n2));
+      });
+      V.composition((+)(1), (+)(2), (*)(3), (*)(4), (+))
+    });
+  });
 });

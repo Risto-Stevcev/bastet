@@ -21,7 +21,10 @@ module Apply = (A: APPLY) => {
 module Monad = (M: MONAD) => {
   include Apply(M);
   let (>>=) = M.flat_map
-  and (=<<) = (ma, f) => M.flat_map(f, ma)
+  and (=<<) = (ma, f) => M.flat_map(f, ma);
+
+  let (>=>) = (f, g, a) => f(a) >>= g
+  and (<=<) = (f, g, a) => f =<< g(a)
 };
 
 module Alt = (A: ALT) => {

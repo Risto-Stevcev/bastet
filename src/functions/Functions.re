@@ -56,6 +56,22 @@ module Apply = (A: APPLY) => {
   }
 };
 
+module Apply' = (A: APPLY, T: TYPE) => {
+  module F = Function.Apply({ type t = T.t });
+  module F' = Function.Apply({ type t = A.t(T.t) });
+  module Apply_F = Apply(F);
+  module Apply_A = Apply(A);
+
+  let apply_const: (A.t(T.t) => A.t('a), A.t(T.t)) => A.t(T.t) = (f, x) => F'.apply(Apply_A.apply_first)(f, x);
+
+  /* Like Apply.apply_(first|second) but takes functions in the form of `T.t => A.t('a)` */
+  let apply_first: (T.t => A.t('a), T.t => A.t('b), T.t) => A.t('a) =
+    (f, g, x) => Apply_F.lift2(Apply_A.apply_first)(f, g, x)
+
+  and apply_second: (T.t => A.t('a), T.t => A.t('b), T.t) => A.t('b) =
+    (f, g, x) => Apply_F.lift2(Apply_A.apply_second)(f, g, x)
+};
+
 module Applicative = (A: APPLICATIVE) => {
   module I = Infix.Apply(A);
 
@@ -240,9 +256,8 @@ module Infix = {
     and (*>) = Functions.apply_second
   };
   module Monad = (M: MONAD) => {
-    module Functions = Monad(M);
-    let (<=<) = Functions.compose_kliesli
-    and (>=>) = Functions.compose_kliesli_flipped
+    module Functions = Infix.Monad(M);
+    let ((>=>), (<=<)) = Functions.((>=>), (<=<))
   };
   module Void = (F: FUNCTOR) => {
     module Functions = Functor(F);

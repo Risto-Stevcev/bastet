@@ -89,8 +89,9 @@ module Ord: ORD with type t = int = {
 
 module Bounded: BOUNDED with type t = int = {
   include Ord;
-  let top = 2147483647;
-  let bottom = -2147483648;
+  /* Uses maximum and minimum values for 32-bit integers */
+  let top = Js.Int.max;
+  let bottom = Js.Int.min;
 };
 
 module Show: SHOW with type t = int = {

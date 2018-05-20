@@ -84,8 +84,11 @@ module Ord: ORD with type t = float = {
 
 module Bounded: BOUNDED with type t = float = {
   include Ord;
-  let top = 2147483647.0;
-  let bottom = -2147483648.0
+  [@bs.val] external max_value: float = "Number.MAX_VALUE";
+  [@bs.val] external min_value: float = "Number.MIN_VALUE";
+
+  let top    = max_value
+  and bottom = min_value
 };
 
 module Show: SHOW with type t = float = {

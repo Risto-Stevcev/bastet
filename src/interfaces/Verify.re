@@ -295,11 +295,19 @@ module Compare = {
   module Bifunctor = (B: BIFUNCTOR, E: EQ2 with type t('a, 'b) = B.t('a, 'b)) => {
     let id = Function.Category.id;
     let (<.) = Function.Infix.(<.);
-    let identity: B.t('a, 'b) => bool = (a) => B.bimap(id, id, a) == a;
+    let identity: B.t('a, 'b) => bool = (a) => E.eq(B.bimap(id, id, a), a);
     let composition: ('b => 'e, 'd => 'f, 'a => 'b, 'c => 'd, B.t('a, 'c)) => bool =
       (f1, g1, f2, g2, a) =>
         E.eq((B.bimap(f1, g1) <. B.bimap(f2, g2))(a), B.bimap(f1 <. f2, g1 <. g2, a))
   };
+  module Bicontravariant = (B: BICONTRAVARIANT, E: EQ2 with type t('a, 'b) = B.t('a, 'b)) => {
+    let id = Function.Category.id;
+    let (<.) = Function.Infix.(<.);
+    let identity: B.t('a, 'b) => bool = (a) => E.eq(B.bicmap(id, id, a), a);
+    let composition: ('e => 'b, 'f => 'd, 'b => 'a, 'd => 'c, B.t('a, 'c)) => bool =
+      (f1, g1, f2, g2, a) =>
+        E.eq((B.bicmap(f1, g1) <. B.bicmap(f2, g2))(a), B.bicmap(f2 <. f1, g2 <. g1, a))
+  }
 };
 
 
@@ -450,4 +458,7 @@ module Comonad = (C: COMONAD) => {
 };
 module Bifunctor = (B: BIFUNCTOR) => {
   include Compare.Bifunctor(B, {type t('a, 'b) = B.t('a, 'b); let eq = (==)})
+};
+module Bicontravariant = (B: BICONTRAVARIANT) => {
+  include Compare.Bicontravariant(B, {type t('a, 'b) = B.t('a, 'b); let eq = (==)})
 };
