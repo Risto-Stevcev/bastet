@@ -3,26 +3,32 @@ open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
 let (<.) = Function.Infix.(<.);
 
-
 describe("Bool", () => {
   describe("Conjunctive", () => {
     describe("Medial Magma", () => {
       module V = Verify.Medial_Magma(Bool.Conjunctive.Medial_Magma);
       property4(
         "should satisfy bicommutativity",
-        arb_bool, arb_bool, arb_bool, arb_bool,
-        V.bicommutativity
-      )
+        arb_bool,
+        arb_bool,
+        arb_bool,
+        arb_bool,
+        V.bicommutativity,
+      );
     });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Conjunctive.Semigroup);
       property3(
-        "should satisfy associativity", arb_bool, arb_bool, arb_bool, V.associativity
+        "should satisfy associativity",
+        arb_bool,
+        arb_bool,
+        arb_bool,
+        V.associativity,
       );
     });
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Conjunctive.Monoid);
-      property1("should satisfy identity", arb_bool, V.identity)
+      property1("should satisfy identity", arb_bool, V.identity);
     });
   });
 
@@ -31,19 +37,26 @@ describe("Bool", () => {
       module V = Verify.Medial_Magma(Bool.Disjunctive.Medial_Magma);
       property4(
         "should satisfy bicommutativity",
-        arb_bool, arb_bool, arb_bool, arb_bool,
-        V.bicommutativity
-      )
+        arb_bool,
+        arb_bool,
+        arb_bool,
+        arb_bool,
+        V.bicommutativity,
+      );
     });
     describe("Semigroup", () => {
       module V = Verify.Semigroup(Bool.Disjunctive.Semigroup);
       property3(
-        "should satisfy associativity", arb_bool, arb_bool, arb_bool, V.associativity
-      )
+        "should satisfy associativity",
+        arb_bool,
+        arb_bool,
+        arb_bool,
+        V.associativity,
+      );
     });
     describe("Monoid", () => {
       module V = Verify.Monoid(Bool.Disjunctive.Monoid);
-      property1("should satisfy identity", arb_bool, V.identity)
+      property1("should satisfy identity", arb_bool, V.identity);
     });
   });
 
@@ -52,34 +65,65 @@ describe("Bool", () => {
     property1("should satisfy reflexivity", arb_bool, V.reflexivity);
     property2("should satisfy symmetry", arb_bool, arb_bool, V.symmetry);
     property3(
-      "should satisfy transitivity", arb_bool, arb_bool, arb_bool, V.transitivity
-    )
+      "should satisfy transitivity",
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.transitivity,
+    );
   });
 
   describe("Ord", () => {
     module V = Verify.Ord(Bool.Ord);
     property1("should satisfy reflexivity", arb_bool, V.reflexivity);
-    property2("should satisfy antisymmetry", arb_bool, arb_bool, V.antisymmetry);
+    property2(
+      "should satisfy antisymmetry",
+      arb_bool,
+      arb_bool,
+      V.antisymmetry,
+    );
     property3(
-      "should satisfy transitivity", arb_bool, arb_bool, arb_bool, V.transitivity
-    )
+      "should satisfy transitivity",
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.transitivity,
+    );
   });
 
   describe("Join_Semilattice", () => {
     module V = Verify.Join_Semilattice(Bool.Join_Semilattice);
     property3(
-      "should satisfy associativity", arb_bool, arb_bool, arb_bool, V.associativity
+      "should satisfy associativity",
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.associativity,
     );
-    property2("should satisfy commutativity", arb_bool, arb_bool, V.commutativity);
+    property2(
+      "should satisfy commutativity",
+      arb_bool,
+      arb_bool,
+      V.commutativity,
+    );
     property1("should satisfy idempotency", arb_bool, V.idempotency);
   });
 
   describe("Meet_Semilattice", () => {
     module V = Verify.Meet_Semilattice(Bool.Meet_Semilattice);
     property3(
-      "should satisfy associativity", arb_bool, arb_bool, arb_bool, V.associativity
+      "should satisfy associativity",
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.associativity,
     );
-    property2("should satisfy commutativity", arb_bool, arb_bool, V.commutativity);
+    property2(
+      "should satisfy commutativity",
+      arb_bool,
+      arb_bool,
+      V.commutativity,
+    );
     property1("should satisfy idempotency", arb_bool, V.idempotency);
   });
 
@@ -106,34 +150,54 @@ describe("Bool", () => {
   describe("Distributive_Lattice", () => {
     module V = Verify.Distributive_Lattice(Bool.Distributive_Lattice);
     property3(
-      "should satisfy distributivity", arb_bool, arb_bool, arb_bool, V.distributivity
+      "should satisfy distributivity",
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.distributivity,
     );
   });
 
   describe("Bounded_Distributive_Lattice", () => {
-    module V = Verify.Bounded_Distributive_Lattice(Bool.Bounded_Distributive_Lattice);
+    module V =
+      Verify.Bounded_Distributive_Lattice(Bool.Bounded_Distributive_Lattice);
     property3(
-      "should satisfy distributivity", arb_bool, arb_bool, arb_bool, V.distributivity
+      "should satisfy distributivity",
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.distributivity,
     );
   });
 
   describe("Heyting_Algebra", () => {
     module V = Verify.Heyting_Algebra(Bool.Heyting_Algebra);
-    property1("should satisfy pseudocomplement", arb_bool, V.pseudocomplement);
+    property1(
+      "should satisfy pseudocomplement",
+      arb_bool,
+      V.pseudocomplement,
+    );
     property3(
       "should satisfy relative pseudocomplement",
-      arb_bool, arb_bool, arb_bool,
-      V.relative_pseudocomplement
+      arb_bool,
+      arb_bool,
+      arb_bool,
+      V.relative_pseudocomplement,
     );
   });
 
   describe("Involutive_Heyting_Algebra", () => {
-    module V = Verify.Involutive_Heyting_Algebra(Bool.Involutive_Heyting_Algebra);
+    module V =
+      Verify.Involutive_Heyting_Algebra(Bool.Involutive_Heyting_Algebra);
     property1("should satisfy involution", arb_bool, V.involution);
   });
 
   describe("Boolean_Algebra", () => {
     module V = Verify.Boolean_Algebra(Bool.Boolean_Algebra);
-    property1("should satisfy the law of excluded middle", arb_bool, V.excluded_middle);
+    property1(
+      "should satisfy the law of excluded middle",
+      arb_bool,
+      V.excluded_middle,
+    );
   });
 });

@@ -8,21 +8,28 @@ describe("JsDate", () => {
     module V = Verify.Medial_Magma(JsDate.Medial_Magma);
     property4(
       "should satisfy bicommutativity",
-      arb_date, arb_date, arb_date, arb_date,
-      V.bicommutativity
-    )
+      arb_date,
+      arb_date,
+      arb_date,
+      arb_date,
+      V.bicommutativity,
+    );
   });
 
   describe("Semigroup", () => {
     module V = Verify.Semigroup(JsDate.Semigroup);
     property3(
-      "should satisfy associativity", arb_date, arb_date, arb_date, V.associativity
+      "should satisfy associativity",
+      arb_date,
+      arb_date,
+      arb_date,
+      V.associativity,
     );
   });
 
   describe("Monoid", () => {
     module V = Verify.Monoid(JsDate.Monoid);
-    property1("should satisfy identity", arb_date, V.identity)
+    property1("should satisfy identity", arb_date, V.identity);
   });
 
   describe("Eq", () => {
@@ -30,16 +37,29 @@ describe("JsDate", () => {
     property1("should satisfy reflexivity", arb_date, V.reflexivity);
     property2("should satisfy symmetry", arb_date, arb_date, V.symmetry);
     property3(
-      "should satisfy transitivity", arb_date, arb_date, arb_date, V.transitivity
-    )
+      "should satisfy transitivity",
+      arb_date,
+      arb_date,
+      arb_date,
+      V.transitivity,
+    );
   });
 
   describe("Ord", () => {
     module V = Verify.Ord(JsDate.Ord);
     property1("should satisfy reflexivity", arb_date, V.reflexivity);
-    property2("should satisfy antisymmetry", arb_date, arb_date, V.antisymmetry);
+    property2(
+      "should satisfy antisymmetry",
+      arb_date,
+      arb_date,
+      V.antisymmetry,
+    );
     property3(
-      "should satisfy transitivity", arb_date, arb_date, arb_date, V.transitivity
-    )
+      "should satisfy transitivity",
+      arb_date,
+      arb_date,
+      arb_date,
+      V.transitivity,
+    );
   });
 });

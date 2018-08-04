@@ -16,7 +16,10 @@ module ArrayF = {
       module Fold_Map = Array.Foldable.Fold_Map(Int.Multiplicative.Monoid);
     };
     module Functions = {
-      module Scan = Functions.Travsersable.Scan({type t = int});
+      module Scan =
+        Functions.Travsersable.Scan({
+          type t = int;
+        });
     };
   };
   module Float = {
@@ -30,7 +33,10 @@ module ArrayF = {
       module Fold_Map = Array.Foldable.Fold_Map(Float.Multiplicative.Monoid);
     };
     module Functions = {
-      module Scan = Functions.Travsersable.Scan({type t = float});
+      module Scan =
+        Functions.Travsersable.Scan({
+          type t = float;
+        });
     };
   };
   module Bool = {
@@ -62,8 +68,6 @@ module ArrayF = {
   };
 };
 
-
-
 module ListF = {
   module Functions = {
     module Travsersable = Functions.Traversable(List.Traversable);
@@ -78,7 +82,10 @@ module ListF = {
       module Fold_Map = List.Foldable.Fold_Map(Int.Multiplicative.Monoid);
     };
     module Functions = {
-      module Scan = Functions.Travsersable.Scan({type t = int});
+      module Scan =
+        Functions.Travsersable.Scan({
+          type t = int;
+        });
     };
   };
   module Float = {
@@ -91,7 +98,10 @@ module ListF = {
       module Fold_Map = List.Foldable.Fold_Map(Float.Multiplicative.Monoid);
     };
     module Functions = {
-      module Scan = Functions.Travsersable.Scan({type t = float});
+      module Scan =
+        Functions.Travsersable.Scan({
+          type t = float;
+        });
     };
   };
   module Bool = {
@@ -120,8 +130,6 @@ module ListF = {
     module Traversable = List.Traversable(List.Applicative);
   };
 };
-
-
 
 module OptionF = {
   module Int = {
@@ -199,25 +207,62 @@ module OptionF = {
   };
 };
 
-
-
 module ResultF = {
   module Int = {
-    module Functor = Result.Functor({type t = int});
-    module Apply = Result.Apply({type t = int});
-    module Applicative = Result.Applicative({type t = int});
-    module Monad = Result.Monad({type t = int});
-    module Extend = Result.Extend({type t = int});
-    module Alt = Result.Alt({type t = int});
-    module Foldable = Result.Foldable({type t = int});
+    module Functor =
+      Result.Functor({
+        type t = int;
+      });
+    module Apply =
+      Result.Apply({
+        type t = int;
+      });
+    module Applicative =
+      Result.Applicative({
+        type t = int;
+      });
+    module Monad =
+      Result.Monad({
+        type t = int;
+      });
+    module Extend =
+      Result.Extend({
+        type t = int;
+      });
+    module Alt =
+      Result.Alt({
+        type t = int;
+      });
+    module Foldable =
+      Result.Foldable({
+        type t = int;
+      });
     module List = {
-      module Traversable = Result.Traversable({type t = int}, List.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = int;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Result.Traversable({type t = int}, Array.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = int;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Result.Traversable({type t = int}, Option.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = int;
+          },
+          Option.Applicative,
+        );
     };
     module Bool = {
       module Eq = Result.Eq(BsAbstract.Int.Eq, BsAbstract.Bool.Eq);
@@ -236,21 +281,60 @@ module ResultF = {
     };
   };
   module Float = {
-    module Functor = Result.Functor({type t = float});
-    module Apply = Result.Apply({type t = float});
-    module Applicative = Result.Applicative({type t = float});
-    module Monad = Result.Monad({type t = float});
-    module Extend = Result.Extend({type t = float});
-    module Alt = Result.Alt({type t = float});
-    module Foldable = Result.Foldable({type t = float});
+    module Functor =
+      Result.Functor({
+        type t = float;
+      });
+    module Apply =
+      Result.Apply({
+        type t = float;
+      });
+    module Applicative =
+      Result.Applicative({
+        type t = float;
+      });
+    module Monad =
+      Result.Monad({
+        type t = float;
+      });
+    module Extend =
+      Result.Extend({
+        type t = float;
+      });
+    module Alt =
+      Result.Alt({
+        type t = float;
+      });
+    module Foldable =
+      Result.Foldable({
+        type t = float;
+      });
     module List = {
-      module Traversable = Result.Traversable({type t = float}, List.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = float;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Result.Traversable({type t = float}, Array.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = float;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Result.Traversable({type t = float}, Option.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = float;
+          },
+          Option.Applicative,
+        );
     };
     module Bool = {
       module Eq = Result.Eq(BsAbstract.Float.Eq, BsAbstract.Bool.Eq);
@@ -265,25 +349,65 @@ module ResultF = {
     module String = {
       module Eq = Result.Eq(BsAbstract.Float.Eq, BsAbstract.String.Eq);
       module Ord = Result.Ord(BsAbstract.Float.Ord, BsAbstract.String.Ord);
-      module Show = Result.Show(BsAbstract.Float.Show, BsAbstract.String.Show);
+      module Show =
+        Result.Show(BsAbstract.Float.Show, BsAbstract.String.Show);
     };
   };
   module Bool = {
-    module Functor = Result.Functor({type t = bool});
-    module Apply = Result.Apply({type t = bool});
-    module Applicative = Result.Applicative({type t = bool});
-    module Monad = Result.Monad({type t = bool});
-    module Extend = Result.Extend({type t = bool});
-    module Alt = Result.Alt({type t = bool});
-    module Foldable = Result.Foldable({type t = bool});
+    module Functor =
+      Result.Functor({
+        type t = bool;
+      });
+    module Apply =
+      Result.Apply({
+        type t = bool;
+      });
+    module Applicative =
+      Result.Applicative({
+        type t = bool;
+      });
+    module Monad =
+      Result.Monad({
+        type t = bool;
+      });
+    module Extend =
+      Result.Extend({
+        type t = bool;
+      });
+    module Alt =
+      Result.Alt({
+        type t = bool;
+      });
+    module Foldable =
+      Result.Foldable({
+        type t = bool;
+      });
     module List = {
-      module Traversable = Result.Traversable({type t = bool}, List.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = bool;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Result.Traversable({type t = bool}, Array.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = bool;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Result.Traversable({type t = bool}, Option.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = bool;
+          },
+          Option.Applicative,
+        );
     };
     module Int = {
       module Eq = Result.Eq(BsAbstract.Bool.Eq, BsAbstract.Int.Eq);
@@ -302,21 +426,60 @@ module ResultF = {
     };
   };
   module String = {
-    module Functor = Result.Functor({type t = string});
-    module Apply = Result.Apply({type t = string});
-    module Applicative = Result.Applicative({type t = string});
-    module Monad = Result.Monad({type t = string});
-    module Extend = Result.Extend({type t = string});
-    module Alt = Result.Alt({type t = string});
-    module Foldable = Result.Foldable({type t = string});
+    module Functor =
+      Result.Functor({
+        type t = string;
+      });
+    module Apply =
+      Result.Apply({
+        type t = string;
+      });
+    module Applicative =
+      Result.Applicative({
+        type t = string;
+      });
+    module Monad =
+      Result.Monad({
+        type t = string;
+      });
+    module Extend =
+      Result.Extend({
+        type t = string;
+      });
+    module Alt =
+      Result.Alt({
+        type t = string;
+      });
+    module Foldable =
+      Result.Foldable({
+        type t = string;
+      });
     module List = {
-      module Traversable = Result.Traversable({type t = string}, List.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = string;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Result.Traversable({type t = string}, Array.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = string;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Result.Traversable({type t = string}, Option.Applicative);
+      module Traversable =
+        Result.Traversable(
+          {
+            type t = string;
+          },
+          Option.Applicative,
+        );
     };
     module Int = {
       module Eq = Result.Eq(BsAbstract.String.Eq, BsAbstract.Int.Eq);
@@ -326,7 +489,8 @@ module ResultF = {
     module Float = {
       module Eq = Result.Eq(BsAbstract.String.Eq, BsAbstract.Float.Eq);
       module Ord = Result.Ord(BsAbstract.String.Ord, BsAbstract.Float.Ord);
-      module Show = Result.Show(BsAbstract.String.Show, BsAbstract.Float.Show);
+      module Show =
+        Result.Show(BsAbstract.String.Show, BsAbstract.Float.Show);
     };
     module Bool = {
       module Eq = Result.Eq(BsAbstract.String.Eq, BsAbstract.Bool.Eq);
@@ -336,12 +500,16 @@ module ResultF = {
   };
 };
 
-
-
 module TupleF = {
   module Int = {
-    module Functor = Tuple.Functor({type t = int});
-    module Foldable = Tuple.Foldable({type t = int});
+    module Functor =
+      Tuple.Functor({
+        type t = int;
+      });
+    module Foldable =
+      Tuple.Foldable({
+        type t = int;
+      });
     module Additive = {
       module Apply = Tuple.Apply(Int.Additive.Semigroup);
       module Applicative = Tuple.Applicative(Int.Additive.Monoid);
@@ -353,18 +521,42 @@ module TupleF = {
       module Monad = Tuple.Monad(Int.Multiplicative.Monoid);
     };
     module List = {
-      module Traversable = Tuple.Traversable({type t = int}, List.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = int;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Tuple.Traversable({type t = int}, Array.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = int;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Tuple.Traversable({type t = int}, Option.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = int;
+          },
+          Option.Applicative,
+        );
     };
   };
   module Bool = {
-    module Functor = Tuple.Functor({type t = bool});
-    module Foldable = Tuple.Foldable({type t = bool});
+    module Functor =
+      Tuple.Functor({
+        type t = bool;
+      });
+    module Foldable =
+      Tuple.Foldable({
+        type t = bool;
+      });
     module Conjunctive = {
       module Apply = Tuple.Apply(Bool.Conjunctive.Semigroup);
       module Applicative = Tuple.Applicative(Bool.Conjunctive.Monoid);
@@ -376,42 +568,92 @@ module TupleF = {
       module Monad = Tuple.Monad(Bool.Disjunctive.Monoid);
     };
     module List = {
-      module Traversable = Tuple.Traversable({type t = bool}, List.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = bool;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Tuple.Traversable({type t = bool}, Array.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = bool;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Tuple.Traversable({type t = bool}, Option.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = bool;
+          },
+          Option.Applicative,
+        );
     };
   };
   module String = {
-    module Functor = Tuple.Functor({type t = string});
-    module Foldable = Tuple.Foldable({type t = string});
+    module Functor =
+      Tuple.Functor({
+        type t = string;
+      });
+    module Foldable =
+      Tuple.Foldable({
+        type t = string;
+      });
     module Apply = Tuple.Apply(String.Semigroup);
     module Applicative = Tuple.Applicative(String.Monoid);
     module Monad = Tuple.Monad(String.Monoid);
     module List = {
-      module Traversable = Tuple.Traversable({type t = string}, List.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = string;
+          },
+          List.Applicative,
+        );
     };
     module Array = {
-      module Traversable = Tuple.Traversable({type t = string}, Array.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = string;
+          },
+          Array.Applicative,
+        );
     };
     module Option = {
-      module Traversable = Tuple.Traversable({type t = string}, Option.Applicative);
+      module Traversable =
+        Tuple.Traversable(
+          {
+            type t = string;
+          },
+          Option.Applicative,
+        );
     };
   };
 };
 
-
 module FunctionF = {
   module Int = {
-    module Functor = Function.Functor({type t = int});
+    module Functor =
+      Function.Functor({
+        type t = int;
+      });
   };
   module Bool = {
-    module Functor = Function.Functor({type t = bool});
+    module Functor =
+      Function.Functor({
+        type t = bool;
+      });
   };
   module String = {
-    module Functor = Function.Functor({type t = string});
+    module Functor =
+      Function.Functor({
+        type t = string;
+      });
   };
 };
