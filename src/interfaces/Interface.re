@@ -169,6 +169,8 @@ let invert = (ordering) => switch ordering {
   | `equal_to => `equal_to
   };
 
+let int_to_ordering = x => x < 0 ? `less_than : x == 0 ? `equal_to : `greater_than;
+
 let unsafe_compare = (a, b) => a < b ? `less_than : a == b ? `equal_to : `greater_than;
 
 module type ORD = {

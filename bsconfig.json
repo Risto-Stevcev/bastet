@@ -10,7 +10,8 @@
     "subdirs": true
   }, {
     "dir": "test",
-    "type": "dev"
+    "type": "dev",
+    "subdirs": true
   }],
   "package-specs": {
     "module": "commonjs",
