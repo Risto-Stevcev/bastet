@@ -1,34 +1,34 @@
 /* Result is the equivalent of Either in Haskell for Ocaml */
 open Interface;
-open Js.Result;
+open Belt.Result;
 let (flip, const) = Function.(flip, const);
 
-let result: ('a => 'c, 'b => 'c, Js.Result.t('a, 'b)) => 'c = (f, g, a) => switch (f, g, a) {
+let result: ('a => 'c, 'b => 'c, Belt.Result.t('a, 'b)) => 'c = (f, g, a) => switch (f, g, a) {
   | (f, _, Ok(a')) => f(a')
   | (_, g, Error(a')) => g(a')
   };
 
 
-module type MAGMA_F         = (T: TYPE, M: MAGMA)           => MAGMA         with type t = Js.Result.t(M.t, T.t);
-module type MEDIAL_MAGMA_F  = (T: TYPE, M: MAGMA)           => MEDIAL_MAGMA  with type t = Js.Result.t(M.t, T.t);
-module type SEMIGROUP_F     = (T: TYPE, S: SEMIGROUP)       => SEMIGROUP     with type t = Js.Result.t(S.t, T.t);
-module type FUNCTOR_F       = (T: TYPE)                     => FUNCTOR       with type t('a) = Js.Result.t('a, T.t);
-module type APPLY_F         = (T: TYPE)                     => APPLY         with type t('a) = Js.Result.t('a, T.t);
-module type APPLICATIVE_F   = (T: TYPE)                     => APPLICATIVE   with type t('a) = Js.Result.t('a, T.t);
-module type MONAD_F         = (T: TYPE)                     => MONAD         with type t('a) = Js.Result.t('a, T.t);
-module type ALT_F           = (T: TYPE)                     => ALT           with type t('a) = Js.Result.t('a, T.t);
-module type EXTEND_F        = (T: TYPE)                     => EXTEND        with type t('a) = Js.Result.t('a, T.t);
-module type SHOW_F          = (Ok: SHOW, Error: SHOW)       => SHOW          with type t = Js.Result.t(Ok.t, Error.t);
-module type EQ_F            = (Ok: EQ, Error: EQ)           => EQ            with type t = Js.Result.t(Ok.t, Error.t);
-module type ORD_F           = (Ok: ORD, Error: ORD)         => ORD           with type t = Js.Result.t(Ok.t, Error.t);
-module type BOUNDED_F       = (Ok: BOUNDED, Error: BOUNDED) => BOUNDED       with type t = Js.Result.t(Ok.t, Error.t);
-module type FOLDABLE_F      = (T: TYPE)                     => FOLDABLE      with type t('a) = Js.Result.t('a, T.t);
-module type TRAVERSABLE_F   = (T: TYPE, A: APPLICATIVE)     => TRAVERSABLE   with type t('a) = Js.Result.t('a, T.t);
-module type BITRAVERSABLE_F = (A: APPLICATIVE)              => BITRAVERSABLE with type t('a, 'b) = Js.Result.t('a, 'b)
+module type MAGMA_F         = (T: TYPE, M: MAGMA)           => MAGMA         with type t = Belt.Result.t(M.t, T.t);
+module type MEDIAL_MAGMA_F  = (T: TYPE, M: MAGMA)           => MEDIAL_MAGMA  with type t = Belt.Result.t(M.t, T.t);
+module type SEMIGROUP_F     = (T: TYPE, S: SEMIGROUP)       => SEMIGROUP     with type t = Belt.Result.t(S.t, T.t);
+module type FUNCTOR_F       = (T: TYPE)                     => FUNCTOR       with type t('a) = Belt.Result.t('a, T.t);
+module type APPLY_F         = (T: TYPE)                     => APPLY         with type t('a) = Belt.Result.t('a, T.t);
+module type APPLICATIVE_F   = (T: TYPE)                     => APPLICATIVE   with type t('a) = Belt.Result.t('a, T.t);
+module type MONAD_F         = (T: TYPE)                     => MONAD         with type t('a) = Belt.Result.t('a, T.t);
+module type ALT_F           = (T: TYPE)                     => ALT           with type t('a) = Belt.Result.t('a, T.t);
+module type EXTEND_F        = (T: TYPE)                     => EXTEND        with type t('a) = Belt.Result.t('a, T.t);
+module type SHOW_F          = (Ok: SHOW, Error: SHOW)       => SHOW          with type t = Belt.Result.t(Ok.t, Error.t);
+module type EQ_F            = (Ok: EQ, Error: EQ)           => EQ            with type t = Belt.Result.t(Ok.t, Error.t);
+module type ORD_F           = (Ok: ORD, Error: ORD)         => ORD           with type t = Belt.Result.t(Ok.t, Error.t);
+module type BOUNDED_F       = (Ok: BOUNDED, Error: BOUNDED) => BOUNDED       with type t = Belt.Result.t(Ok.t, Error.t);
+module type FOLDABLE_F      = (T: TYPE)                     => FOLDABLE      with type t('a) = Belt.Result.t('a, T.t);
+module type TRAVERSABLE_F   = (T: TYPE, A: APPLICATIVE)     => TRAVERSABLE   with type t('a) = Belt.Result.t('a, T.t);
+module type BITRAVERSABLE_F = (A: APPLICATIVE)              => BITRAVERSABLE with type t('a, 'b) = Belt.Result.t('a, 'b)
   and type applicative_t('a) = A.t('a);
 
 module Magma: MAGMA_F = (T: TYPE, M: MAGMA) => {
-  type t = Js.Result.t(M.t, T.t);
+  type t = Belt.Result.t(M.t, T.t);
   let append = (a, b) => switch (a, b) {
     | (Ok(a'), Ok(b')) => Ok(M.append(a', b'))
     | (_, Ok(b')) => Ok(b')
@@ -42,15 +42,15 @@ module Medial_Magma: MEDIAL_MAGMA_F = (T: TYPE, M: MAGMA) => { include Magma(T, 
 module Semigroup: SEMIGROUP_F = (T: TYPE, S: SEMIGROUP) => { include Magma(T, S) };
 
 module Functor: FUNCTOR_F = (T: TYPE) => {
-  type t('a) = Js.Result.t('a, T.t);
+  type t('a) = Belt.Result.t('a, T.t);
   let map = (f, a) => switch a {
     | Ok(r) => Ok(f(r))
     | Error(l) => Error(l)
     }
 };
 
-module Bifunctor: BIFUNCTOR with type t('a, 'b) = Js.Result.t('a, 'b) = {
-  type t('a, 'b) = Js.Result.t('a, 'b);
+module Bifunctor: BIFUNCTOR with type t('a, 'b) = Belt.Result.t('a, 'b) = {
+  type t('a, 'b) = Belt.Result.t('a, 'b);
   let bimap = (f, g, a) => switch a {
     | Ok(a') => Ok(f(a'))
     | Error(a') => Error(g(a'))
@@ -95,12 +95,12 @@ module Extend: EXTEND_F = (T: TYPE) => {
 };
 
 module Show: SHOW_F = (Ok: SHOW, Error: SHOW) => {
-  type t = Js.Result.t(Ok.t, Error.t);
+  type t = Belt.Result.t(Ok.t, Error.t);
   let show = result(Ok.show, Error.show)
 };
 
 module Eq: EQ_F = (Ok: EQ, Error: EQ) => {
-  type t = Js.Result.t(Ok.t, Error.t);
+  type t = Belt.Result.t(Ok.t, Error.t);
   let eq = (a, b) => switch (a, b) {
     | (Ok(a'), Ok(b')) => Ok.eq(a', b')
     | (Error(a'), Error(b')) => Error.eq(a', b')
@@ -131,21 +131,21 @@ module Many_Valued_Logic = {
    * - The law of excluded middle
    */
 
-  module type EQ_F  = (Ok: TYPE, Error: TYPE) => EQ  with type t = Js.Result.t(Ok.t, Error.t);
-  module type ORD_F = (Ok: TYPE, Error: TYPE) => ORD with type t = Js.Result.t(Ok.t, Error.t);
+  module type EQ_F  = (Ok: TYPE, Error: TYPE) => EQ  with type t = Belt.Result.t(Ok.t, Error.t);
+  module type ORD_F = (Ok: TYPE, Error: TYPE) => ORD with type t = Belt.Result.t(Ok.t, Error.t);
   module type JOIN_SEMILATTICE_F = (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) =>
-    JOIN_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+    JOIN_SEMILATTICE with type t = Belt.Result.t(Ok.t, Error.t);
   module type MEET_SEMILATTICE_F = (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) =>
-    MEET_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+    MEET_SEMILATTICE with type t = Belt.Result.t(Ok.t, Error.t);
   module type BOUNDED_JOIN_SEMILATTICE_F = (Ok: BOUNDED_JOIN_SEMILATTICE, Error: BOUNDED_JOIN_SEMILATTICE) => 
-    BOUNDED_JOIN_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+    BOUNDED_JOIN_SEMILATTICE with type t = Belt.Result.t(Ok.t, Error.t);
   module type BOUNDED_MEET_SEMILATTICE_F = (Ok: BOUNDED_MEET_SEMILATTICE, Error: BOUNDED_MEET_SEMILATTICE) =>
-    BOUNDED_MEET_SEMILATTICE with type t = Js.Result.t(Ok.t, Error.t);
+    BOUNDED_MEET_SEMILATTICE with type t = Belt.Result.t(Ok.t, Error.t);
   module type HEYTING_ALGEBRA_F = (Ok: HEYTING_ALGEBRA, Error: HEYTING_ALGEBRA) => 
-    HEYTING_ALGEBRA with type t = Js.Result.t(Ok.t, Error.t);
+    HEYTING_ALGEBRA with type t = Belt.Result.t(Ok.t, Error.t);
 
   module Quasireflexive_Eq: EQ_F = (Ok: TYPE, Error: TYPE) => {
-    type t = Js.Result.t(Ok.t, Error.t);
+    type t = Belt.Result.t(Ok.t, Error.t);
     /* Quasi-reflexive */
     let eq = (a, b) => switch (a, b) {
       | (Ok(_), Ok(_)) | (Error(_), Error(_)) => true 
@@ -164,7 +164,7 @@ module Many_Valued_Logic = {
   };
 
   module Join_Semilattice: JOIN_SEMILATTICE_F = (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) => {
-    type t = Js.Result.t(Ok.t, Error.t);
+    type t = Belt.Result.t(Ok.t, Error.t);
     let join = (a, b) => switch (a, b) {
       | (Ok(a'), Ok(b')) => Ok(Ok.join(a', b'))
       | (Ok(a'), _) | (_, Ok(a')) => Ok(a')
@@ -173,7 +173,7 @@ module Many_Valued_Logic = {
   };
 
   module Meet_Semilattice: MEET_SEMILATTICE_F = (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) => {
-    type t = Js.Result.t(Ok.t, Error.t);
+    type t = Belt.Result.t(Ok.t, Error.t);
     let meet = (a, b) => switch (a, b) {
       | (Ok(a'), Ok(b')) => Ok(Ok.meet(a', b'))
       | (Error(a'), Error(b')) => Error(Error.meet(a', b'))
@@ -237,7 +237,7 @@ module Many_Valued_Logic = {
 };
 
 module Foldable: FOLDABLE_F = (T: TYPE) => {
-  type t('a) = Js.Result.t('a, T.t);
+  type t('a) = Belt.Result.t('a, T.t);
 
   let fold_left = (f, initial, a) => switch a {
     | Ok(a') => f(initial, a')
@@ -260,8 +260,8 @@ module Foldable: FOLDABLE_F = (T: TYPE) => {
   };
 };
 
-module Bifoldable: BIFOLDABLE with type t('a, 'b) = Js.Result.t('a, 'b) = {
-  type t('a, 'b) = Js.Result.t('a, 'b);
+module Bifoldable: BIFOLDABLE with type t('a, 'b) = Belt.Result.t('a, 'b) = {
+  type t('a, 'b) = Belt.Result.t('a, 'b);
 
   let bifold_left = (f, g, initial, a) => switch a {
     | Ok(a') => f(initial, a')
@@ -282,7 +282,7 @@ module Traversable: TRAVERSABLE_F = (T: TYPE, A: APPLICATIVE) => {
   module I = Infix.Apply(A);
   module E = Applicative(T);
 
-  type t('a) = Js.Result.t('a, T.t) and applicative_t('a) = A.t('a);
+  type t('a) = Belt.Result.t('a, T.t) and applicative_t('a) = A.t('a);
 
   include (Functor(T): FUNCTOR with type t('a) := t('a));
   include (Foldable(T): FOLDABLE with type t('a) := t('a));
@@ -301,7 +301,7 @@ module Traversable: TRAVERSABLE_F = (T: TYPE, A: APPLICATIVE) => {
 module Bitraversable = (A: APPLICATIVE) => {
   module I = Infix.Apply(A);
 
-  type t('a, 'b) = Js.Result.t('a, 'b) and applicative_t('a) = A.t('a);
+  type t('a, 'b) = Belt.Result.t('a, 'b) and applicative_t('a) = A.t('a);
 
   include (Bifunctor: BIFUNCTOR with type t('a, 'b) := t('a, 'b));
   include (Bifoldable: BIFOLDABLE with type t('a, 'b) := t('a, 'b));
@@ -322,7 +322,7 @@ module Infix = {
 };
 
 module Choose = (A: ALT) => {
-  let choose: (A.t('a), A.t('b)) => A.t(Js.Result.t('a, 'b)) =
+  let choose: (A.t('a), A.t('b)) => A.t(Belt.Result.t('a, 'b)) =
     (a, b) => A.alt(A.map(x => Ok(x), a), A.map(x => Error(x), b))
 };
 
@@ -341,8 +341,8 @@ module Unsafe = {
 let is_ok    = a => result(const(true), const(false))(a)
 and is_error = a => result(const(false), const(true))(a)
 
-and note: ('a, option('b)) => Js.Result.t('a, 'b) =
+and note: ('a, option('b)) => Belt.Result.t('a, 'b) =
   default => Option.maybe(~f=x => Ok(x), ~default=Error(default))
 
-and hush: Js.Result.t('a, 'b) => option('b) =
+and hush: Belt.Result.t('a, 'b) => option('b) =
   e => result(Option.Applicative.pure, const(None))(e)

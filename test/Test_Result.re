@@ -3,7 +3,7 @@ open BsChai.Expect.Expect;
 open BsChai.Expect.Combos.End;
 open BsJsverify.Verify.Arbitrary;
 open BsJsverify.Verify.Property;
-open Js.Result;
+open Belt.Result;
 type arbitrary('a) = BsJsverify.Verify.Arbitrary.arbitrary('a);
 let ((<.), (>.)) = Function.Infix.((<.), (>.));
 let (const, id) = (Function.const, Function.Category.id);
@@ -195,7 +195,7 @@ module Toggle = {
 };
 
 
-let arb_result : (arbitrary('a), arbitrary('b)) => arbitrary(Js.Result.t('a, 'b)) =
+let arb_result : (arbitrary('a), arbitrary('b)) => arbitrary(Belt.Result.t('a, 'b)) =
   (arb_ok, arb_error) => {
     smap(
       e => switch e {
