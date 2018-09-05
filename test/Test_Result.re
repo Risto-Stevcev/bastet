@@ -695,4 +695,30 @@ describe("Result", () => {
       V.excluded_middle,
     );
   });
+
+  describe("Result_Utilities", () => {
+    let errResult: Belt.Result.t(int, string) = Belt.Result.Error("ERROR");
+    let okResult: Belt.Result.t(int, string) = Belt.Result.Ok(4);
+    let someFloat = Some(5.0);
+
+    describe("Hush", () => {
+      it("should convert Error result to None", () => {
+        expect(Result.hush(errResult)) |> to_be(None);
+      });
+
+      it("should convert Success result to Some", () => {
+        expect(Result.hush(okResult)) |> to_be(Some(4));
+      });
+    });
+
+    describe("Note", () => {
+      it("should convert None to Error result", () => {
+        expect(Result.note("ERROR", None)) |> to_be(Belt.Result.Error("ERROR"));
+      });
+
+      it("should convert Some to Ok result", () => {
+        expect(Result.note("ERROR", someFloat)) |> to_be(Belt.Result.Ok(5.0));
+      });
+    });
+  });
 });
