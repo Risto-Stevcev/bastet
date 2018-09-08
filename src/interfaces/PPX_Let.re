@@ -13,14 +13,15 @@ module type PPX_LET = {
 
 /* Makes the `ppx_let` module from a monad */
 module Make = (M: MONAD) => {
+  module A = Functions.Apply(M);
+
   module Let_syntax: PPX_LET with type t('a) = M.t('a) = {
     type t('a) = M.t('a);
 
     let return = M.pure
     and bind = M.flat_map
     and map = (a, ~f) => M.map(f, a)
-    and both = (a, b) =>
-      M.flat_map(a, a' => M.flat_map(b, b' => M.pure((a', b'))));
+    and both = A.apply_both;
 
     module Open_on_rhs = {
       let return = M.pure;
