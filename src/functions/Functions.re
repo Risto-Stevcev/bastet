@@ -43,6 +43,8 @@ module Apply = (A: APPLY) => {
     (a, b) => const <$> a <*> b
   and apply_second: (A.t('a), A.t('b)) => A.t('b) =
     (a, b) => const(id) <$> a <*> b
+  and apply_both: (A.t('a), A.t('b)) => A.t(('a, 'b)) =
+    (a, b) => ((a', b') => (a', b')) <$> a <*> b
   and lift2: (('a, 'b) => 'c, A.t('a), A.t('b)) => A.t('c) =
     (f, a, b) => f <$> a <*> b
   and lift3: (('a, 'b, 'c) => 'd, A.t('a), A.t('b), A.t('c)) => A.t('d) =
@@ -84,11 +86,13 @@ module Apply' = (A: APPLY, T: TYPE) => {
   let apply_const: (A.t(T.t) => A.t('a), A.t(T.t)) => A.t(T.t) =
     (f, x) => F'.apply(Apply_A.apply_first, f, x);
 
-  /* Like Apply.apply_(first|second) but takes functions in the form of `T.t => A.t('a)` */
+  /* Like Apply.apply_(first|second|both) but takes functions in the form of `T.t => A.t('a)` */
   let apply_first: (T.t => A.t('a), T.t => A.t('b), T.t) => A.t('a) =
     (f, g, x) => Apply_F.lift2(Apply_A.apply_first, f, g, x)
   and apply_second: (T.t => A.t('a), T.t => A.t('b), T.t) => A.t('b) =
-    (f, g, x) => Apply_F.lift2(Apply_A.apply_second, f, g, x);
+    (f, g, x) => Apply_F.lift2(Apply_A.apply_second, f, g, x)
+  and apply_both: (T.t => A.t('a), T.t => A.t('b), T.t) => A.t(('a, 'b)) =
+    (f, g, x) => Apply_F.lift2(Apply_A.apply_both, f, g, x);
 };
 
 module Applicative = (A: APPLICATIVE) => {
@@ -98,7 +102,7 @@ module Applicative = (A: APPLICATIVE) => {
     (f, fa) => I.(A.pure(f) <*> fa)
   and when_: (bool, A.t(unit)) => A.t(unit) = (p, fa) => p ? fa : A.pure()
   and unless: (bool, A.t(unit)) => A.t(unit) =
-    (p, fa) => ! p ? fa : A.pure();
+    (p, fa) => !p ? fa : A.pure();
 };
 
 module Monad = (M: MONAD) => {
