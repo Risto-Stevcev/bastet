@@ -449,7 +449,7 @@ module Unsafe = {
 
 let is_ok = a => result(const(true), const(false), a)
 and is_error = a => result(const(false), const(true), a)
-and note: ('a, option('b)) => Belt.Result.t('a, 'b) =
+and note: ('err, option('a)) => Belt.Result.t('a, 'err) =
   default => Option.maybe(~f=x => Ok(x), ~default=Error(default))
-and hush: Belt.Result.t('a, 'b) => option('b) =
+and hush: Belt.Result.t('a, 'err) => option('a) =
   e => result(Option.Applicative.pure, const(None), e);
