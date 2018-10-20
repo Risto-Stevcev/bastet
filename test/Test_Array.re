@@ -35,6 +35,22 @@ describe("Array", () => {
     );
   });
 
+  describe("Semigroup_Any", () => {
+    module V = Verify.Semigroup_Any(Array.Semigroup_Any);
+    property3(
+      "should satisfy associativity",
+      arb_array(arb_nat),
+      arb_array(arb_nat),
+      arb_array(arb_nat),
+      V.associativity,
+    );
+  });
+
+  describe("Monoid_Any", () => {
+    module V = Verify.Monoid_Any(Array.Monoid_Any);
+    property1("should satisfy identity", arb_array(arb_nat), V.identity);
+  });
+
   describe("Functor", () => {
     module V = Verify.Functor(Array.Functor);
     property1("should satisfy identity", arb_array(arb_nat), V.identity);

@@ -7,6 +7,22 @@ open Functors;
 let (<.) = Function.Infix.(<.);
 
 describe("List", () => {
+  describe("Semigroup_Any", () => {
+    module V = Verify.Semigroup_Any(List.Semigroup_Any);
+    property3(
+      "should satisfy associativity",
+      arb_list(arb_nat),
+      arb_list(arb_nat),
+      arb_list(arb_nat),
+      V.associativity,
+    );
+  });
+
+  describe("Monoid_Any", () => {
+    module V = Verify.Monoid_Any(List.Monoid_Any);
+    property1("should satisfy identity", arb_list(arb_nat), V.identity);
+  });
+
   describe("Functor", () => {
     module V = Verify.Functor(List.Functor);
     property1("should satisfy identity", arb_list(arb_nat), V.identity);

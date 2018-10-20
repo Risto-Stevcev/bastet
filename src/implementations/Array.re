@@ -15,6 +15,20 @@ let zip_with: (('a, 'b) => 'c, array('a), array('b)) => array('c) =
 let zip: (array('a), array('b)) => array('c) =
   (xs, ys) => zip_with((a, b) => (a, b), xs, ys);
 
+module Magma_Any: MAGMA_ANY with type t('a) = array('a) = {
+  type t('a) = array('a);
+  let append = ArrayLabels.append;
+};
+
+module Semigroup_Any: SEMIGROUP_ANY with type t('a) = array('a) = {
+  include Magma_Any;
+};
+
+module Monoid_Any: MONOID_ANY with type t('a) = array('a) = {
+  include Semigroup_Any;
+  let empty = [||];
+};
+
 module type EQ_F = (E: EQ) => EQ with type t = array(E.t);
 module type ORD_F = (O: ORD) => ORD with type t = array(O.t);
 module type SHOW_F = (S: SHOW) => SHOW with type t = array(S.t);

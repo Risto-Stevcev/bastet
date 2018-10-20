@@ -1,5 +1,19 @@
 open Interface;
 
+module Magma_Any: MAGMA_ANY with type t('a) = list('a) = {
+  type t('a) = list('a);
+  let append = ListLabels.append;
+};
+
+module Semigroup_Any: SEMIGROUP_ANY with type t('a) = list('a) = {
+  include Magma_Any;
+};
+
+module Monoid_Any: MONOID_ANY with type t('a) = list('a) = {
+  include Semigroup_Any;
+  let empty = [];
+};
+
 module type EQ_F = (E: EQ) => EQ with type t = list(E.t);
 module type SHOW_F = (S: SHOW) => SHOW with type t = list(S.t);
 module type TRAVERSABLE_F =
