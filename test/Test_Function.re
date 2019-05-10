@@ -147,7 +147,7 @@ describe("Function", () => {
           );
         V.composition(
           float_of_int,
-          string_of_float,
+          Js.Float.toString,
           ( * )(4),
           (++)("!"),
           ( *. )(2.0),

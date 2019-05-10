@@ -416,7 +416,7 @@ describe("Result", () => {
       "should satisfy associativity",
       arb_result(arb_nat, arb_bool),
       V.associativity(
-        Result.result(string_of_float, const(String.Monoid.empty)),
+        Result.result(Js.Float.toString, const(String.Monoid.empty)),
         Result.result(float_of_int, const(Float.Additive.Monoid.empty)),
       ),
     );
