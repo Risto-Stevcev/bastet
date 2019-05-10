@@ -115,7 +115,7 @@ module Bounded: BOUNDED with type t = float = {
 
 module Show: SHOW with type t = float = {
   type t = float;
-  let show = string_of_float;
+  let show = Js.Float.toString;
 };
 
 module Semiring: SEMIRING with type t = float = {

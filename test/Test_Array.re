@@ -255,7 +255,7 @@ describe("Array", () => {
     property1(
       "should satisfy associativity",
       arb_array(arb_int'),
-      V.associativity(string_of_float <. fold', float_of_int <. fold),
+      V.associativity(Js.Float.toString <. fold', float_of_int <. fold),
     );
   });
 });
