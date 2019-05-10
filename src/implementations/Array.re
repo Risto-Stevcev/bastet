@@ -55,7 +55,7 @@ module Monad: MONAD with type t('a) = array('a) = {
 
 module Alt: ALT with type t('a) = array('a) = {
   include Functor;
-  let alt = Js.Array.concat;
+  let alt = (a, b) => Js.Array.concat(b, a);
 };
 
 module Plus: PLUS with type t('a) = array('a) = {
