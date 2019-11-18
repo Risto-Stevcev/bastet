@@ -100,6 +100,12 @@ module type FOLDABLE = {
     (P: PLUS) => {let fold_map: ('a => P.t('a), t('a)) => P.t('a);};
 };
 
+module type UNFOLDABLE = {
+  type t('a);
+
+  let unfold: ('a => option(('a, 'a))) => 'a => t('a);
+};
+
 module type TRAVERSABLE = {
   include FUNCTOR;
   include FOLDABLE with type t('a) := t('a);
