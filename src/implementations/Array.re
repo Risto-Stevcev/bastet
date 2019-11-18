@@ -109,6 +109,17 @@ module Foldable: FOLDABLE with type t('a) = array('a) = {
   };
 };
 
+module Unfoldable: UNFOLDABLE with type t('a) = array('a) = {
+  type t('a) = array('a);
+
+  let rec unfold = (f, init) =>
+    switch(f(init)) {
+      | Some((a, next)) =>
+       Js.Array.concat(unfold(f, next), [|a|])
+      | None => [||]
+    };
+};
+
 module Traversable: TRAVERSABLE_F =
   (A: APPLICATIVE) => {
     type t('a) = array('a)

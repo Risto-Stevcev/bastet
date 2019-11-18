@@ -141,6 +141,14 @@ describe("Array", () => {
     });
   });
 
+  describe("Unfoldable", () => {
+    open Array.Unfoldable;
+    it("should do unfold", () => {
+      expect(unfold(x => if (x>5) None else Some((x, x+1)), 0)) |> to_be([|0, 1, 2, 3, 4, 5|]);
+      expect(unfold(x => if (x>20) None else Some((x, x+5)), 0)) |> to_be([|0, 5, 10, 15, 20|]);
+    });
+  });
+
   describe("Traversable", () => {
     let (traverse, sequence) =
       ArrayF.Option.Traversable.(traverse, sequence);
