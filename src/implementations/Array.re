@@ -115,7 +115,7 @@ module Unfoldable: UNFOLDABLE with type t('a) = array('a) = {
   let rec unfold = (f, init) =>
     switch(f(init)) {
       | Some((a, next)) =>
-       Js.Array.concat(unfold(f, next), [|a|])
+       Belt.Array.concat([|a|], unfold(f, next))
       | None => [||]
     };
 };
