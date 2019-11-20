@@ -93,6 +93,16 @@ module Foldable: FOLDABLE with type t('a) = list('a) = {
   };
 };
 
+module Unfoldable: UNFOLDABLE with type t('a) = list('a) = {
+  type t('a) = list('a);
+
+  let rec unfold = (f, init) =>
+    switch(f(init)) {
+      | Some((a, next)) => [a, ...unfold(f, next)]
+      | None =>  []
+    };
+};
+
 module Traversable: TRAVERSABLE_F =
   (A: APPLICATIVE) => {
     type t('a) = list('a)
