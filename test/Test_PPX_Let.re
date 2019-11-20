@@ -5,7 +5,7 @@ open BsChai.Expect.Combos.End;
 let (<.) = Function.Infix.(<.);
 
 [@bs.module "perf_hooks"] [@bs.scope "performance"]
-external now: unit => float = "";
+external now: unit => float = "now";
 
 describe("PPX_Let", () => {
   module Monad: Interface.MONAD with type t('a) = ('a => unit) => unit = {
