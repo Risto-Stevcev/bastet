@@ -172,4 +172,16 @@ describe("Option", () => {
       V.transitivity,
     );
   });
+
+  describe("Ord", () =>
+    it("should compare two option values for equality", () => {
+      let compare = Functors.OptionF.Float.Ord.compare;
+      expect(compare(Some(1.23), Some(1.23))) |> to_be(`equal_to);
+      expect(compare(Some(1.23), Some(4.56))) |> to_be(`less_than);
+      expect(compare(Some(1.23), Some(-1.23))) |> to_be(`greater_than);
+      expect(compare(None, None)) |> to_be(`equal_to);
+      expect(compare(None, Some(-1.23))) |> to_be(`less_than);
+      expect(compare(Some(0.0), None)) |> to_be(`greater_than);
+    })
+  );
 });
