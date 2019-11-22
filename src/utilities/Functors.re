@@ -134,6 +134,7 @@ module ListF = {
 module OptionF = {
   module Int = {
     module Eq = Option.Eq(Int.Eq);
+    module Ord = Option.Ord(Int.Ord);
     module Additive = {
       module Semigroup = Option.Semigroup(Int.Additive.Semigroup);
       module Quasigroup = Option.Quasigroup(Int.Additive.Quasigroup);
@@ -152,6 +153,7 @@ module OptionF = {
   };
   module Float = {
     module Eq = Option.Eq(Float.Eq);
+    module Ord = Option.Ord(Float.Ord);
     module Additive = {
       module Semigroup = Option.Semigroup(Float.Additive.Semigroup);
       module Quasigroup = Option.Quasigroup(Float.Additive.Quasigroup);
@@ -173,6 +175,7 @@ module OptionF = {
   };
   module Bool = {
     module Eq = Option.Eq(Bool.Eq);
+    module Ord = Option.Ord(Bool.Ord);
     module Conjunctive = {
       module Semigroup = Option.Semigroup(Bool.Conjunctive.Semigroup);
       module Monoid = Option.Monoid(Bool.Conjunctive.Semigroup);
@@ -184,6 +187,7 @@ module OptionF = {
   };
   module String = {
     module Eq = Option.Eq(String.Eq);
+    module Ord = Option.Ord(String.Ord);
     module Semigroup = Option.Semigroup(String.Semigroup);
     module Monoid = Option.Monoid(String.Semigroup);
   };

@@ -17,6 +17,7 @@ module type QUASIGROUP_F =
   (Q: QUASIGROUP) => QUASIGROUP with type t = option(Q.t);
 module type LOOP_F = (L: LOOP) => LOOP with type t = option(L.t);
 module type EQ_F = (E: EQ) => EQ with type t = option(E.t);
+module type ORD_F = (O: ORD) => ORD with type t = option(O.t);
 module type SHOW_F = (S: SHOW) => SHOW with type t = option(S.t);
 module type TRAVERSABLE_F =
   (A: APPLICATIVE) =>
@@ -146,6 +147,18 @@ module Eq: EQ_F =
       | (Some(a), Some(b)) => E.eq(a, b)
       | (None, None) => true
       | _ => false
+      };
+  };
+
+module Ord: ORD_F =
+  (O: ORD) => {
+    include Eq(O);
+    let compare = (a, b) =>
+      switch (a, b) {
+      | (Some(a'), Some(b')) => O.compare(a', b')
+      | (None, None) => `equal_to
+      | (None, Some(_)) => `less_than
+      | (Some(_), None) => `greater_than
       };
   };
 
