@@ -63,7 +63,6 @@ module ArrayF = {
     module Alt = Infix.Alt(Array.Alt);
   };
   module Array = {
-    module Fold_Map_Plus = Array.Foldable.Fold_Map_Plus(Array.Plus);
     module Traversable = Array.Traversable(Array.Applicative);
   };
 };
@@ -112,7 +111,6 @@ module ListF = {
     module Eq = List.Eq(String.Eq);
   };
   module Array = {
-    module Fold_Map_Plus = List.Foldable.Fold_Map_Plus(Array.Plus);
     module Traversable = List.Traversable(Array.Applicative);
   };
   module Option = {
@@ -196,7 +194,6 @@ module OptionF = {
     module Traversable = Option.Traversable(List.Applicative);
   };
   module Array = {
-    module Fold_Map_Plus = Option.Foldable.Fold_Map_Plus(Array.Plus);
     module Traversable = Option.Traversable(Array.Applicative);
   };
   module Infix = {

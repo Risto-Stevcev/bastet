@@ -97,27 +97,6 @@ describe("Array", () => {
     );
   });
 
-  describe("Plus", () => {
-    module V = Verify.Plus(Array.Plus);
-    it("should satisfy annihalation", () =>
-      expect(V.annihalation(string_of_int)) |> to_be(true)
-    );
-    property1("should satisfy identity", arb_array(arb_nat), V.identity);
-  });
-
-  describe("Alternative", () => {
-    module V = Verify.Alternative(Array.Alternative);
-    let pure = Array.Applicative.pure;
-    property1(
-      "should satisfy distributivity",
-      arb_array(arb_nat),
-      V.distributivity(pure(( * )(3)), pure((+)(4))),
-    );
-    it("should satisfy annihalation", () =>
-      expect(V.annihalation(pure(string_of_int))) |> to_be(true)
-    );
-  });
-
   describe("Foldable", () => {
     open Array.Foldable;
     it("should do a left fold", () => {
@@ -142,11 +121,34 @@ describe("Array", () => {
   });
 
   describe("Unfoldable", () => {
-    open Array.Unfoldable;
-    it("should do unfold", () => {
-      expect(unfold(x => if (x>5) None else Some((x, x+1)), 0)) |> to_be([|0, 1, 2, 3, 4, 5|]);
-      expect(unfold(x => if (x>20) None else Some((x, x+5)), 0)) |> to_be([|0, 5, 10, 15, 20|]);
-    });
+    Array.Unfoldable.(
+      it("should do unfold", () => {
+        expect(
+          unfold(
+            x =>
+              if (x > 5) {
+                None;
+              } else {
+                Some((x, x + 1));
+              },
+            0,
+          ),
+        )
+        |> to_be([|0, 1, 2, 3, 4, 5|]);
+        expect(
+          unfold(
+            x =>
+              if (x > 20) {
+                None;
+              } else {
+                Some((x, x + 5));
+              },
+            0,
+          ),
+        )
+        |> to_be([|0, 5, 10, 15, 20|]);
+      })
+    )
   });
 
   describe("Traversable", () => {
@@ -235,24 +237,6 @@ describe("Array", () => {
         ( * )(3) <. int_of_float,
         ( *. )(4.0) <. float_of_int,
       ),
-    );
-  });
-
-  describe("Monad_Zero", () => {
-    module V = Verify.Monad_Zero(Array.Monad_Zero);
-    it("should satisfy annihalation", () =>
-      expect(V.annihalation(Array.Applicative.pure <. string_of_int))
-      |> to_be(true)
-    );
-  });
-
-  describe("Monad_Plus", () => {
-    module V = Verify.Monad_Plus(Array.Monad_Plus);
-    property2(
-      "should satisfy distributivity",
-      arb_array(arb_int'),
-      arb_array(arb_int'),
-      V.distributivity(Array.Applicative.pure <. string_of_int),
     );
   });
 
