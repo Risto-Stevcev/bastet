@@ -76,10 +76,10 @@ bs-mocha@^0.5.0:
   dependencies:
     mocha "^6.0.0"
 
-bs-platform@^7.0.2-dev.2:
-  version "7.0.2-dev.2"
-  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-7.0.2-dev.2.tgz#ae055440ce075348179f84bac591ff874201e082"
-  integrity sha512-IMHf+9JNrBZy4jpbDZROPjF/13xro5rGGuGmRqlbJe0rImXtHZMmT3jNFXveou/F5hKU8c40jpQEGdUUNv1iFA==
+bs-platform@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-7.1.0.tgz#72b52148b1c4be7f878969e6e2afd1bfab068cdd"
+  integrity sha512-XUeZf1nGzmsVymG89j5L8G9YNDHl0J/5iDGExXA7a4RKxnbvP2TselBZAzFeEH4rs3gG01b7yKt+h2pm7yh7Ww==
 
 camelcase@^5.0.0:
   version "5.3.1"
