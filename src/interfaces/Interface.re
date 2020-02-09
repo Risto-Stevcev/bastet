@@ -95,9 +95,9 @@ module type FOLDABLE = {
 
   module Fold_Map: (M: MONOID) => {let fold_map: ('a => M.t, t('a)) => M.t;};
   module Fold_Map_Any:
-    (M: MONOID_ANY) => {let fold_map: ('a => M.t('a), t('a)) => M.t('a);};
+    (M: MONOID_ANY) => {let fold_map: ('a => M.t('b), t('a)) => M.t('b);};
   module Fold_Map_Plus:
-    (P: PLUS) => {let fold_map: ('a => P.t('a), t('a)) => P.t('a);};
+    (P: PLUS) => {let fold_map: ('a => P.t('b), t('a)) => P.t('b);};
 };
 
 module type UNFOLDABLE = {

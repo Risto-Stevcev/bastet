@@ -114,6 +114,12 @@ describe("List", () => {
       expect(fold_map(List.Applicative.pure, [[1, 2, 3], [4, 5]]))
       |> to_be([[1, 2, 3], [4, 5]]);
     });
+
+    it("should do a map fold ('a => array('b))", () => {
+      let fold_map = ListF.Array.Fold_Map_Plus.fold_map;
+      expect(fold_map(Array.Applicative.pure <. Int.Show.show, [1, 2, 3]))
+      |> to_be([|"1", "2", "3"|])
+    });
   });
 
   describe("Unfoldable", () => {
