@@ -24,9 +24,9 @@
   "license": "BSD-3-Clause",
   "dependencies": {},
   "devDependencies": {
-    "bs-chai": "^0.5.0",
+    "bs-chai": "^1.0.1",
     "bs-jsverify": "0.10.0",
-    "bs-mocha": "^0.5.0",
-    "bs-platform": "^7.1.0"
+    "bs-mocha": "^1.0.0",
+    "bs-platform": "^7.1.1"
   }
 }
