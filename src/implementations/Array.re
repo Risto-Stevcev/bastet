@@ -20,9 +20,8 @@ module type ORD_F = (O: ORD) => ORD with type t = array(O.t);
 module type SHOW_F = (S: SHOW) => SHOW with type t = array(S.t);
 module type TRAVERSABLE_F =
   (A: APPLICATIVE) =>
-
-    TRAVERSABLE with
-      type t('a) = array('a) and type applicative_t('a) = A.t('a);
+  TRAVERSABLE with
+    type t('a) = array('a) and type applicative_t('a) = A.t('a);
 
 module Functor: FUNCTOR with type t('a) = array('a) = {
   type t('a) = array('a);
@@ -104,9 +103,10 @@ module Unfoldable: UNFOLDABLE with type t('a) = array('a) = {
   type t('a) = array('a);
 
   let rec unfold = (f, init) =>
-    switch (f(init)) {
-    | Some((a, next)) => Belt.Array.concat([|a|], unfold(f, next))
-    | None => [||]
+    switch(f(init)) {
+      | Some((a, next)) =>
+       Belt.Array.concat([|a|], unfold(f, next))
+      | None => [||]
     };
 };
 
