@@ -58,16 +58,6 @@ module Alt: ALT with type t('a) = array('a) = {
   let alt = (a, b) => Js.Array.concat(b, a);
 };
 
-module Plus: PLUS with type t('a) = array('a) = {
-  include Alt;
-  let empty = [||];
-};
-
-module Alternative: ALTERNATIVE with type t('a) = array('a) = {
-  include Applicative;
-  include (Plus: PLUS with type t('a) := t('a));
-};
-
 module Foldable: FOLDABLE with type t('a) = array('a) = {
   type t('a) = array('a);
 
@@ -192,15 +182,6 @@ module Invariant: INVARIANT with type t('a) = array('a) = {
   let imap = (f, _) => Functor.map(f);
 };
 
-module Monad_Zero: MONAD_ZERO with type t('a) = array('a) = {
-  include Monad;
-  include (Alternative: ALTERNATIVE with type t('a) := t('a));
-};
-
-module Monad_Plus: MONAD_PLUS with type t('a) = array('a) = {
-  include Monad_Zero;
-};
-
 module Extend: EXTEND with type t('a) = array('a) = {
   include Functor;
   let extend = (f, xs) =>
@@ -210,5 +191,4 @@ module Extend: EXTEND with type t('a) = array('a) = {
 module Infix = {
   include Infix.Monad(Monad);
   include Infix.Extend(Extend);
-  include Infix.Alternative(Alternative);
 };
