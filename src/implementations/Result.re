@@ -381,7 +381,6 @@ module Bifoldable: BIFOLDABLE with type t('a, 'b) = Belt.Result.t('a, 'b) = {
 
 module Traversable: TRAVERSABLE_F =
   (T: TYPE, A: APPLICATIVE) => {
-    module I = Infix.Apply(A);
     module E = Applicative(T);
 
     type t('a) = Belt.Result.t('a, T.t)

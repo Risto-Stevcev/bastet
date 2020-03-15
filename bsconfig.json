@@ -4,7 +4,10 @@
   "refmt": 3,
   "namespace": true,
   "bsc-flags": ["-bs-super-errors"],
-  "warnings": { "error": "+25", "number": "-102" },
+  "warnings": {
+    "error" : "+101+25+8+9+27",
+    "number": "-102-48"
+  },
   "sources": [{
     "dir": "src",
     "subdirs": true
