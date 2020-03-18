@@ -1,0 +1,3 @@
+(library
+ (name ocaml_abstract)
+ (public_name ocaml_abstract))

@@ -1,0 +1,91 @@
+{1:top Ocaml_abstract}
+
+{i Ocaml_abstract} is a ReasonML/Ocaml library for category theory and abstract algebra. The entry
+point of this library is the module: {!Ocaml_abstract}.
+
+{2 Project Layout}
+
+{ul
+{- {!Ocaml_abstract.Interface} provides the category theory and abstract algebra interfaces.}
+{- {!Ocaml_abstract.Verify} provides property based tests to verify that implementations are
+lawful.}
+{- {!Ocaml_abstract.Infix} provides functors to generate infix operators for the interfaces.
+Implementations in this library already have instantiated infix submodules for convenience.}
+{- {!Ocaml_abstract.Default} provides default implementations for interface functions.}
+{- {!Ocaml_abstract.Functors} provides already instantiated functors for common data combinations
+for convenience.}
+{- {!Ocaml_abstract.Functions} provides generic functions that are built on top the abstract
+interfaces.}
+{- {!Ocaml_abstract.PPX_Let} privides helpers for integrating with the
+{{:https://opam.ocaml.org/packages/ppx_let}ppx_let} package.}
+}
+
+There are also implementations for these builtin Ocaml data types:
+
+{ul
+{- {!Ocaml_abstract.Array}}
+{- {!Ocaml_abstract.Bool}}
+{- {!Ocaml_abstract.Dual}}
+{- {!Ocaml_abstract.Endo}}
+{- {!Ocaml_abstract.Float}}
+{- {!Ocaml_abstract.Function}}
+{- {!Ocaml_abstract.Int}}
+{- {!Ocaml_abstract.List}}
+{- {!Ocaml_abstract.Option}}
+{- {!Ocaml_abstract.String}}
+{- {!Ocaml_abstract.Tuple}}
+{- {!Ocaml_abstract.Result}}
+}
+
+{2 PPX Let }
+
+You can integrate monads with {{:https://opam.ocaml.org/packages/ppx_let}ppx_let}, a ppx rewriter
+that provides {e do notation} sugar for {!Ocaml_abstract.Interface.MONAD}s. The rewriter expects a
+[Let_syntax] module to be in scope, which you can construct using [PPX_Let.Make], like so:
+
+{[
+# #require "ocaml_abstract";;
+# #require "fmt";;
+# open Ocaml_abstract;;
+# module OptionLet = PPX_Let.Make(Option.Monad);;
+# let add_optionals = fun x y ->
+    let open OptionLet in
+    let%bind x' = x in 
+    let%bind y' = y in
+    Some (x' + y');;
+# Fmt.pr "%a" (Fmt.option Fmt.int) @@ add_optionals (Some 123) (Some 456);;
+- : int option = Some 579
+]}
+
+For bucklescript there is the {{:https://github.com/reasonml-labs/bs-let}bs-let} library.
+
+
+{2 Background}
+
+The initial inspiration for the library came from a [sequence]
+{{:https://gist.github.com/Risto-Stevcev/ecfa56d9e87c58a3c20127393c6f283f}demo} on the FP slack by
+{{:https://github.com/rightfold}rightfold (Chloe)} on how to simulate higher kinded types in Ocaml.
+
+Bucklescript had released v1 at the time and ReasonML was announced. I was initially interested
+because of Facebook's backing of ReasonML, which I felt would popularize the language enough to
+built a robust ecosystem that Purescript was lacking. That turned out to be true.
+
+As someone coming from Purescript, I realized that I could get a lot of the stuff I liked from that
+ecosystem in a language that was much easier for an average developer to learn due to Ocaml's much
+simpler type system and explicitness, while still getting all of the benefits of the ML family of
+languages. Ocaml also ran effects without the [IO] type by default, which meant that working with
+the JS FFI was much more pleasant because side-effects wouldn't have to be threaded through IO. And
+since both mutation and OO programming were also supported, it meant that it could reach developers
+that weren't even familiar with FP. Onboarding was no longer an excuse not to use the language.
+
+Other category theory libraries for Ocaml at the time used the uglier
+[HKT<>]/[HKT2<>]/[TyCon]/[TyCon2] hacks that are prevalent in other languages that lack higher
+kinded types. They also lacked a lot of features.
+
+The realization was that there was a better way and that it was possible to write a clean interface
+in Ocaml using local opens, functors, and avoiding monoid instances for containerized types like
+[list] and [array] and using [alt] instead, since these types are monoids in the category of
+functors. Ultimately, I wanted to leverage what I had learned from Haskell and Purescript while also
+considering the practical aspects like the learning curve, and so this library was born.
+
+

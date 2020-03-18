@@ -6,13 +6,16 @@
   "bsc-flags": ["-bs-super-errors"],
   "warnings": {
     "error" : "+101+25+8+9+27",
-    "number": "-102-48"
+    "number": "-102-48-3"
   },
   "sources": [{
-    "dir": "src",
+    "dir": "ocaml_abstract",
     "subdirs": true
   }, {
-    "dir": "test",
+    "dir": "ocaml_abstract_js/src",
+    "subdirs": true
+  }, {
+    "dir": "ocaml_abstract_js/test",
     "type": "dev",
     "subdirs": true
   }],

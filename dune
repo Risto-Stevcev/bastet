@@ -1,0 +1,10 @@
+(rule
+ (alias runtest)
+ (package ocaml_abstract)
+ (deps
+  (package ocaml_abstract)
+  (:x README.md))
+ (action
+  (progn
+   (run ocaml-mdx test %{x})
+   (diff? %{x} %{x}.corrected))))

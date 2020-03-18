@@ -1,140 +1,140 @@
-# bs-abstract
+# ocaml-abstract
 
-Bucklescript interfaces and implementations for category theory and abstract algebra
+A ReasonML/Ocaml library for category theory and abstract algebra.
 
 <img src="https://raw.githubusercontent.com/Risto-Stevcev/bs-abstract/master/cantellated_tesseract.png" height="100" width="100"/>
+
+
+## Documentation
+
+See [documentation][1]
+
 
 ## Installation
 
 Install the project:
 
-`npm install bs-abstract --save`
+`npm install ocaml-abstract --save`
 
 And add the dependency to your bs-dependencies in `bsconfig.json`:
 
 ```json
 "bs-dependencies": [
-  "bs-abstract"
+  "ocaml-abstract"
 ]
 ```
 
 The project will be available under the `BsAbstract` namespace
 
-## Project Layout
 
-This is the current layout of the project. It's subject to change:
+## Examples
 
-- [src/interfaces/Interface.re][1] - Contains the category theory and abstract algebra interfaces
-- [src/interfaces/Verify.re][2] - Contains property based tests to verify that implementations are lawful
-- [src/interfaces/Infix.re][3] - Contains functors to generate infix operators for the interfaces. Modules implementing interfaces contain an already instantiated Infix module for convenience where appropriate
-- [src/utilities/Default.re][4] - Contains default implementations for interface functions
-- [src/utilities/Functors.re][5] - Contains already instantiated functors for common data combinations for convenience
-- [src/functions/Functions.re][6] - Contains generic functions that are built on top the abstract interfaces
-- [src/implementations/][7] - Contains implementations for common bucklescript types 
+```ocaml
+# #require "ocaml_abstract";;
+# open Ocaml_abstract;;
+# module T = Functors.ListF.Option.Traversable;;
+module T = Ocaml_abstract.Functors.ListF.Option.Traversable
 
-The rest of the files under `src` are implementations based on data type (ie: `String.re` for strings). These files and their corresponding unit tests in the `test` folder will give you an idea on how to use and implement the interfaces for your own data structures.
+# T.sequence [Some "foo"; Some "bar"];;
+- : string list option = Some ["foo"; "bar"]
+
+# Functors.ListF.Int.Show.show [1; 1; 2; 3; 5; 8];;
+- : string = "[1, 1, 2, 3, 5, 8]"
+```
 
 ## Suggested Usage
 
-- The suggested way to combine monadic code is to use kliesli composition instead of `flat_map`. For example, given a 
-  type that's a monad, a very common pattern is to get the inner value and pass it in as an argument to a 
-  subsequent function, like so:
+### Use kliesli composition
 
-  ```reason
-  module I = Functions.Infix.Monad(BsEffects.Effect.Monad);
+The monadic equivalent of the `|>` operator is `flat_map` (`>>=`). Both are very useful for writing
+code that's easy to reason about as data all flows in one direction.
 
-  let exclaim_file = path => BsEffects.Effect.Infix.({
-    read_file(path) >>= contents => {
-      write_file(path, contents ++ "!")
-    }
-  });
-  ```
+However, function composition (`>.`) and kliesli composition for monads (`>=>`) are often underused
+in code. Composing functions and monads monoidally like this in a concatenative style can make a
+codebase easier to read and can also prevent devs on the team from duplicating code.
 
-  Which looks like this using do notation (in haskell):
-
-  ```haskell
-  contents <- read_file "foo"
-  _ <- write_file "foo" (contents ++ "!")
-  ```
-
-  This can be written with kliesli composition like this:
-
-  ```reason
-  module Effect_Infix = Functions.Infix.Monad(BsEffects.Effect.Monad);
-  let ((>=>), (>.)) = (Effect_Infix.(>=>), Function.Infix.(>.));
-
-  let exclaim = Function.flip((++))("!");
-  let exclaim_file = path => Function.const(read_file(path)) >=> (exclaim >. write_file(path));
-  ```
-
-  Building up functions using function and kliesli composition is a good litmus test that your program 
-  is built up from generic, pure abstractions. Which means that the code is easy to abstract to make it reusable in many 
-  other contexts, and abstractions are easy to decompose when requirements change.
-
-
-- For interfaces based on functors, Use already instantiated functors if available to avoid the extra boilerplate, ie:
-  ```reason
-  ArrayF.Int.Additive.Fold_Map.fold_map
-  ```
-
-- Don't overuse infix operators. If the code is combinatorial it can make it more readable, but a lot of times prefix operators are simpler and easier to read
-- If you do use infix operators, prefer local opens over global opens, and prefer explicit unpacking over local opens, ie:
-
-  ```reason
-  let ((<.), (>.)) = Function.Infix.((<.), (>.))
-  ```
-
-- Abbreviated modules can make code terser and easier to read in some situations (ie: `A.map`), especially in situations where infix operators can't be used because they would introduce ambiguity, like for example when two different monoids are used in the same function.
-
-
-Example code:
-```reason
-module T = ListF.Option.Traversable;
-assert(T.sequence([Some("foo"), Some("bar")]) == Some(["foo", "bar"]));
-Js.log(ListF.Int.Show.show([1,1,2,3,5,8]));
-```
-
-See the unit tests for many more examples
-
-## Side effects / IO
-
-See the [bs-effects][8] package for sync and async implementations of the "IO monad", and 
-the [bs-free][9] package for free monads and other free structures.
-
-## Use with ppx_let
-
-You can integrate monads with [ppx_let](https://opam.ocaml.org/packages/ppx_let/), a ppx rewriter that provides 
-"do notation" sugar for monads. The rewriter expects a `Let_syntax` module to be in scope, which you can construct 
-using `PPX_Let.Make`, like so: 
+Consider a typical use case. Often in a codebase you have something that fetches a value that may or
+may not exist (`'a option`).  Splitting out this code into smaller functions and combining (and
+reusing) them with composition leads a lean code style:
 
 ```ocaml
-module OptionLet = PPX_Let.Make(Option.Monad);;
+# let ((>=>)) = Option.Infix.((>=>));;
+val ( >=> ) : ('a -> 'b option) -> ('b -> 'c option) -> 'a -> 'c option =
+  <fun>
 
-let add_optionals = fun x y ->
-  let open OptionLet in
-  let%bind x' = x in 
-  let%bind y' = y in
-  Some (x' + y');;
+# type form = { name: string; address: string option };;
+type form = { name : string; address : string option; }
 
-Js.log @@ add_optionals (Some 123) (Some 456);; (* Some 579 *)
+# let get_form () =
+  (* Assume some side effect got the form here *)
+  Some { name = "Foo"; address = Some "123 Bar St." };;
+val get_form : unit -> form option = <fun>
+
+# let get_address form = form.address;;
+val get_address : form -> string option = <fun>
+
+# let get_form_address = get_form >=> get_address;;
+val get_form_address : unit -> string option = <fun>
+
+# get_form_address ();;
+- : string option = Some "123 Bar St."
 ```
 
-Currently as of this writing, there's no support for `let%bind` style syntax for ReasonML, but it 
-should be available in one of the next releases
+### Instantiated Functors
+
+For interfaces based on functors, use already instantiated functors if available to avoid the extra
+boilerplate:
+
+```ocaml
+# Functors.ArrayF.Int.Additive.Fold_Map.fold_map
+- : ('a -> int) -> 'a array -> int = <fun>
+```
+
+### Don't Overuse Infix
+
+Don't overuse infix operators. If the code is combinatorial it can make it more readable, but in a
+lot of cases the prefix operators are simpler and easier to read. If you do use infix operators,
+prefer local opens over global opens to avoid polluting the toplevel:
+
+```ocaml
+# let trim_all strings =
+  let open List.Infix in
+  StringLabels.trim <$> strings;;
+val trim_all : string list -> string list = <fun>
+
+# trim_all ["foo "; "bar"; "   baz"];;
+- : string list = ["foo"; "bar"; "baz"]
+```
+
+### Use Abbreviated Modules
+
+Abbreviated modules can make code both terser and easier to read in some situations, like for
+example where two different semigroups are used in the same function and infix operators can't be
+used:
+
+```ocaml
+# type game = { score: int; disqualified: bool };;
+type game = { score : int; disqualified : bool; }
+
+# let total_score a b =
+  let module I = Int.Additive.Semigroup in
+  let module B = Bool.Disjunctive.Semigroup in
+  { score = I.append a.score b.score; disqualified = B.append a.disqualified b.disqualified };;
+val total_score : game -> game -> game = <fun>
+
+# let result =
+  let game_1 = { score = 4; disqualified = false }
+  and game_2 = { score = 2; disqualified = true }
+  in
+  total_score game_1 game_2;;
+val result : game = {score = 6; disqualified = true}
+```
 
 
 ## License
 
-Licensed under the BSD-3-Clause license. See `LICENSE`
+See [LICENSE][2]
 
 
-
-[1]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/interfaces/Interface.re
-[2]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/interfaces/Verify.re
-[3]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/interfaces/Infix.re
-[4]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/utilities/Default.re
-[5]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/utilities/Functors.re
-[6]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/functions/Functions.re
-[7]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/src/implementations
-[8]: https://github.com/Risto-Stevcev/bs-effects
-[9]: https://github.com/Risto-Stevcev/bs-free
+[1]: https://risto-stevcev.github.io/ocaml-abstract
+[2]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/LICENSE
