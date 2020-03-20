@@ -43,18 +43,18 @@ open-docs: copy-docs
 	xdg-open docs/index.html
 
 .PHONY: test-bs
-test-bs:
+test-bs: build-bs
 	yarn test
 
 .PHONY: test-native
-test-native:
+test-native: build-native
 	dune runtest --no-buffer
 
 .PHONY: test
 test: test-bs test-native
 
 .PHONY: watch-native
-watch:
+watch-native:
 	dune build @all -w
 
 .PHONY: watch-bs

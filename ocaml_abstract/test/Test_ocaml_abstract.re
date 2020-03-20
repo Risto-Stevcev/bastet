@@ -1,9 +1,2 @@
-/*
-let () =
-  print_newline ();
-  Alcotest.run
-    "Ocaml_abstract"
-    [
-      "Array", Test_Array.suite;
-    ]
-    */
+let () = print_newline();
+Alcotest.run("Ocaml_abstract", Test_Array.suites);

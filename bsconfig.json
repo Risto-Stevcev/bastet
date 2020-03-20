@@ -9,7 +9,7 @@
     "number": "-102-48-3"
   },
   "sources": [{
-    "dir": "ocaml_abstract",
+    "dir": "ocaml_abstract/src",
     "subdirs": true
   }, {
     "dir": "ocaml_abstract_js/src",
