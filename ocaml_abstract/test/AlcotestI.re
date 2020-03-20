@@ -8,6 +8,7 @@ module Test:
   type check('a) = Alcotest.testable('a);
 
   let int = Alcotest.int;
+  let bool = Alcotest.bool;
   let string = Alcotest.string;
   let array = Alcotest.array;
   let list = Alcotest.list;

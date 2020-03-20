@@ -1,7 +1,5 @@
 open BsMocha.Mocha;
 open BsJsverify.Verify.Arbitrary;
-let id = Function.Category.id;
-let (<.) = Function.Infix.(<.);
 
 module ArbitraryArray:
   Test.ARBITRARY_A with
@@ -24,8 +22,8 @@ module TestArray =
   Test.Array(
     MochaI.Test,
     JsVerifyI.Quickcheck,
-    ArbitraryArray,
     ArbitraryArrayInt,
+    ArbitraryArray,
   );
 
 describe("Array", () => {

@@ -7,7 +7,9 @@ module Test:
   type suite(_) = unit => unit;
   type check('a) = BsJsverify.Verify.Arbitrary.arbitrary('a);
 
+  // TODO, OBj.magic everything?
   let int = BsJsverify.Verify.Arbitrary.arb_int(-1000, 1000);
+  let bool = BsJsverify.Verify.Arbitrary.arb_bool;
   let string = BsJsverify.Verify.Arbitrary.arb_string;
   let array = Obj.magic;
   let list = Obj.magic;

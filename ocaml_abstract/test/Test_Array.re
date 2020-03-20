@@ -20,8 +20,8 @@ module TestArray =
   Ocaml_abstract.Test.Array(
     AlcotestI.Test,
     QCheckI.Quickcheck,
-    ArbitraryArray,
     ArbitraryArrayInt,
+    ArbitraryArray,
   );
 
 let suites = TestArray.suites;
