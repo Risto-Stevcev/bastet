@@ -18,6 +18,8 @@ for convenience.}
 interfaces.}
 {- {!Ocaml_abstract.PPX_Let} privides helpers for integrating with the
 {{:https://opam.ocaml.org/packages/ppx_let}ppx_let} package.}
+{- {!Ocaml_abstract.Test} provides generic tests that can be combined with any frontend or backend
+unit and generative test framework.}
 }
 
 There are also implementations for these builtin Ocaml data types:
@@ -66,26 +68,11 @@ The initial inspiration for the library came from a [sequence]
 {{:https://gist.github.com/Risto-Stevcev/ecfa56d9e87c58a3c20127393c6f283f}demo} on the FP slack by
 {{:https://github.com/rightfold}rightfold (Chloe)} on how to simulate higher kinded types in Ocaml.
 
-Bucklescript had released v1 at the time and ReasonML was announced. I was initially interested
-because of Facebook's backing of ReasonML, which I felt would popularize the language enough to
-built a robust ecosystem that Purescript was lacking. That turned out to be true.
-
-As someone coming from Purescript, I realized that I could get a lot of the stuff I liked from that
-ecosystem in a language that was much easier for an average developer to learn due to Ocaml's much
-simpler type system and explicitness, while still getting all of the benefits of the ML family of
-languages. Ocaml also ran effects without the [IO] type by default, which meant that working with
-the JS FFI was much more pleasant because side-effects wouldn't have to be threaded through IO. And
-since both mutation and OO programming were also supported, it meant that it could reach developers
-that weren't even familiar with FP. Onboarding was no longer an excuse not to use the language.
-
 Other category theory libraries for Ocaml at the time used the uglier
 [HKT<>]/[HKT2<>]/[TyCon]/[TyCon2] hacks that are prevalent in other languages that lack higher
 kinded types. They also lacked a lot of features.
 
-The realization was that there was a better way and that it was possible to write a clean interface
-in Ocaml using local opens, functors, and avoiding monoid instances for containerized types like
-[list] and [array] and using [alt] instead, since these types are monoids in the category of
-functors. Ultimately, I wanted to leverage what I had learned from Haskell and Purescript while also
-considering the practical aspects like the learning curve, and so this library was born.
-
-
+The realization was that there was a better way and that it was possible to write a {i clean}
+interface in Ocaml using local opens, functors, and avoiding monoid instances for containerized
+types like [list] and [array] and using [alt] instead, since these types are monoids in the category
+of functors.
