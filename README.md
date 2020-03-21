@@ -9,7 +9,7 @@ See [documentation][1]
 
 ## Installation
 
-# Bucklescript/ReasonML
+### Bucklescript/ReasonML
 
 Install the project:
 
@@ -27,7 +27,7 @@ And add the dependency to your bs-dependencies in `bsconfig.json`:
 
 The project will be available under the `Bastet` namespace
 
-# Native
+### Native
 
 Install the project:
 
