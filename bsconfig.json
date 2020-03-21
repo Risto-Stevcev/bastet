@@ -1,18 +1,21 @@
 {
-  "name": "bs-abstract",
+  "name": "bastet",
   "version": "1.0.0",
   "refmt": 3,
   "namespace": true,
   "bsc-flags": ["-bs-super-errors"],
   "warnings": {
     "error" : "+101+25+8+9+27",
-    "number": "-102-48"
+    "number": "-102-48-3"
   },
   "sources": [{
-    "dir": "src",
+    "dir": "bastet/src",
     "subdirs": true
   }, {
-    "dir": "test",
+    "dir": "bastet_js/src",
+    "subdirs": true
+  }, {
+    "dir": "bastet_js/test",
     "type": "dev",
     "subdirs": true
   }],

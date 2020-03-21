@@ -1,21 +1,21 @@
 {
-  "name": "bs-abstract",
+  "name": "bastet",
   "version": "1.0.0",
-  "description": "Bucklescript interfaces and implementations for category theory and abstract algebra",
+  "description": "A ReasonML/Ocaml library for category theory and abstract algebra",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Risto-Stevcev/bs-abstract.git"
+    "url": "git://github.com/Risto-Stevcev/bastet.git"
   },
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w",
     "mocha": "mocha",
-    "test": "mocha lib/js/test/Test_*.js lib/js/test/**/Test_*.js",
-    "test-watch": "mocha -w lib/js/test/Test_*.js"
+    "test": "mocha lib/js/bastet_js/test/Test_*.js",
+    "watch-test": "mocha -w lib/js/bastet_js/test/Test_*.js"
   },
-  "homepage": "https://github.com/Risto-Stevcev/bs-abstract",
-  "bugs": "https://github.com/Risto-Stevcev/bs-abstract/issues",
+  "homepage": "https://github.com/Risto-Stevcev/bastet",
+  "bugs": "https://github.com/Risto-Stevcev/bastet/issues",
   "keywords": [
     "BuckleScript",
     "reason"

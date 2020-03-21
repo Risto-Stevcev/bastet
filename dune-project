@@ -1,0 +1,23 @@
+(lang dune 2.2.0)
+(name bastet)
+(source (github Risto-Stevcev/bastet))
+(license BSD-3-Clause)
+(authors "Risto Stevcev")
+(maintainers "me@risto.codes")
+(generate_opam_files true)
+(implicit_transitive_deps false)
+
+(package
+ (name bastet)
+ (synopsis "Interfaces and implementations for category theory and abstract algebra")
+ (depends
+  (ocaml (>= 4.06.1))
+  (reason (>= 3.6.0))
+  (alcotest (and (>= 1.0.1) :with-test))
+  (qcheck (and (>= 0.13) :with-test))
+  (qcheck-alcotest (and (>= 0.13) :with-test))
+  (ocamlformat (and (>= 0.13.0) :with-test))
+  (mdx (and (>= 1.6.0) :with-test))
+  (odoc (and (>= 1.5.0) :with-doc))
+  (mustache (and (>= 3.1.0) :with-doc))
+  (dune (>= 2.2.0))))

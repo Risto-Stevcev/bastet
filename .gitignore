@@ -26,3 +26,6 @@ lib/bs
 .bsb.lock
 lib
 node_modules
+_build/
+_opam/
+bastet/src/index.mld

@@ -1,0 +1,10 @@
+(rule
+ (alias runtest)
+ (package bastet)
+ (deps
+  (package bastet)
+  (:x README.md))
+ (action
+  (progn
+   (run ocaml-mdx test %{x})
+   (diff? %{x} %{x}.corrected))))
