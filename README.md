@@ -9,9 +9,13 @@ See [documentation][1]
 
 ## Installation
 
+# Bucklescript/ReasonML
+
 Install the project:
 
-`npm install bastet --save`
+```
+yarn install bs-bastet --save
+```
 
 And add the dependency to your bs-dependencies in `bsconfig.json`:
 
@@ -22,6 +26,14 @@ And add the dependency to your bs-dependencies in `bsconfig.json`:
 ```
 
 The project will be available under the `Bastet` namespace
+
+# Native
+
+Install the project:
+
+```
+opam install bastet
+```
 
 
 ## Examples
