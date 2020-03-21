@@ -1,6 +1,6 @@
 (lang dune 2.2.0)
-(name ocaml_abstract)
-(source (github Risto-Stevcev/ocaml-abstract))
+(name bastet)
+(source (github Risto-Stevcev/bastet))
 (license BSD-3-Clause)
 (authors "Risto Stevcev")
 (maintainers "me@risto.codes")
@@ -8,7 +8,7 @@
 (implicit_transitive_deps false)
 
 (package
- (name ocaml_abstract)
+ (name bastet)
  (synopsis "Interfaces and implementations for category theory and abstract algebra")
  (depends
   (ocaml (>= 4.06.1))

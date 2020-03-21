@@ -1,9 +1,6 @@
-# ocaml-abstract
+<img src="https://raw.githubusercontent.com/Risto-Stevcev/bs-abstract/native-compat/bastet.jpg"/>
 
 A ReasonML/Ocaml library for category theory and abstract algebra.
-
-<img src="https://raw.githubusercontent.com/Risto-Stevcev/bs-abstract/master/cantellated_tesseract.png" height="100" width="100"/>
-
 
 ## Documentation
 
@@ -14,26 +11,26 @@ See [documentation][1]
 
 Install the project:
 
-`npm install ocaml-abstract --save`
+`npm install bastet --save`
 
 And add the dependency to your bs-dependencies in `bsconfig.json`:
 
 ```json
 "bs-dependencies": [
-  "ocaml-abstract"
+  "bastet"
 ]
 ```
 
-The project will be available under the `BsAbstract` namespace
+The project will be available under the `Bastet` namespace
 
 
 ## Examples
 
 ```ocaml
-# #require "ocaml_abstract";;
-# open Ocaml_abstract;;
+# #require "bastet";;
+# open Bastet;;
 # module T = Functors.ListF.Option.Traversable;;
-module T = Ocaml_abstract.Functors.ListF.Option.Traversable
+module T = Bastet.Functors.ListF.Option.Traversable
 
 # T.sequence [Some "foo"; Some "bar"];;
 - : string list option = Some ["foo"; "bar"]
@@ -136,5 +133,5 @@ val result : game = {score = 6; disqualified = true}
 See [LICENSE][2]
 
 
-[1]: https://risto-stevcev.github.io/ocaml-abstract
-[2]: https://github.com/Risto-Stevcev/bs-abstract/blob/master/LICENSE
+[1]: https://risto-stevcev.github.io/bastet
+[2]: https://github.com/Risto-Stevcev/bastet/blob/master/LICENSE

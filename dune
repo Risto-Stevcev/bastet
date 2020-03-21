@@ -1,8 +1,8 @@
 (rule
  (alias runtest)
- (package ocaml_abstract)
+ (package bastet)
  (deps
-  (package ocaml_abstract)
+  (package bastet)
   (:x README.md))
  (action
   (progn

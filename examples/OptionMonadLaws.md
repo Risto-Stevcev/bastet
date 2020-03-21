@@ -1,6 +1,6 @@
 ```ocaml
-# #require "ocaml_abstract"
-# open Ocaml_abstract;;
+# #require "bastet"
+# open Bastet;;
 
 # let (>=>) = Option.Infix.(>=>);;
 val ( >=> ) : ('a -> 'b option) -> ('b -> 'c option) -> 'a -> 'c option =

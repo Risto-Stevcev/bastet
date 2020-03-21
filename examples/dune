@@ -4,9 +4,9 @@
 
 (rule
  (alias runtest)
- (package ocaml_abstract)
+ (package bastet)
  (deps
-  (package ocaml_abstract)
+  (package bastet)
   (:array_map ArrayMap.md)
   (:identity_fn IdentityFn.md)
   (:compose_fn ComposeFn.md)

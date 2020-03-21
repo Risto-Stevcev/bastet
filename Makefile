@@ -32,10 +32,10 @@ fmt:
 
 .PHONY: docs-template
 docs-template: test-native
-	cat ocaml_abstract/src/index.mld.template | \
+	cat bastet/src/index.mld.template | \
 		sed -e 's/{{:/{ {:/g' | \
 		dune exec examples/docs_template.exe | \
-		sed -e 's/{ {:/{{:/g' > ocaml_abstract/src/index.mld
+		sed -e 's/{ {:/{{:/g' > bastet/src/index.mld
 
 .PHONY: docs
 docs: clean-docs docs-template

@@ -2,7 +2,7 @@
 # module List_Apply (M: Interface.MAGMA) =
   struct let apply init list = ListLabels.fold_left ~f:M.append ~init list end;;
 module List_Apply :
-  functor (M : Ocaml_abstract.Interface.MAGMA) ->
+  functor (M : Bastet.Interface.MAGMA) ->
     sig val apply : M.t -> M.t list -> M.t end
 
 # module List_Additive_Int_Apply = List_Apply(Int.Additive.Magma);;

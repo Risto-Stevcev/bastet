@@ -1,5 +1,5 @@
 {
-  "name": "bs-abstract",
+  "name": "bastet",
   "version": "1.0.0",
   "refmt": 3,
   "namespace": true,
@@ -9,13 +9,13 @@
     "number": "-102-48-3"
   },
   "sources": [{
-    "dir": "ocaml_abstract/src",
+    "dir": "bastet/src",
     "subdirs": true
   }, {
-    "dir": "ocaml_abstract_js/src",
+    "dir": "bastet_js/src",
     "subdirs": true
   }, {
-    "dir": "ocaml_abstract_js/test",
+    "dir": "bastet_js/test",
     "type": "dev",
     "subdirs": true
   }],

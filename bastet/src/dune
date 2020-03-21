@@ -1,0 +1,6 @@
+(library
+ (name bastet)
+ (public_name bastet))
+
+(documentation
+ (package bastet))
