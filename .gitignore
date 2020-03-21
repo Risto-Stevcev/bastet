@@ -28,3 +28,4 @@ lib
 node_modules
 _build/
 _opam/
+ocaml_abstract/src/index.mld

@@ -19,4 +19,5 @@
   (ocamlformat (and (>= 0.13.0) :with-test))
   (mdx (and (>= 1.6.0) :with-test))
   (odoc (and (>= 1.5.0) :with-doc))
+  (mustache (and (>= 3.1.0) :with-doc))
   (dune (>= 2.2.0))))

@@ -1,0 +1,4 @@
+```ocaml
+# true;;
+- : bool = true
+```

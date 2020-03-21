@@ -25,19 +25,33 @@ unit and generative test framework.}
 There are also implementations for these builtin Ocaml data types:
 
 {ul
-{- {!Ocaml_abstract.Array}}
-{- {!Ocaml_abstract.Bool}}
-{- {!Ocaml_abstract.Dual}}
-{- {!Ocaml_abstract.Endo}}
-{- {!Ocaml_abstract.Float}}
-{- {!Ocaml_abstract.Function}}
-{- {!Ocaml_abstract.Int}}
-{- {!Ocaml_abstract.List}}
-{- {!Ocaml_abstract.Option}}
-{- {!Ocaml_abstract.String}}
-{- {!Ocaml_abstract.Tuple}}
-{- {!Ocaml_abstract.Result}}
+{- {!Ocaml_abstract.Array} }
+{- {!Ocaml_abstract.Bool} }
+{- {!Ocaml_abstract.Dual} }
+{- {!Ocaml_abstract.Endo} }
+{- {!Ocaml_abstract.Float} }
+{- {!Ocaml_abstract.Function} }
+{- {!Ocaml_abstract.Int} }
+{- {!Ocaml_abstract.List} }
+{- {!Ocaml_abstract.Option} }
+{- {!Ocaml_abstract.String} }
+{- {!Ocaml_abstract.Tuple} }
+{- {!Ocaml_abstract.Result} }
 }
+
+{2 Examples }
+
+{3 Semigroup }
+
+{[
+{{Semigroup}}
+]}
+
+{3 Monoid }
+
+{[
+{{Monoid}}
+]}
 
 {2 PPX Let }
 
@@ -52,7 +66,7 @@ that provides {e do notation} sugar for {!Ocaml_abstract.Interface.MONAD}s. The 
 # module OptionLet = PPX_Let.Make(Option.Monad);;
 # let add_optionals = fun x y ->
     let open OptionLet in
-    let%bind x' = x in 
+    let%bind x' = x in
     let%bind y' = y in
     Some (x' + y');;
 # Fmt.pr "%a" (Fmt.option Fmt.int) @@ add_optionals (Some 123) (Some 456);;

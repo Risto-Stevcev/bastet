@@ -1,0 +1,38 @@
+(executable
+  (name docs_template)
+  (libraries mustache))
+
+(rule
+ (alias runtest)
+ (package ocaml_abstract)
+ (deps
+  (package ocaml_abstract)
+  (:semigroup Semigroup.md)
+  (:monoid Monoid.md)
+  (:plus Plus.md)
+  (:monad Monad.md)
+  (:category Category.md)
+  (:eq Eq.md)
+  (:ord Ord.md)
+  (:ring Euclidean_Ring.md)
+  (:lattice Join_Semilattice.md))
+ (action
+  (progn
+   (run ocaml-mdx test %{semigroup})
+   (diff? %{semigroup} %{semigroup}.corrected)
+   (run ocaml-mdx test %{monoid})
+   (diff? %{monoid} %{monoid}.corrected)
+   (run ocaml-mdx test %{plus})
+   (diff? %{plus} %{plus}.corrected)
+   (run ocaml-mdx test %{monad})
+   (diff? %{monad} %{monad}.corrected)
+   (run ocaml-mdx test %{category})
+   (diff? %{category} %{category}.corrected)
+   (run ocaml-mdx test %{eq})
+   (diff? %{eq} %{eq}.corrected)
+   (run ocaml-mdx test %{ord})
+   (diff? %{ord} %{ord}.corrected)
+   (run ocaml-mdx test %{ring})
+   (diff? %{ring} %{ring}.corrected)
+   (run ocaml-mdx test %{lattice})
+   (diff? %{lattice} %{lattice}.corrected))))
