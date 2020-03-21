@@ -7,8 +7,6 @@ point of this library is the module: {!Ocaml_abstract}.
 
 {ul
 {- {!Ocaml_abstract.Interface} provides the category theory and abstract algebra interfaces.}
-{- {!Ocaml_abstract.Verify} provides property based tests to verify that implementations are
-lawful.}
 {- {!Ocaml_abstract.Infix} provides functors to generate infix operators for the interfaces.
 Implementations in this library already have instantiated infix submodules for convenience.}
 {- {!Ocaml_abstract.Default} provides default implementations for interface functions.}
@@ -18,6 +16,8 @@ for convenience.}
 interfaces.}
 {- {!Ocaml_abstract.PPX_Let} privides helpers for integrating with the
 {{:https://opam.ocaml.org/packages/ppx_let}ppx_let} package.}
+{- {!Ocaml_abstract.Verify} provides property based tests to verify that implementations are
+lawful.}
 {- {!Ocaml_abstract.Test} provides generic tests that can be combined with any frontend or backend
 unit and generative test framework.}
 }
@@ -40,7 +40,7 @@ There are also implementations for these builtin Ocaml data types:
 }
 
 
-{2 Who is this for? }
+{2 Who is this for?}
 
 This library is intended for those who want to write highly reusable functional code. Category
 theory and abstract algebra is a perfect foundation for this because of functional programming's
@@ -61,74 +61,404 @@ argument instead of an {!option} type:
 In this example, the (abstract) [Hush] functor would be exposed to other library authors while the
 (concrete) [hush] function with some docs would be exposed only to the newcomers.
 
-This way anyone can still take advantage of the {i free} implementations provided by this
-abstractions without any of the learning curve — they can just read the type signature of the [hush]
-function and none of the other stuff. And if need be, the functor here could be reused for some
-other type that takes two parameters, such as a tuple, map, or record.
+This way anyone can still take advantage of the derived implementations provided by this abstraction
+without any of the learning curve — they can just read the type signature of the [hush] function and
+ignore the other stuff. And the functor could be reused for some other type that takes two
+parameters, such as a tuple, map, or record.
 
 
 
-{2 A Brief Introduction }
+{2 A Succinct Introduction}
 
 The downside to using such abstractions is that newcomers are often overwhelmed. They might not know
 how much category theory or abstract algebra they need to formally know (almost none), or whether or
 not to read monad tutorials (you shouldn't). The best way to learn this stuff is to read the [module
-type]s and the laws that the types need to satisfy.
+type]s and the laws that the types need to satisfy. This succinct and hopeful more useful
+introduction is ideally all you will need to understand the core concepts and be productive.
 
-{3 Monoids }
+You can try all of the examples here with {{:https://opam.ocaml.org/packages/utop}utop}.
+
+
+{3 Functors}
+
+Functors generalize the notion of something that's {i composably mappable}. You're probably already
+familiar with this concept from javascript's
+{{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map}Array.map}
+function.
+
+Here's what it looks like in Ocaml:
+
+{[{{&ArrayMap}}]}
+
+In order for a type to be a functor, it needs to have a [map] function that also satisfies two laws.
+The laws ensure that the [map] function works well with function composition:
+
+{ul
+{- The Identity Law:
+
+   [map id x = x]
+
+   In this context, [id] is the identity function ({!Ocaml_abstract.Function.Category.id}).
+   It's the simplest function imaginable: it just returns the value given to it. It's written like
+   this in Ocaml:
+
+   {[{{&IdentityFn}}]}
+
+   This law is saying is that if I call [map] on a functor and I don't do anything to the elements
+   because I'm calling [map] with the [id] function, then I should get back the same collection.
+   This is important to achieve the notion that functors should be {i composably mappable}.
+}
+{- The Composition Law
+
+   [map (compose g f) x = compose (map g) (map f) x]
+
+   And [compose] is just function composition:
+
+   {[{{&ComposeFn}}]}
+}
+}
+
+Thsee laws describe what's meant by {i composably mappable}: the [map] function together with
+function composition ([compose]) should be sort of
+{{:https://en.m.wikipedia.org/wiki/Distributive_property} right-distributive} and work together in a
+nice way.
+
+Here are some concerete examples:
+
+{ul
+{- The {!Ocaml_abstract.Array.Functor} from the earlier example}
+{- The {!Ocaml_abstract.List.Functor}
+  {[{{&ListFunctor}}]}
+}
+{- The {!Ocaml_abstract.Option.Functor}
+  {[{{&OptionFunctor}}]}
+}
+}
+
+
+{3 Magmas}
+
+Magmas are a very simple concept: it's just a set (or type) with a single binary operation, and that
+binary operation must be closed under that set. That just means it takes two arguments of the same
+type and returns the same type. You're already familiar with several magmas:
+
+{[{{&Magma}}]}
+
+No additional laws or conditions need to be satisfied. This is extremely useful when you want to be
+able to write abstractions that work for {i any} binary operation that's closed:
+
+{[{{&List_Apply}}]}
+
+This example provides a generic functor that works on any magma. Some concrete instances are
+constructed for {!Ocaml_abstract.Int.Additive.Magma} and {!Ocaml_abstract.Int.Subtractive.Magma}.
+
+As you can see it can be pretty useful. One of the benefits of magmas is that it's very general
+because you don't need to satisfy any additional laws.
+
+You might ask: why not just use {{:#monoid}monoids}? Integer subtraction ([-]) can't be a monoid
+because although it has an empty element ([0]), it's not {i associative} — the {i evaluation order}
+of the operations matter:
+
+{[{{&Int_Subtraction_Not_Associative}}]}
+
+And obviously you'll probably eventually run into a situation where you need to subtract everything
+in a [list] or [array] starting from some initial value, which is where magmas shine. Monoids will
+be exlpained more in the next section.
+
+
+{3 Monoidal Categories}
 
 {i - "A monad is just a monoid in the category of endofunctors, what's the problem?" }
 
-{4 Monoid }
+This quote is often cited in the FP community as a joke. The joke is that the sentence sounds
+extremely complicated because of the jargon, but it's actually the easiest way of understanding
+monads.
 
-Int, String
+By the end of this section you'll learn about the different categories of monoids (like monads) and
+why monads are used for [IO]. The goal ideally is that you'll leave this section without feeling the
+need to pick up any other resource for monads because you get it now.
+
+
+{4 General Overview}
+
+This section provides a general overview of monoids. This is one subsection that you might not get
+immediately. Because of the level of abstraction, it's recommended that you don't spend a lot of
+time on this section, and instead come back to it after reading the subsequent sections and writing
+code that uses this stuff to get a feel for it.
+
+The idea of a monoid is to represent something that's {i appendable} or combinable in a general way.
+
+Monoids come up constantly in programming because we're more or less just {i combining} things: a
+construction worker is a civic developer, and for the most part we're white-collar construction
+workers (software developers).
+
+You can obviously combine things that are of different types, otherwise we wouldn't be able to build
+anything really interesting or useful with software. A monoid specifically describes combining
+something of the same type and returning the same type.
+
+We know that we need a magma because we're taking two things of the same type and returning the same
+type. But as you saw in the previous section, a magma isn't enough to describe something that's
+appendable because subtraction is a magma, and subtraction {i doesn't combine} or add two things
+together, it takes something away.
+
+What's really needed is a magma that satisfies two {i laws} in order to truly describe something
+that's appendable:
+
+{ul
+{- The {{:https://en.m.wikipedia.org/wiki/Associative_property}Law of Associativity}:
+
+   {[a • (b • c) = (a • b) • c]} 
+
+   Where the [•] operation is a placeholder for the operation used in the magma's implementation.
+   Some concrete examples are addition ([+]) and multiplication ([*]):  
+
+   {[{{&Associativity}}]}
+
+   And as you saw in the previous section, subtraction isn't associative so it can't describe
+   something that appends things.  Another example is division, which is also a magma but isn't
+   associative, and consequently it doesn't describe combining anything but rather {i splitting}
+   something up instead.
+}
+{- The {{:https://en.m.wikipedia.org/wiki/Identity_element}Law of Identity} with an [identity]
+element called [empty]:
+
+  {[a • empty = a]}
+
+  The law states that using the operation on the empty element just returns the same element. Here
+  are some concrete examples:
+
+  {[{{&IdentityElement}}]}
+
+  In these examples, [((+), 0)], [(( * ), 1)], and [((^), "")] are all monoids: all of those
+  operations are associative, and if you pair those operations with those specific values as the
+  empty elemnt then it satisfies the identity law as well.
+}
+}
+
+
+{4 Monoid}
+
+After reading the previous section, you might not have understood everything fully and that's {i
+ok}. It's best to see some concrete examples of functions that you've often used in order to get a
+wholistic perspective of what's going on.
+
+{ul
+{- The {!Ocaml_abstract.Int.Additive.Monoid}
+
+  [(+)] with [0] as the empty element [((+), 0)]:
+
+  {[{{&AdditiveMonoid}}]}
+}
+{- The {!Ocaml_abstract.Int.Multiplicative.Monoid}
+
+  [( * )] with [1] as the empty element [(( * ), 1)]:
+
+  {[{{&MultiplicativeMonoid}}]}
+}
+{- The {!Ocaml_abstract.Bool.Conjunctive.Monoid}
+
+  [(&&)] with [true] as the empty element [((&&), true)]:
+
+  {[{{&ConjunctiveMonoid}}]}
+}
+{- The {!Ocaml_abstract.Bool.Disjunctive.Monoid}
+
+  [(||)] with [false] as the empty element [((||), false)]:
+
+  {[{{&DisjunctiveMonoid}}]}
+}
+{- The {!Ocaml_abstract.String.Monoid}
+
+  [(^)] with [""] as the empty element [((^), "")]:
+
+  {[{{&StringMonoid}}]}
+}
+}
+
+
+{4 Plus}
+
+{!Ocaml_abstract.Interface.PLUS} is a {i monoid in the category of functors}.
+
+Unlike a {{:#monoid}monoid}, it's a {{:#functor}functor} so it's type has a type parameter {i 'a}:
+instead of having a type [t] where t is a concerete type (ie: [string], [int]), it instead has a
+type ['a t] where the {i 'a} can be anything (ie: ['a list], ['a option]).
+
+It satisfies the monoid laws at the functor level:
+
+{ul
+{- The {!Ocaml_abstract.List.Plus}
+
+  [List.append] with [[]] as the empty element [(List.append, [])]:
+
+  {[{{&ListMonoid}}]}
+}
+{- The {!Ocaml_abstract.Option.Plus}
+
+  {[{{&OptionMonoid}}]}
+}
+}
+
+
+{4 Monad}
+
+{!Ocaml_abstract.Interface.MONAD} is a {i monoid in the category of endofunctors}.
+
+Monads are endofunctors: they're {{:#functors}functors} that have a [pure] function that can be
+thought of as a constructor function, and a [flatten] function that flattens the nested type.
+
+It's common practice to provide a [flat_map] function directly instead of a [flatten] function. The
+[flat_map] function can be derived from [flat_map f = compose flatten (map f)], and vice-versa. For
+the purposes of this section, it's best to think of monads as functors that provide additional
+[pure] and [flatten] functions and satisfies the monoid laws.
+
+
+{5 Example}
+
+Here's an example of {!Ocaml_abstract.Option.Monad}:
+
+{[{{&OptionMonad}}]}
+
+As you can see in the example, [kliesli_compose] can be derived entirely from [flat_map].
+
+
+{5 Monoid Laws}
+
+Monads satisfy the monoid laws at the endofunctor level:
+
+{[{{&OptionMonadLaws}}]}
+
+
+{5 IO}
+
+A good introduction on why monads are used for [IO] is to consider how javascript handles effects:
+using callbacks. This is called {{:https://en.m.wikipedia.org/wiki/Continuation-passing_style
+}continuation passing style}.
+
+A motivation for developing promises was to avoid callback hell:
 
 {[
-{{Monoid}}
+doSomeEffect(cb => {
+  // do more stuff
+  doSomeOtherEffect(cb => {
+    // do more stuff
+    doYetAnotherEffect(cb => {
+      // do more stuff
+    })
+  })
+})
 ]}
 
-{4 Plus }
+This example shows how you can use monads to flatten callbacks without having to use promises:
 
-list, array, option
+{[{{&IOMonad}}]}
 
-{4 Monad }
+As you can see, monads are very useful for [IO]. Haskell and Purescript more or less uses some
+variation of this to achieve pure FP with their [IO] constructs. Lazy semantics are simulated with
+functions in Bucklescript and Purescript, and what Purescript does is it keeps the side-effects in a
+function, threads these functions together using [flat_map] without evaluating it yet by wrapping
+the computation in a function, and then the runtime (calling [main]) or [unsafePerformIO] will run
+the side-effects by calling the function. This makes the language "pure" because only the runtime or
+the unsafe escape hatch can run the effects.
 
-option
+If you want to see an example of how Purescript-like lazy effects are written in Ocaml, see
+{{:https://github.com/Risto-Stevcev/bs-effects}Bs-effects}.
+
+
+
 
 {4 Category }
 
-function
+Category satisfies the monoid laws at the category level.
 
-{3 Comparison }
+The simples example is {!Ocaml_abstract.Function.Category}, where [empty] is the identity function
+and [append] is function composition:
 
-{4 Eq }
-{4 Ord }
-
-
-{3 Rings }
-
-{4 Euclidean Ring }
-
-int, float
-
-
-{3 Lattices }
-
-{4 Join Semilattice }
-
-propagators
-
-{4 Heyting Algebra }
-
-fuzzy logics
-
-{4 Boolean Algebra }
-
-bool
+{[{{&CategoryMonoid}}]}
 
 
 
-{2 PPX Let }
+{3 Comparisons}
+
+The comparison interfaces {!Ocaml_abstract.Interface.EQ} and {!Ocaml_abstract.Interface.ORD} are
+self-explanatory: use the [EQ] interface to define how to determine whether two values of a type are
+equal, and the [ORD] interface to define whether two values are {i greater-than}, {i less-than} or
+{i equal}.
+
+
+{3 Rings}
+
+Types that you can both [add] and [multiply] are {!Ocaml_abstract.Interface.SEMIRING}s. If you
+include [subtract] you get a {!Ocaml_abstract.Interface.RING}, include [divide] to that and you get
+a {!Ocaml_abstract.Interface.DIVISION_RING}, and add [modulo] to that and you get a
+{!Ocaml_abstract.Interface.EUCLIDEAN_RING}.
+
+These are predominantly useful in situations where [monoids] aren't enough and you want to be able
+to use [int]s and [float]s without having to write the same function over again.
+
+
+{3 Lattices}
+
+The most common lattice-like interface is {!Ocaml_abstract.Interface.BOOLEAN_ALGEBRA} with [bool]
+being the most well-known implementation of it.
+
+Other lattice-like structures in programming come up occasionally. For example,
+{!Ocaml_abstract.Interface.JOIN_SEMILATTICE}s are used to describe
+{{:http://groups.csail.mit.edu/genesis/papers/radul%202009.pdf}propagator} networks, and
+{!Ocaml_abstract.Interface.HEYTING_ALGEBRA}s are useful for describing fuzzy logics which don't
+satisfy the law of excluded middle. 
+
+
+{3 Further Reading }
+
+You might be wondering if there's more to it then what's described here. For the current state of
+using these kinds of things in FP there really isn't, but it's fascinating stuff on it's own.
+
+Wikipedia actually has some pretty nice articles on abstract algebra that are accessible to people
+who don't have a strong background in math. Reading these is highly recommended:
+
+{ul
+{- {{:https://en.m.wikipedia.org/wiki/Magma_(algebra)}Magma} }
+{- {{:https://en.m.wikipedia.org/wiki/Semigroup}Semigroup} }
+{- {{:https://en.m.wikipedia.org/wiki/Monoid}Monoid} }
+{- {{:https://en.m.wikipedia.org/wiki/Quasigroup}Quasigroup} }
+{- {{:https://en.m.wikipedia.org/wiki/Quasigroup#Loops}Loop} }
+{- {{:https://en.m.wikipedia.org/wiki/Group_(mathematics)}Group} }
+{- {{:https://en.m.wikipedia.org/wiki/Semiring}Semiring} }
+{- {{:https://en.m.wikipedia.org/wiki/Division_ring}Division Ring} }
+{- {{:https://en.m.wikipedia.org/wiki/Semilattice}Semilattice} }
+{- {{:https://en.m.wikipedia.org/wiki/Lattice_(order)#General_lattice}Lattice} }
+{- {{:https://en.m.wikipedia.org/wiki/Lattice_(order)#Bounded_lattice}Bounded Lattice} }
+{- {{:https://en.m.wikipedia.org/wiki/Heyting_algebra}Heyting Algebra} }
+{- {{:https://en.m.wikipedia.org/wiki/Boolean_algebra_(structure)#Definition}Boolean Algebra} }
+}
+
+And some of the algebraic laws:
+
+{ul
+{- {{:https://en.m.wikipedia.org/wiki/Distributive_property}Distributivity} }
+{- {{:https://en.m.wikipedia.org/wiki/Associative_property}Associativity} }
+{- {{:https://en.m.wikipedia.org/wiki/Identity_element}Identity} }
+{- {{:https://en.m.wikipedia.org/wiki/Commutative_property#Mathematical_definitions}Commutativity} }
+{- {{:https://en.m.wikipedia.org/wiki/Cancellation_property}Cancellativity} }
+{- {{:https://en.m.wikipedia.org/wiki/Inverse_element#In_a_unital_magma}Invertibility} }
+}
+
+There are also different types of relations/relational properties. These are used for the
+{!Ocaml_abstract.Interface.EQ} and {!Ocaml_abstract.Interface.ORD} interfaces, but they also show up
+with lattice-like structures. They're also good to know if you plan on doing relational or logic
+programming:
+
+{ul
+{- {{:https://en.m.wikipedia.org/wiki/Reflexive_relation}Reflexivity} }
+{- {{:https://en.m.wikipedia.org/wiki/Symmetric_relation}Symmetry} }
+{- {{:https://en.m.wikipedia.org/wiki/Asymmetric_relation}Asymmetry} }
+{- {{:https://en.m.wikipedia.org/wiki/Antisymmetric_relation}Antisymmetry} }
+{- {{:https://en.m.wikipedia.org/wiki/Transitive_relation}Transitivity} }
+}
+
+
+{2 PPX Let}
 
 You can integrate monads with {{:https://opam.ocaml.org/packages/ppx_let}ppx_let}, a ppx rewriter
 that provides {e do notation} sugar for {!Ocaml_abstract.Interface.MONAD}s. The rewriter expects a
@@ -155,11 +485,7 @@ The initial inspiration for the library came from a [sequence]
 {{:https://gist.github.com/Risto-Stevcev/ecfa56d9e87c58a3c20127393c6f283f}demo} on the FP slack by
 {{:https://github.com/rightfold}rightfold (Chloe)} on how to simulate higher kinded types in Ocaml.
 
-Other category theory libraries for Ocaml at the time used the uglier
-[HKT<>]/[HKT2<>]/[TyCon]/[TyCon2] hacks that are prevalent in other languages that lack higher
-kinded types. They also lacked a lot of features.
-
-The realization was that there was a better way and that it was possible to write a {i clean}
-interface in Ocaml using local opens, functors, and avoiding monoid instances for containerized
-types like [list] and [array] and using [alt] instead, since these types are monoids in the category
-of functors.
+The realization was that there was a better way and that it was possible to write a decent interface
+in Ocaml using local opens, functors, and avoiding monoid instances for containerized types by
+relying on their monoidal categories instead, such as {!Ocaml_abstract.Interface.PLUS},
+{!Ocaml_abstract.Interface.MONAD}, and {!Ocaml_abstract.Interface.CATEGORY}.
