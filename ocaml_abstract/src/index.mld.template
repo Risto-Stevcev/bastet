@@ -39,19 +39,94 @@ There are also implementations for these builtin Ocaml data types:
 {- {!Ocaml_abstract.Result} }
 }
 
-{2 Examples }
 
-{3 Semigroup }
+{2 Who is this for? }
+
+This library is intended for those who want to write highly reusable functional code. Category
+theory and abstract algebra is a perfect foundation for this because of functional programming's
+close relationship with pure math — functions in this context are closer to the mathematical sense
+of the word rather than something like a subroutine. 
+
+But unless your entire team is already familiar with these principles, it's recommended that library
+authors provide a {i concrete} API that doesn't expose this level of abstraction for newcomers.
+
+For example, consider this abstraction that generalizes the notion of something similar to the
+{!Ocaml_abstract.Result.hush} function but instead returns a [unit] type for the second type
+argument instead of an {!option} type:
 
 {[
-{{Semigroup}}
+{{&Hush}}
 ]}
 
-{3 Monoid }
+In this example, the (abstract) [Hush] functor would be exposed to other library authors while the
+(concrete) [hush] function with some docs would be exposed only to the newcomers.
+
+This way anyone can still take advantage of the {i free} implementations provided by this
+abstractions without any of the learning curve — they can just read the type signature of the [hush]
+function and none of the other stuff. And if need be, the functor here could be reused for some
+other type that takes two parameters, such as a tuple, map, or record.
+
+
+
+{2 A Brief Introduction }
+
+The downside to using such abstractions is that newcomers are often overwhelmed. They might not know
+how much category theory or abstract algebra they need to formally know (almost none), or whether or
+not to read monad tutorials (you shouldn't). The best way to learn this stuff is to read the [module
+type]s and the laws that the types need to satisfy.
+
+{3 Monoids }
+
+{i - "A monad is just a monoid in the category of endofunctors, what's the problem?" }
+
+{4 Monoid }
+
+Int, String
 
 {[
 {{Monoid}}
 ]}
+
+{4 Plus }
+
+list, array, option
+
+{4 Monad }
+
+option
+
+{4 Category }
+
+function
+
+{3 Comparison }
+
+{4 Eq }
+{4 Ord }
+
+
+{3 Rings }
+
+{4 Euclidean Ring }
+
+int, float
+
+
+{3 Lattices }
+
+{4 Join Semilattice }
+
+propagators
+
+{4 Heyting Algebra }
+
+fuzzy logics
+
+{4 Boolean Algebra }
+
+bool
+
+
 
 {2 PPX Let }
 
@@ -60,9 +135,7 @@ that provides {e do notation} sugar for {!Ocaml_abstract.Interface.MONAD}s. The 
 [Let_syntax] module to be in scope, which you can construct using [PPX_Let.Make], like so:
 
 {[
-# #require "ocaml_abstract";;
 # #require "fmt";;
-# open Ocaml_abstract;;
 # module OptionLet = PPX_Let.Make(Option.Monad);;
 # let add_optionals = fun x y ->
     let open OptionLet in

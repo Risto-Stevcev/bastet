@@ -7,7 +7,6 @@
  (package ocaml_abstract)
  (deps
   (package ocaml_abstract)
-  (:semigroup Semigroup.md)
   (:monoid Monoid.md)
   (:plus Plus.md)
   (:monad Monad.md)
@@ -15,11 +14,10 @@
   (:eq Eq.md)
   (:ord Ord.md)
   (:ring Euclidean_Ring.md)
-  (:lattice Join_Semilattice.md))
+  (:lattice Join_Semilattice.md)
+  (:hush Hush.md))
  (action
   (progn
-   (run ocaml-mdx test %{semigroup})
-   (diff? %{semigroup} %{semigroup}.corrected)
    (run ocaml-mdx test %{monoid})
    (diff? %{monoid} %{monoid}.corrected)
    (run ocaml-mdx test %{plus})
@@ -35,4 +33,6 @@
    (run ocaml-mdx test %{ring})
    (diff? %{ring} %{ring}.corrected)
    (run ocaml-mdx test %{lattice})
-   (diff? %{lattice} %{lattice}.corrected))))
+   (diff? %{lattice} %{lattice}.corrected)
+   (run ocaml-mdx test %{hush})
+   (diff? %{lattice} %{hush}.corrected))))
