@@ -9,7 +9,7 @@
 
 (package
  (name bastet)
- (synopsis "Interfaces and implementations for category theory and abstract algebra")
+ (synopsis "A ReasonML/Ocaml library for category theory and abstract algebra")
  (depends
   (ocaml (>= 4.06.1))
   (reason (>= 3.6.0))

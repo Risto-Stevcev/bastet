@@ -1,6 +1,6 @@
 {
   "name": "bastet",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "refmt": 3,
   "namespace": true,
   "bsc-flags": ["-bs-super-errors"],
