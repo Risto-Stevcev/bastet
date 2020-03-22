@@ -12,8 +12,13 @@ clean-native:
 clean-docs:
 	rm -rf docs/**
 
+.PHONY: clean-coverage
+clean-coverage:
+	rm -rf _coverage *.coverage
+	rm -f coverage.json
+
 .PHONY: clean
-clean: clean-bs clean-native clean-docs
+clean: clean-bs clean-native clean-docs clean-coverage
 
 .PHONY: build-bs
 build-bs:
@@ -60,6 +65,25 @@ test-native: build-native
 .PHONY: test
 test: test-bs test-native
 
+.PHONY: bisect
+bisect:
+	BISECT_ENABLE=yes make test
+
+.PHONY: bisect-html
+bisect-html: bisect
+	bisect-ppx-report html
+
+.PHONY: coveralls-json
+coveralls-json: bisect
+	bisect-ppx-report coveralls --repo-token ${COVERALLS_TOKEN} coverage.json
+
+.PHONY: coveralls-send
+coveralls-send:
+	curl -L -F json_file=@./coverage.json https://coveralls.io/api/v1/jobs
+
+.PHONY: coveralls
+coveralls: coveralls-json coveralls-send
+
 .PHONY: watch-native
 watch-native:
 	dune build @all -w
@@ -71,7 +95,7 @@ watch-bs:
 .PHONY: watch-test-bs
 watch-test-bs:
 	yarn run watch-test
-	
+
 .PHONY: watch-test-native
 watch-test:
 	dune runtest --no-buffer -w

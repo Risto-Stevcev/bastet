@@ -9,7 +9,7 @@
 
 (package
  (name bastet)
- (synopsis "A ReasonML/Ocaml library for category theory and abstract algebra")
+ (synopsis "A ReasonML/OCaml library for category theory and abstract algebra")
  (depends
   (ocaml (>= 4.06.1))
   (reason (>= 3.6.0))
@@ -18,6 +18,7 @@
   (qcheck-alcotest (and (>= 0.13) :with-test))
   (ocamlformat (and (>= 0.13.0) :with-test))
   (mdx (and (>= 1.6.0) :with-test))
+  (bisect_ppx (and (>= 2.1.0) :with-test))
   (odoc (and (>= 1.5.0) :with-doc))
   (mustache (and (>= 3.1.0) :with-doc))
   (dune (>= 2.2.0))))

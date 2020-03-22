@@ -41,6 +41,11 @@ balanced-match@^1.0.0:
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
 
+bisect_ppx@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/bisect_ppx/-/bisect_ppx-2.1.0.tgz#b1f9b0c125a104c41dc6aaddb8b0e112af618ae4"
+  integrity sha512-wFw+BwOExrX2MbtlNlHY5gNDw8Wsd+aL5ykRdN904aGLrVfuV6YUf1S0+X/4khA8GhibgqC7pLazW4/IvxgPIw==
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"

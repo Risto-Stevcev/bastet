@@ -1,7 +1,7 @@
 {
   "name": "bs-bastet",
   "version": "1.1.0",
-  "description": "A ReasonML/Ocaml library for category theory and abstract algebra",
+  "description": "A ReasonML/OCaml library for category theory and abstract algebra",
   "repository": {
     "type": "git",
     "url": "git://github.com/Risto-Stevcev/bastet.git"
@@ -24,6 +24,7 @@
   "license": "BSD-3-Clause",
   "dependencies": {},
   "devDependencies": {
+    "bisect_ppx": "^2.1.0",
     "bs-chai": "^1.0.1",
     "bs-jsverify": "0.10.0",
     "bs-mocha": "^1.0.0",

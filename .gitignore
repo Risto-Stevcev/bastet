@@ -29,3 +29,5 @@ node_modules
 _build/
 _opam/
 bastet/src/index.mld
+docs/bisect_ppx
+coverage.json
