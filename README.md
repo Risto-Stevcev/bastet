@@ -1,5 +1,6 @@
 ![Bastet](https://raw.githubusercontent.com/Risto-Stevcev/bs-abstract/native-compat/bastet.jpg)
 
+[![npm](https://img.shields.io/npm/v/bs-bastet.svg)](https://npmjs.org/bs-bastet)
 [![Build Status](https://travis-ci.org/Risto-Stevcev/bastet.svg?branch=master)](https://travis-ci.org/Risto-Stevcev/bastet)
 [![Coverage Status](https://coveralls.io/repos/github/Risto-Stevcev/bastet/badge.svg)](https://coveralls.io/github/Risto-Stevcev/bastet)
 [![Release](https://img.shields.io/github/v/tag/Risto-Stevcev/bastet)](https://github.com/Risto-Stevcev/bastet/releases)
