@@ -65,7 +65,7 @@ module Monad: MONAD with type t('a) = array('a) = {
 
 module Alt: ALT with type t('a) = array('a) = {
   include Functor;
-  let alt = (a, b) => ArrayLabels.append(b, a);
+  let alt = (a, b) => ArrayLabels.append(a, b);
 };
 
 module Foldable: FOLDABLE with type t('a) = array('a) = {
