@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/Risto-Stevcev/bastet/badge.svg)](https://coveralls.io/github/Risto-Stevcev/bastet)
 [![Release](https://img.shields.io/github/v/tag/Risto-Stevcev/bastet)](https://github.com/Risto-Stevcev/bastet/releases)
 
-A ReasonML/Ocaml library for category theory and abstract algebra.
+A ReasonML/OCaml library for category theory and abstract algebra.
 
 ## Documentation
 

@@ -4,7 +4,9 @@ synopsis: "A ReasonML/OCaml library for category theory and abstract algebra"
 maintainer: ["me@risto.codes"]
 authors: ["Risto Stevcev"]
 license: "BSD-3-Clause"
+tags: ["category theory" "abstract algebra" "algebra" "cats"]
 homepage: "https://github.com/Risto-Stevcev/bastet"
+doc: "https://risto-stevcev.github.io/bastet"
 bug-reports: "https://github.com/Risto-Stevcev/bastet/issues"
 depends: [
   "ocaml" {>= "4.06.1"}

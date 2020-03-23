@@ -10,6 +10,9 @@
 (package
  (name bastet)
  (synopsis "A ReasonML/OCaml library for category theory and abstract algebra")
+ (documentation "https://risto-stevcev.github.io/bastet")
+ (tags
+  ("category theory" "abstract algebra" "algebra" "cats"))
  (depends
   (ocaml (>= 4.06.1))
   (reason (>= 3.6.0))
