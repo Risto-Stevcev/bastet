@@ -1,6 +1,6 @@
 {
   "name": "bs-bastet",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A ReasonML/OCaml library for category theory and abstract algebra",
   "repository": {
     "type": "git",
