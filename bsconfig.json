@@ -25,6 +25,7 @@
   },
   "suffix": ".bs.js",
   "bs-dependencies": [
+    "bs-stdlib-shims",
     "bisect_ppx"
   ],
   "bs-dev-dependencies": [

@@ -11,6 +11,7 @@ bug-reports: "https://github.com/Risto-Stevcev/bastet/issues"
 depends: [
   "ocaml" {>= "4.06.1"}
   "reason" {>= "3.6.0"}
+  "stdlib-shims" {>= "0.1.0"}
   "alcotest" {>= "1.0.1" & with-test}
   "qcheck" {>= "0.13" & with-test}
   "qcheck-alcotest" {>= "0.13" & with-test}

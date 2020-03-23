@@ -16,6 +16,7 @@
  (depends
   (ocaml (>= 4.06.1))
   (reason (>= 3.6.0))
+  (stdlib-shims (>= 0.1.0))
   (alcotest (and (>= 1.0.1) :with-test))
   (qcheck (and (>= 0.13) :with-test))
   (qcheck-alcotest (and (>= 0.13) :with-test))

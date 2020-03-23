@@ -1,6 +1,7 @@
 (library
  (name bastet)
- (public_name bastet))
+ (public_name bastet)
+ (libraries stdlib-shims))
 
 (documentation
  (package bastet))

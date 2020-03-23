@@ -22,7 +22,9 @@
   ],
   "author": "Risto Stevcev",
   "license": "BSD-3-Clause",
-  "dependencies": {},
+  "dependencies": {
+    "bs-stdlib-shims": "^0.1.0"
+  },
   "devDependencies": {
     "bisect_ppx": "^2.1.0",
     "bs-chai": "^1.0.1",

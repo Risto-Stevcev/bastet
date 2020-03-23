@@ -2,7 +2,7 @@
 open Interface;
 let (flip, const) = Function.(flip, const);
 
-let result: ('a => 'c, 'b => 'c, Pervasives.result('a, 'b)) => 'c =
+let result: ('a => 'c, 'b => 'c, Stdlib.result('a, 'b)) => 'c =
   (f, g, a) =>
     switch (f, g, a) {
     | (f, _, Ok(a')) => f(a')
@@ -10,50 +10,47 @@ let result: ('a => 'c, 'b => 'c, Pervasives.result('a, 'b)) => 'c =
     };
 
 module type MAGMA_F =
-  (T: TYPE, M: MAGMA) => MAGMA with type t = Pervasives.result(M.t, T.t);
+  (T: TYPE, M: MAGMA) => MAGMA with type t = Stdlib.result(M.t, T.t);
 module type MEDIAL_MAGMA_F =
-  (T: TYPE, M: MAGMA) =>
-   MEDIAL_MAGMA with type t = Pervasives.result(M.t, T.t);
+  (T: TYPE, M: MAGMA) => MEDIAL_MAGMA with type t = Stdlib.result(M.t, T.t);
 module type SEMIGROUP_F =
-  (T: TYPE, S: SEMIGROUP) =>
-   SEMIGROUP with type t = Pervasives.result(S.t, T.t);
+  (T: TYPE, S: SEMIGROUP) => SEMIGROUP with type t = Stdlib.result(S.t, T.t);
 module type FUNCTOR_F =
-  (T: TYPE) => FUNCTOR with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => FUNCTOR with type t('a) = Stdlib.result('a, T.t);
 module type APPLY_F =
-  (T: TYPE) => APPLY with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => APPLY with type t('a) = Stdlib.result('a, T.t);
 module type APPLICATIVE_F =
-  (T: TYPE) => APPLICATIVE with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => APPLICATIVE with type t('a) = Stdlib.result('a, T.t);
 module type MONAD_F =
-  (T: TYPE) => MONAD with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => MONAD with type t('a) = Stdlib.result('a, T.t);
 module type ALT_F =
-  (T: TYPE) => ALT with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => ALT with type t('a) = Stdlib.result('a, T.t);
 module type EXTEND_F =
-  (T: TYPE) => EXTEND with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => EXTEND with type t('a) = Stdlib.result('a, T.t);
 module type SHOW_F =
-  (Ok: SHOW, Error: SHOW) =>
-   SHOW with type t = Pervasives.result(Ok.t, Error.t);
+  (Ok: SHOW, Error: SHOW) => SHOW with type t = Stdlib.result(Ok.t, Error.t);
 module type EQ_F =
-  (Ok: EQ, Error: EQ) => EQ with type t = Pervasives.result(Ok.t, Error.t);
+  (Ok: EQ, Error: EQ) => EQ with type t = Stdlib.result(Ok.t, Error.t);
 module type ORD_F =
-  (Ok: ORD, Error: ORD) => ORD with type t = Pervasives.result(Ok.t, Error.t);
+  (Ok: ORD, Error: ORD) => ORD with type t = Stdlib.result(Ok.t, Error.t);
 module type BOUNDED_F =
   (Ok: BOUNDED, Error: BOUNDED) =>
-   BOUNDED with type t = Pervasives.result(Ok.t, Error.t);
+   BOUNDED with type t = Stdlib.result(Ok.t, Error.t);
 module type FOLDABLE_F =
-  (T: TYPE) => FOLDABLE with type t('a) = Pervasives.result('a, T.t);
+  (T: TYPE) => FOLDABLE with type t('a) = Stdlib.result('a, T.t);
 module type TRAVERSABLE_F =
   (T: TYPE, A: APPLICATIVE) =>
-   TRAVERSABLE with type t('a) = Pervasives.result('a, T.t);
+   TRAVERSABLE with type t('a) = Stdlib.result('a, T.t);
 module type BITRAVERSABLE_F =
   (A: APPLICATIVE) =>
 
     BITRAVERSABLE with
-      type t('a, 'b) = Pervasives.result('a, 'b) and
+      type t('a, 'b) = Stdlib.result('a, 'b) and
       type applicative_t('a) = A.t('a);
 
 module Magma: MAGMA_F =
   (T: TYPE, M: MAGMA) => {
-    type t = Pervasives.result(M.t, T.t);
+    type t = Stdlib.result(M.t, T.t);
     let append = (a, b) =>
       switch (a, b) {
       | (Ok(a'), Ok(b')) => Ok(M.append(a', b'))
@@ -75,7 +72,7 @@ module Semigroup: SEMIGROUP_F =
 
 module Functor: FUNCTOR_F =
   (T: TYPE) => {
-    type t('a) = Pervasives.result('a, T.t);
+    type t('a) = Stdlib.result('a, T.t);
     let map = (f, a) =>
       switch (a) {
       | Ok(r) => Ok(f(r))
@@ -83,8 +80,8 @@ module Functor: FUNCTOR_F =
       };
   };
 
-module Bifunctor: BIFUNCTOR with type t('a, 'b) = Pervasives.result('a, 'b) = {
-  type t('a, 'b) = Pervasives.result('a, 'b);
+module Bifunctor: BIFUNCTOR with type t('a, 'b) = Stdlib.result('a, 'b) = {
+  type t('a, 'b) = Stdlib.result('a, 'b);
   let bimap = (f, g, a) =>
     switch (a) {
     | Ok(a') => Ok(f(a'))
@@ -140,13 +137,13 @@ module Extend: EXTEND_F =
 
 module Show: SHOW_F =
   (Ok: SHOW, Error: SHOW) => {
-    type t = Pervasives.result(Ok.t, Error.t);
+    type t = Stdlib.result(Ok.t, Error.t);
     let show = result(Ok.show, Error.show);
   };
 
 module Eq: EQ_F =
   (Ok: EQ, Error: EQ) => {
-    type t = Pervasives.result(Ok.t, Error.t);
+    type t = Stdlib.result(Ok.t, Error.t);
     let eq = (a, b) =>
       switch (a, b) {
       | (Ok(a'), Ok(b')) => Ok.eq(a', b')
@@ -182,30 +179,28 @@ module Many_Valued_Logic = {
    */
 
   module type EQ_F =
-    (Ok: TYPE, Error: TYPE) =>
-     EQ with type t = Pervasives.result(Ok.t, Error.t);
+    (Ok: TYPE, Error: TYPE) => EQ with type t = Stdlib.result(Ok.t, Error.t);
   module type ORD_F =
-    (Ok: TYPE, Error: TYPE) =>
-     ORD with type t = Pervasives.result(Ok.t, Error.t);
+    (Ok: TYPE, Error: TYPE) => ORD with type t = Stdlib.result(Ok.t, Error.t);
   module type JOIN_SEMILATTICE_F =
     (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) =>
-     JOIN_SEMILATTICE with type t = Pervasives.result(Ok.t, Error.t);
+     JOIN_SEMILATTICE with type t = Stdlib.result(Ok.t, Error.t);
   module type MEET_SEMILATTICE_F =
     (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) =>
-     MEET_SEMILATTICE with type t = Pervasives.result(Ok.t, Error.t);
+     MEET_SEMILATTICE with type t = Stdlib.result(Ok.t, Error.t);
   module type BOUNDED_JOIN_SEMILATTICE_F =
     (Ok: BOUNDED_JOIN_SEMILATTICE, Error: BOUNDED_JOIN_SEMILATTICE) =>
-     BOUNDED_JOIN_SEMILATTICE with type t = Pervasives.result(Ok.t, Error.t);
+     BOUNDED_JOIN_SEMILATTICE with type t = Stdlib.result(Ok.t, Error.t);
   module type BOUNDED_MEET_SEMILATTICE_F =
     (Ok: BOUNDED_MEET_SEMILATTICE, Error: BOUNDED_MEET_SEMILATTICE) =>
-     BOUNDED_MEET_SEMILATTICE with type t = Pervasives.result(Ok.t, Error.t);
+     BOUNDED_MEET_SEMILATTICE with type t = Stdlib.result(Ok.t, Error.t);
   module type HEYTING_ALGEBRA_F =
     (Ok: HEYTING_ALGEBRA, Error: HEYTING_ALGEBRA) =>
-     HEYTING_ALGEBRA with type t = Pervasives.result(Ok.t, Error.t);
+     HEYTING_ALGEBRA with type t = Stdlib.result(Ok.t, Error.t);
 
   module Quasireflexive_Eq: EQ_F =
     (Ok: TYPE, Error: TYPE) => {
-      type t = Pervasives.result(Ok.t, Error.t);
+      type t = Stdlib.result(Ok.t, Error.t);
       /* Quasi-reflexive */
       let eq = (a, b) =>
         switch (a, b) {
@@ -230,7 +225,7 @@ module Many_Valued_Logic = {
 
   module Join_Semilattice: JOIN_SEMILATTICE_F =
     (Ok: JOIN_SEMILATTICE, Error: JOIN_SEMILATTICE) => {
-      type t = Pervasives.result(Ok.t, Error.t);
+      type t = Stdlib.result(Ok.t, Error.t);
       let join = (a, b) =>
         switch (a, b) {
         | (Ok(a'), Ok(b')) => Ok(Ok.join(a', b'))
@@ -242,7 +237,7 @@ module Many_Valued_Logic = {
 
   module Meet_Semilattice: MEET_SEMILATTICE_F =
     (Ok: MEET_SEMILATTICE, Error: MEET_SEMILATTICE) => {
-      type t = Pervasives.result(Ok.t, Error.t);
+      type t = Stdlib.result(Ok.t, Error.t);
       let meet = (a, b) =>
         switch (a, b) {
         | (Ok(a'), Ok(b')) => Ok(Ok.meet(a', b'))
@@ -323,7 +318,7 @@ module Many_Valued_Logic = {
 
 module Foldable: FOLDABLE_F =
   (T: TYPE) => {
-    type t('a) = Pervasives.result('a, T.t);
+    type t('a) = Stdlib.result('a, T.t);
 
     let fold_left = (f, initial, a) =>
       switch (a) {
@@ -359,8 +354,8 @@ module Foldable: FOLDABLE_F =
     };
   };
 
-module Bifoldable: BIFOLDABLE with type t('a, 'b) = Pervasives.result('a, 'b) = {
-  type t('a, 'b) = Pervasives.result('a, 'b);
+module Bifoldable: BIFOLDABLE with type t('a, 'b) = Stdlib.result('a, 'b) = {
+  type t('a, 'b) = Stdlib.result('a, 'b);
 
   let bifold_left = (f, g, initial, a) =>
     switch (a) {
@@ -388,7 +383,7 @@ module Traversable: TRAVERSABLE_F =
   (T: TYPE, A: APPLICATIVE) => {
     module E = Applicative(T);
 
-    type t('a) = Pervasives.result('a, T.t)
+    type t('a) = Stdlib.result('a, T.t)
     and applicative_t('a) = A.t('a);
 
     include (Functor(T): FUNCTOR with type t('a) := t('a));
@@ -409,7 +404,7 @@ module Traversable: TRAVERSABLE_F =
 module Bitraversable = (A: APPLICATIVE) => {
   module I = Infix.Apply(A);
 
-  type t('a, 'b) = Pervasives.result('a, 'b)
+  type t('a, 'b) = Stdlib.result('a, 'b)
   and applicative_t('a) = A.t('a);
 
   include (Bifunctor: BIFUNCTOR with type t('a, 'b) := t('a, 'b));
@@ -432,7 +427,7 @@ module Infix = {
 };
 
 module Choose = (A: ALT) => {
-  let choose: (A.t('a), A.t('b)) => A.t(Pervasives.result('a, 'b)) =
+  let choose: (A.t('a), A.t('b)) => A.t(Stdlib.result('a, 'b)) =
     (a, b) => A.alt(A.map(x => Ok(x), a), A.map(x => Error(x), b));
 };
 
@@ -453,7 +448,7 @@ module Unsafe = {
 
 let is_ok = a => result(const(true), const(false), a)
 and is_error = a => result(const(false), const(true), a)
-and note: ('err, option('a)) => Pervasives.result('a, 'err) =
+and note: ('err, option('a)) => Stdlib.result('a, 'err) =
   default => Option.maybe(~f=x => Ok(x), ~default=Error(default))
-and hush: Pervasives.result('a, 'err) => option('a) =
+and hush: Stdlib.result('a, 'err) => option('a) =
   e => result(Option.Applicative.pure, const(None), e);
