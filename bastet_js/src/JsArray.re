@@ -1,5 +1,10 @@
 open Interface;
 
+/**
+ This module provdes [Js.Array]-sepcific implementations for those who want things to compile into
+ clean javascript code. You can still use {!Array} on the JS side if this doesn't matter to you.
+ */
+
 let zip_with: (('a, 'b) => 'c, array('a), array('b)) => array('c) =
   (f, xs, ys) => {
     let l =

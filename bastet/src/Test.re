@@ -1429,6 +1429,21 @@ module Array =
     );
   };
 
+  let alt_order = {
+    T.suite(
+      "Array.Alt.alt",
+      [
+        T.test("should order the arrays correctly", () => {
+          T.check(
+            T.array(T.int),
+            Array.Alt.alt([|1, 2, 3|], [|4, 5|]),
+            [|1, 2, 3, 4, 5|],
+          )
+        }),
+      ],
+    );
+  };
+
   let suites =
     [
       Functor.suite,
@@ -1449,6 +1464,7 @@ module Array =
          traversable,
          show,
          extend,
+         alt_order,
        ]);
 };
 
@@ -1863,6 +1879,21 @@ module List =
     );
   };
 
+  let alt_order = {
+    T.suite(
+      "List.Alt.alt",
+      [
+        T.test("should order the lists correctly", () => {
+          T.check(
+            T.list(T.int),
+            List.Alt.alt([1, 2, 3], [4, 5]),
+            [1, 2, 3, 4, 5],
+          )
+        }),
+      ],
+    );
+  };
+
   let suites =
     [
       Functor.suite,
@@ -1873,7 +1904,7 @@ module List =
       Eq.suite,
     ]
     |> ListLabels.map(~f=suite => suite("List"))
-    |> ListLabels.append([foldable, unfoldable, traversable, show]);
+    |> ListLabels.append([foldable, unfoldable, traversable, show, alt_order]);
 };
 
 module Int =
