@@ -1,4 +1,4 @@
-(lang dune 2.2.0)
+(lang dune 2.0.1)
 (name bastet)
 (source (github Risto-Stevcev/bastet))
 (license BSD-3-Clause)
@@ -24,4 +24,4 @@
   (bisect_ppx (and (>= 2.1.0) :with-test))
   (odoc (and (>= 1.5.0) :with-doc))
   (mustache (and (>= 3.1.0) :with-doc))
-  (dune (>= 2.2.0))))
+  (dune (>= 2.0.1))))
