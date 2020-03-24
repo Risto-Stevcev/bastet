@@ -19,6 +19,7 @@
   (alcotest (and (>= 1.0.1) :with-test))
   (qcheck (and (>= 0.13) :with-test))
   (qcheck-alcotest (and (>= 0.13) :with-test))
+  (merlin (and (>= 3.3.3) :with-test))
   (ocamlformat (and (>= 0.13.0) :with-test))
   (mdx (and (>= 1.6.0) :with-test))
   (bisect_ppx (and (>= 2.1.0) :with-test))
