@@ -40,10 +40,12 @@ module type FOLDABLE_F =
   (T: TYPE) => FOLDABLE with type t('a) = result('a, T.t);
 module type TRAVERSABLE_F =
   (T: TYPE, A: APPLICATIVE) =>
-   TRAVERSABLE with type t('a) = result('a, T.t);
+    TRAVERSABLE with
+      type t('a) = result('a, T.t) and
+      type applicative_t('a) = A.t('a);
+
 module type BITRAVERSABLE_F =
   (A: APPLICATIVE) =>
-
     BITRAVERSABLE with
       type t('a, 'b) = result('a, 'b) and
       type applicative_t('a) = A.t('a);
@@ -401,9 +403,7 @@ module Traversable: TRAVERSABLE_F =
       };
   };
 
-module Bitraversable = (A: APPLICATIVE) => {
-  module I = Infix.Apply(A);
-
+module Bitraversable: BITRAVERSABLE_F = (A: APPLICATIVE) => {
   type t('a, 'b) = result('a, 'b)
   and applicative_t('a) = A.t('a);
 
