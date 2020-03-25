@@ -38,11 +38,16 @@ module Functor: FUNCTOR with type t('a) = array('a) = {
   let map = f => ArrayLabels.map(~f);
 };
 
+module Alt: ALT with type t('a) = array('a) = {
+  include Functor;
+  let alt = (a, b) => ArrayLabels.append(a, b);
+};
+
 module Apply: APPLY with type t('a) = array('a) = {
   include Functor;
   let apply = (fn_array, a) =>
     ArrayLabels.fold_left(
-      ~f=(acc, f) => ArrayLabels.append(acc, map(f, a)),
+      ~f=(acc, f) => Alt.alt(acc, map(f, a)),
       ~init=[||],
       fn_array,
     );
@@ -57,15 +62,10 @@ module Monad: MONAD with type t('a) = array('a) = {
   include Applicative;
   let flat_map = (x, f) =>
     ArrayLabels.fold_left(
-      ~f=(acc, a) => ArrayLabels.append(acc, f(a)),
+      ~f=(acc, a) => Alt.alt(acc, f(a)),
       ~init=[||],
       x,
     );
-};
-
-module Alt: ALT with type t('a) = array('a) = {
-  include Functor;
-  let alt = (a, b) => ArrayLabels.append(a, b);
 };
 
 module Foldable: FOLDABLE with type t('a) = array('a) = {
@@ -114,7 +114,7 @@ module Unfoldable: UNFOLDABLE with type t('a) = array('a) = {
 
   let rec unfold = (f, init) =>
     switch (f(init)) {
-    | Some((a, next)) => ArrayLabels.concat([[|a|], unfold(f, next)])
+    | Some((a, next)) => Alt.alt([|a|], unfold(f, next))
     | None => [||]
     };
 };
@@ -134,7 +134,7 @@ module Traversable: TRAVERSABLE_F =
         ArrayLabels.fold_right(
           ~f=
             (acc, x) =>
-              A.pure((x, y) => ArrayLabels.append([|x|], y))
+              A.pure((x, y) => Alt.alt([|x|], y))
               <*> f(acc)
               <*> x,
           ~init=A.pure([||]),
