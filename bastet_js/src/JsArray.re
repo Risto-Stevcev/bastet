@@ -132,7 +132,8 @@ module Eq: Array.EQ_F =
   (E: EQ) => {
     type t = array(E.t);
     let eq = (xs, ys) =>
-      Js.Array.every(((a, b)) => E.eq(a, b), zip(xs, ys));
+      Js.Array.length(xs) == Js.Array.length(ys)
+      && Js.Array.every(((a, b)) => E.eq(a, b), zip(xs, ys));
   };
 
 module Ord: Array.ORD_F =
