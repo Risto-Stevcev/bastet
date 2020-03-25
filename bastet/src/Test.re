@@ -1235,148 +1235,9 @@ module Make = (T: TEST, Q: QUICKCHECK with type t = T.test) => {
   };
 };
 
-module JsArray =
-       (
-         T: TEST,
-         Q: QUICKCHECK with type t = T.test,
-         A:
-           ARBITRARY with
-             type t = array(int) and type arbitrary('a) = Q.arbitrary('a),
-         AA:
-           ARBITRARY_A with
-             type t('a) = array('a) and
-             type arbitrary('a) = Q.arbitrary('a),
-       ) => {
-  module M = Make(T, Q);
-
-  module Functor = M.Functor(JsArray.Functor, AA);
-  module Monad = M.Monad(JsArray.Monad, AA);
-  module Alt = M.Alt(JsArray.Alt, AA);
-  module Eq = M.Eq(JsArray.Eq(Int.Eq), A);
-  module Ord = M.Ord(JsArray.Ord(Int.Ord), A);
-
-  let zip_with =
-    T.suite(
-      "JsArray.zip_with",
-      [
-        T.test("should zip_with two arrays", () => {
-          T.check(
-            T.array(T.int),
-            JsArray.zip_with(( * ), [|1, 2, 3|], [|4, 5, 6|]),
-            [|4, 10, 18|],
-          )
-        }),
-      ],
-    );
-
-  let zip =
-    T.suite(
-      "JsArray.zip",
-      [
-        T.test("should zip two arrays", () => {
-          T.check(
-            T.array(T.tuple(T.int, T.string)),
-            JsArray.zip([|1, 2, 3|], [|"a", "b", "c"|]),
-            [|(1, "a"), (2, "b"), (3, "c")|],
-          )
-        }),
-      ],
-    );
-
-  let foldable =
-    T.suite(
-      "JsArray.Foldable",
-      [
-        T.test("should do a left fold", () => {
-          T.check(
-            T.int,
-            JsArray.Foldable.fold_left((+), 0, [|1, 2, 3, 4, 5|]),
-            15,
-          );
-          T.check(T.int, JsArray.Foldable.fold_left((-), 10, [|3, 2, 1|]), 4);
-        }),
-        T.test("should do a right fold", () => {
-          T.check(
-            T.int,
-            JsArray.Foldable.fold_right((-), 10, [|3, 2, 1|]),
-            -8,
-          )
-        }),
-      ],
-    );
-
-  let unfoldable =
-    T.suite(
-      "JsArray.Unfoldable",
-      [
-        T.test("should do an unfold", () => {
-          T.check(
-            T.array(T.int),
-            JsArray.Unfoldable.unfold(
-              x =>
-                if (x > 5) {
-                  None;
-                } else {
-                  Some((x, x + 1));
-                },
-              0,
-            ),
-            [|0, 1, 2, 3, 4, 5|],
-          )
-        }),
-        T.test("should do an unfold", () => {
-          T.check(
-            T.array(T.int),
-            JsArray.Unfoldable.unfold(
-              x =>
-                if (x > 20) {
-                  None;
-                } else {
-                  Some((x, x + 5));
-                },
-              0,
-            ),
-            [|0, 5, 10, 15, 20|],
-          )
-        }),
-      ],
-    );
-
-  let alt_order = {
-    T.suite(
-      "JsArray.Alt.alt",
-      [
-        T.test("should order the arrays correctly", () => {
-          T.check(
-            T.array(T.int),
-            JsArray.Alt.alt([|1, 2, 3|], [|4, 5|]),
-            [|1, 2, 3, 4, 5|],
-          )
-        }),
-      ],
-    );
-  };
-
-  let suites =
-    [
-      Functor.suite,
-      Monad.suite,
-      Alt.suite,
-      Eq.suite,
-      Ord.suite,
-    ]
-    |> ListLabels.map(~f=suite => suite("JsArray"))
-    |> ListLabels.append([
-         zip_with,
-         zip,
-         foldable,
-         unfoldable,
-         alt_order,
-       ]);
-};
-
 module Array =
        (
+         Arr: ArrayF.ARRAY,
          T: TEST,
          Q: QUICKCHECK with type t = T.test,
          A:
@@ -1389,14 +1250,14 @@ module Array =
        ) => {
   module M = Make(T, Q);
 
-  module Functor = M.Functor(Array.Functor, AA);
-  module Apply = M.Apply(Array.Applicative, AA);
-  module Applicative = M.Applicative(Array.Applicative, AA);
-  module Monad = M.Monad(Array.Monad, AA);
-  module Alt = M.Alt(Array.Alt, AA);
+  module Functor = M.Functor(Arr.Functor, AA);
+  module Apply = M.Apply(Arr.Applicative, AA);
+  module Applicative = M.Applicative(Arr.Applicative, AA);
+  module Monad = M.Monad(Arr.Monad, AA);
+  module Alt = M.Alt(Arr.Alt, AA);
   module Eq = M.Eq(Functors.ArrayF.Int.Eq, A);
   module Ord = M.Ord(Functors.ArrayF.Int.Ord, A);
-  module Invariant = M.Invariant(Array.Invariant, AA);
+  module Invariant = M.Invariant(Arr.Invariant, AA);
 
   let zip_with =
     T.suite(
@@ -1405,7 +1266,7 @@ module Array =
         T.test("should zip_with two arrays", () => {
           T.check(
             T.array(T.int),
-            Array.zip_with(( * ), [|1, 2, 3|], [|4, 5, 6|]),
+            Arr.zip_with(( * ), [|1, 2, 3|], [|4, 5, 6|]),
             [|4, 10, 18|],
           )
         }),
@@ -1419,7 +1280,7 @@ module Array =
         T.test("should zip two arrays", () => {
           T.check(
             T.array(T.tuple(T.int, T.string)),
-            Array.zip([|1, 2, 3|], [|"a", "b", "c"|]),
+            Arr.zip([|1, 2, 3|], [|"a", "b", "c"|]),
             [|(1, "a"), (2, "b"), (3, "c")|],
           )
         }),
@@ -1433,17 +1294,13 @@ module Array =
         T.test("should do a left fold", () => {
           T.check(
             T.int,
-            Array.Foldable.fold_left((+), 0, [|1, 2, 3, 4, 5|]),
+            Arr.Foldable.fold_left((+), 0, [|1, 2, 3, 4, 5|]),
             15,
           );
-          T.check(T.int, Array.Foldable.fold_left((-), 10, [|3, 2, 1|]), 4);
+          T.check(T.int, Arr.Foldable.fold_left((-), 10, [|3, 2, 1|]), 4);
         }),
         T.test("should do a right fold", () => {
-          T.check(
-            T.int,
-            Array.Foldable.fold_right((-), 10, [|3, 2, 1|]),
-            -8,
-          )
+          T.check(T.int, Arr.Foldable.fold_right((-), 10, [|3, 2, 1|]), -8)
         }),
         T.test("should do a map fold (int)", () => {
           let fold_map = Functors.ArrayF.Int.Additive.Fold_Map.fold_map;
@@ -1467,7 +1324,7 @@ module Array =
         T.test("should do an unfold", () => {
           T.check(
             T.array(T.int),
-            Array.Unfoldable.unfold(
+            Arr.Unfoldable.unfold(
               x =>
                 if (x > 5) {
                   None;
@@ -1482,7 +1339,7 @@ module Array =
         T.test("should do an unfold", () => {
           T.check(
             T.array(T.int),
-            Array.Unfoldable.unfold(
+            Arr.Unfoldable.unfold(
               x =>
                 if (x > 20) {
                   None;
@@ -1534,7 +1391,7 @@ module Array =
   };
 
   let show = {
-    module S = Array.Show(Int.Show);
+    module S = Arr.Show(Int.Show);
 
     T.suite(
       "Array.Show",
@@ -1551,7 +1408,7 @@ module Array =
   };
 
   let extend = {
-    module V = Verify.Extend(Array.Extend);
+    module V = Verify.Extend(Arr.Extend);
     let id = Function.Category.id;
     let (<.) = Function.Infix.(<.);
     let fold = Functors.ArrayF.Int.Additive.Fold_Map.fold_map(id);
@@ -1576,7 +1433,7 @@ module Array =
         T.test("should order the arrays correctly", () => {
           T.check(
             T.array(T.int),
-            Array.Alt.alt([|1, 2, 3|], [|4, 5|]),
+            Arr.Alt.alt([|1, 2, 3|], [|4, 5|]),
             [|1, 2, 3, 4, 5|],
           )
         }),

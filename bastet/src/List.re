@@ -12,11 +12,16 @@ module Functor: FUNCTOR with type t('a) = list('a) = {
   let map = f => ListLabels.map(~f);
 };
 
+module Alt: ALT with type t('a) = list('a) = {
+  include Functor;
+  let alt = ListLabels.append;
+};
+
 module Apply: APPLY with type t('a) = list('a) = {
   include Functor;
   let apply = (fn_array, a) =>
     ListLabels.fold_left(
-      ~f=(acc, f) => ListLabels.append(acc, map(f, a)),
+      ~f=(acc, f) => Alt.alt(acc, map(f, a)),
       ~init=[],
       fn_array,
     );
@@ -31,15 +36,10 @@ module Monad: MONAD with type t('a) = list('a) = {
   include Applicative;
   let flat_map = (x, f) =>
     ListLabels.fold_left(
-      ~f=(acc, a) => ListLabels.append(acc, f(a)),
+      ~f=(acc, a) => Alt.alt(acc, f(a)),
       ~init=[],
       x,
     );
-};
-
-module Alt: ALT with type t('a) = list('a) = {
-  include Functor;
-  let alt = ListLabels.append;
 };
 
 module Plus: PLUS with type t('a) = list('a) = {

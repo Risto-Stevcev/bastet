@@ -18,6 +18,7 @@ module ArbitraryArrayInt:
 
 module TestArray =
   Bastet.Test.Array(
+    Bastet.Array,
     AlcotestI.Test,
     QCheckI.Quickcheck,
     ArbitraryArrayInt,
