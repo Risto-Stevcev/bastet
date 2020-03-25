@@ -44,7 +44,7 @@ module Apply: APPLY with type t('a) = array('a) = {
 module Monad: MONAD with type t('a) = array('a) = {
   include Array.Applicative;
   let flat_map = (x, f) =>
-    Js.Array.reduce((acc, a) => Js.Array.concat(acc, f(a)), [||], x);
+    Js.Array.reduce((acc, a) => Js.Array.concat(f(a), acc), [||], x);
 };
 
 module Foldable: FOLDABLE with type t('a) = array('a) = {
@@ -93,7 +93,7 @@ module Unfoldable: UNFOLDABLE with type t('a) = array('a) = {
 
   let rec unfold = (f, init) =>
     switch (f(init)) {
-    | Some((a, next)) => Js.Array.concat([|a|], unfold(f, next))
+    | Some((a, next)) => Js.Array.concat(unfold(f, next), [|a|])
     | None => [||]
     };
 };
