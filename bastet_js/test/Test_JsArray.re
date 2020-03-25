@@ -21,7 +21,7 @@ module ArbitraryArrayInt:
 };
 
 module TestArray =
-  Test.Array(
+  Test.JsArray(
     MochaI.Test,
     JsVerifyI.Quickcheck,
     ArbitraryArrayInt,
