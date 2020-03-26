@@ -103,3 +103,22 @@ watch-test:
 .PHONY: utop
 utop:
 	dune utop .
+
+.PHONY: remove-switch
+remove-switch:
+	opam switch remove -y .
+
+.PHONY: dev-tools
+dev-tools:
+	opam install -y merlin ocamlformat utop
+
+.PHONY: 4.06-switch
+4.06-switch: remove-switch
+	opam switch create -y . 4.06.1 -t -d
+	make dev-tools
+
+.PHONY: default-switch
+default-switch: remove-switch
+	opam switch create -y . -t -d
+	make dev-tools
+	eval $(opam env)

@@ -14,8 +14,6 @@ depends: [
   "alcotest" {>= "1.0.1" & with-test}
   "qcheck" {>= "0.13" & with-test}
   "qcheck-alcotest" {>= "0.13" & with-test}
-  "merlin" {>= "3.3.3" & with-test}
-  "ocamlformat" {>= "0.13.0" & with-test}
   "mdx" {>= "1.6.0" & with-test}
   "bisect_ppx" {>= "2.1.0" & with-test}
   "odoc" {>= "1.5.0" & with-doc}
