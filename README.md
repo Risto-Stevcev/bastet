@@ -26,7 +26,7 @@ And add the dependency to your bs-dependencies in `bsconfig.json`:
 
 ```json
 "bs-dependencies": [
-  "bastet"
+  "bs-bastet"
 ]
 ```
 
