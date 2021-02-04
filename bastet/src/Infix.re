@@ -10,7 +10,7 @@ module Magma_Any = (M: MAGMA_ANY) => {
 
 module Functor = (F: FUNCTOR) => {
   let (<$>) = F.map
-  and (<#>) = (f, x) => F.map(x, f);
+  and (<@>) = (f, x) => F.map(x, f);
 };
 
 module Apply = (A: APPLY) => {
