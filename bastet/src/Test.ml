@@ -1,0 +1,1412 @@
+module type TEST = sig
+  type test
+
+  type 'a suite
+
+  type 'a check
+
+  val int : int check
+
+  val bool : bool check
+
+  val string : string check
+
+  val array : 'a check -> 'a array check
+
+  val option : 'a check -> 'a option check
+
+  val list : 'a check -> 'a list check
+
+  val tuple : 'a check -> 'b check -> ('a * 'b) check
+
+  val check : 'a check -> ?name:string -> 'a -> 'a -> unit
+
+  val test : string -> (unit -> unit) -> test
+
+  val suite : string -> test list -> test suite
+end
+[@@ocaml.doc "\n These helpers provide generative tests for implementations.\n "]
+
+module type ARBITRARY = sig
+  type t
+
+  type 'a arbitrary
+
+  val make : t arbitrary
+end
+
+module type ARBITRARY_A = sig
+  type 'a t
+  [@@ocaml.doc
+    " Generic helper to make an [arbitrary(t('a))] type from a given [arbitrary('a)] type. "]
+
+  type 'a arbitrary
+
+  val make : 'a arbitrary -> 'a t arbitrary
+
+  val make_bound : 'a arbitrary -> 'a t arbitrary
+end
+
+module type QUICKCHECK = sig
+  type t
+  [@@ocaml.doc
+    "\n\
+    \  This module type is required to create the generative tests. Provide the framework-specific\n\
+    \  implementations here (ie: qcheck, jsverify,etc).\n\
+    \  "]
+
+  type 'a arbitrary
+
+  val arbitrary_int : int arbitrary
+
+  val property : ?count:int -> ?name:string -> 'a arbitrary -> ('a -> bool) -> t
+
+  val property2 :
+    ?count:int -> ?name:string -> 'a arbitrary -> 'b arbitrary -> ('a -> 'b -> bool) -> t
+
+  val property3 :
+    ?count:int ->
+    ?name:string ->
+    'a arbitrary ->
+    'b arbitrary ->
+    'c arbitrary ->
+    ('a -> 'b -> 'c -> bool) ->
+    t
+
+  val property4 :
+    ?count:int ->
+    ?name:string ->
+    'a arbitrary ->
+    'b arbitrary ->
+    'c arbitrary ->
+    'd arbitrary ->
+    ('a -> 'b -> 'c -> 'd -> bool) ->
+    t
+end
+
+module Make (T : TEST) (Q : QUICKCHECK with type t = T.test) = struct
+  type t
+
+  type 'a arbitrary
+
+  let ( <. ) = Function.Infix.( <. )
+
+  module Compare = struct
+    module Medial_Magma
+        (M : Interface.MEDIAL_MAGMA)
+        (E : Interface.EQ with type t = M.t)
+        (A : ARBITRARY with type t := M.t and type 'a arbitrary := 'a Q.arbitrary) =
+    struct
+      module V = Verify.Compare.Medial_Magma (M) (E)
+
+      let suite name =
+        T.suite
+          (name ^ ".Medial_Magma")
+          [
+            Q.property4
+              ~name:"should satisfy bicommutativity"
+              A.make
+              A.make
+              A.make
+              A.make
+              V.bicommutativity;
+          ]
+    end
+
+    module Quasigroup
+        (QG : Interface.QUASIGROUP)
+        (E : Interface.EQ with type t = QG.t)
+        (A : ARBITRARY with type t := QG.t and type 'a arbitrary := 'a Q.arbitrary) =
+    struct
+      module V = Verify.Compare.Quasigroup (QG) (E)
+
+      let suite name =
+        T.suite
+          (name ^ ".Quasigroup")
+          [Q.property3 ~name:"should satisfy associativity" A.make A.make A.make V.cancellative]
+    end
+
+    module Semiring
+        (S : Interface.SEMIRING)
+        (E : Interface.EQ with type t = S.t)
+        (A : ARBITRARY with type t := S.t and type 'a arbitrary := 'a Q.arbitrary) =
+    struct
+      module V = Verify.Compare.Semiring (S) (E)
+
+      let suite name =
+        T.suite
+          (name ^ ".Semiring")
+          [
+            Q.property3
+              ~name:"should satisfy additive associativity"
+              A.make
+              A.make
+              A.make
+              V.additive_associativity;
+            Q.property ~name:"should satisfy additive identity" A.make V.additive_identity;
+            Q.property2 ~name:"should satisfy commutativity" A.make A.make V.commutativity;
+            Q.property3
+              ~name:"should satisfy multiplicative associativity"
+              A.make
+              A.make
+              A.make
+              V.multiplicative_associativity;
+            Q.property
+              ~name:"should satisfy multiplicative identity"
+              A.make
+              V.multiplicative_identity;
+            Q.property3 ~name:"should satisfy distributivity" A.make A.make A.make V.distributivity;
+          ]
+    end
+
+    module Division_Ring
+        (D : Interface.DIVISION_RING)
+        (E : Interface.EQ with type t = D.t)
+        (A : ARBITRARY with type t := D.t and type 'a arbitrary := 'a Q.arbitrary) =
+    struct
+      module V = Verify.Compare.Division_Ring (D) (E)
+
+      let suite name =
+        T.suite
+          (name ^ ".Division_Ring")
+          [
+            T.test "should be a non-zero ring (zero is not one)" (fun () ->
+                T.check T.bool V.non_zero_ring true);
+            Q.property ~name:"should satisfy multiplicative inverse" A.make V.multiplicative_inverse;
+          ]
+    end
+
+    module Euclidean_Ring
+        (E : Interface.EUCLIDEAN_RING)
+        (EQ : Interface.EQ with type t = E.t)
+        (A : ARBITRARY with type t := E.t and type 'a arbitrary := 'a Q.arbitrary) =
+    struct
+      module V = Verify.Compare.Euclidean_Ring (E) (EQ)
+
+      let suite name =
+        T.suite
+          (name ^ ".Euclidean_Ring")
+          [
+            T.test "should be a non-zero ring (zero is not one)" (fun () ->
+                T.check T.bool V.non_zero_ring true);
+            Q.property2 ~name:"should satisfy integral domain" A.make A.make V.integral_domain;
+            Q.property ~name:"should satisfy non negative degree" A.make V.non_negative_degree;
+            Q.property2
+              ~name:"should satisfy the properties for remainder"
+              A.make
+              A.make
+              V.remainder;
+            Q.property2 ~name:"should satisfy submultiplicative" A.make A.make V.submultiplicative;
+          ]
+    end
+  end
+
+  module Medial_Magma
+      (M : Interface.MEDIAL_MAGMA)
+      (A : ARBITRARY with type t := M.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Medial_Magma (M)
+
+    let suite name =
+      T.suite
+        (name ^ ".Medial_Magma")
+        [
+          Q.property4
+            ~name:"should satisfy bicommutativity"
+            A.make
+            A.make
+            A.make
+            A.make
+            V.bicommutativity;
+        ]
+  end
+
+  module Semigroup
+      (S : Interface.SEMIGROUP)
+      (A : ARBITRARY with type t := S.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Semigroup (S)
+
+    let suite name =
+      T.suite
+        (name ^ ".Semigroup")
+        [Q.property3 ~name:"should satisfy associativity" A.make A.make A.make V.associativity]
+  end
+
+  module Quasigroup
+      (QG : Interface.QUASIGROUP)
+      (A : ARBITRARY with type t := QG.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Quasigroup (QG)
+
+    let suite name =
+      T.suite
+        (name ^ ".Quasigroup")
+        [Q.property3 ~name:"should satisfy associativity" A.make A.make A.make V.cancellative]
+  end
+
+  module Loop
+      (L : Interface.LOOP)
+      (A : ARBITRARY with type t := L.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Loop (L)
+
+    let suite name =
+      T.suite (name ^ ".Loop") [Q.property ~name:"should satisfy identity" A.make V.identity]
+  end
+
+  module Group
+      (G : Interface.GROUP)
+      (A : ARBITRARY with type t := G.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Group (G)
+
+    let suite name =
+      T.suite
+        (name ^ ".Group")
+        [
+          Q.property ~name:"should satisfy invertibility" A.make V.invertibility;
+          Q.property3 ~name:"should satisfy associativity" A.make A.make A.make V.associativity;
+        ]
+  end
+
+  module Abelian_Group
+      (G : Interface.ABELIAN_GROUP)
+      (A : ARBITRARY with type t := G.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Abelian_Group (G)
+
+    let suite name =
+      T.suite
+        (name ^ ".Abelian_Group")
+        [Q.property2 ~name:"should satisfy commutativity" A.make A.make V.commutativity]
+  end
+
+  module Monoid
+      (M : Interface.MONOID)
+      (A : ARBITRARY with type t := M.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Monoid (M)
+
+    let suite name =
+      T.suite (name ^ ".Monoid") [Q.property ~name:"should satisfy identity" A.make V.identity]
+  end
+
+  module Functor
+      (F : Interface.FUNCTOR)
+      (AA : ARBITRARY_A with type 'a t := 'a F.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Functor (F)
+
+    let suite name =
+      T.suite
+        (name ^ ".Functor")
+        [
+          Q.property ~name:"should satisfy identity" (AA.make Q.arbitrary_int) V.identity;
+          Q.property ~name:"should satisfy composition" (AA.make Q.arbitrary_int) (fun a ->
+              V.composition (( ^ ) "!") string_of_int a);
+        ]
+  end
+
+  module Apply
+      (A : Interface.APPLICATIVE)
+      (AA : ARBITRARY_A with type 'a t := 'a A.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Apply (A)
+
+    let suite name =
+      T.suite
+        (name ^ ".Apply")
+        [
+          Q.property
+            ~name:"should satisfy associative composition"
+            (AA.make Q.arbitrary_int)
+            (fun n -> V.associative_composition (A.pure (( ^ ) "!")) (A.pure string_of_int) n);
+        ]
+  end
+
+  module Applicative
+      (A : Interface.APPLICATIVE)
+      (AA : ARBITRARY_A with type 'a t := 'a A.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Applicative (A)
+
+    let suite name =
+      T.suite
+        (name ^ ".Applicative")
+        [
+          Q.property ~name:"should satisfy identity" (AA.make Q.arbitrary_int) V.identity;
+          Q.property
+            ~name:"should satisfy homomorphism"
+            (AA.make Q.arbitrary_int)
+            (V.homomorphism (A.map string_of_int));
+          Q.property
+            ~name:"should satisfy interchange"
+            Q.arbitrary_int
+            (V.interchange (A.pure string_of_int));
+        ]
+  end
+
+  module Monad
+      (M : Interface.MONAD)
+      (AA : ARBITRARY_A with type 'a t := 'a M.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Monad (M)
+
+    let suite name =
+      T.suite
+        (name ^ ".Monad")
+        [
+          Q.property
+            ~name:"should satisfy associativity"
+            (AA.make_bound Q.arbitrary_int)
+            (V.associativity (M.pure <. string_of_int) (M.pure <. ( ^ ) "!"));
+          Q.property
+            ~name:"should satisfy identity"
+            Q.arbitrary_int
+            (V.identity (M.pure <. string_of_int));
+        ]
+  end
+
+  module Alt
+      (A : Interface.ALT)
+      (AA : ARBITRARY_A with type 'a t := 'a A.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Alt (A)
+
+    let suite name =
+      T.suite
+        (name ^ ".Alt")
+        [
+          Q.property3
+            ~name:"should satisfy associativity"
+            (AA.make Q.arbitrary_int)
+            (AA.make Q.arbitrary_int)
+            (AA.make Q.arbitrary_int)
+            V.associativity;
+          Q.property2
+            ~name:"should satisfy distributivity"
+            (AA.make Q.arbitrary_int)
+            (AA.make Q.arbitrary_int)
+            (V.distributivity string_of_int);
+        ]
+  end
+
+  module Alternative
+      (A : Interface.ALTERNATIVE)
+      (AA : ARBITRARY_A with type 'a t := 'a A.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Alternative (A)
+
+    let suite name =
+      T.suite
+        (name ^ ".Alternative")
+        [
+          Q.property
+            ~name:"should satisfy distributivity"
+            (AA.make Q.arbitrary_int)
+            (V.distributivity (A.pure (( * ) 2)) (A.pure (( + ) 3)));
+          T.test "should satisfy annihalation" (fun () ->
+              T.check T.bool (V.annihalation (string_of_int |> A.pure)) true);
+        ]
+  end
+
+  module Plus
+      (P : Interface.PLUS)
+      (AA : ARBITRARY_A with type 'a t := 'a P.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Plus (P)
+
+    let suite name =
+      T.suite
+        (name ^ ".Plus")
+        [
+          Q.property ~name:"should satisfy identity" (AA.make Q.arbitrary_int) V.identity;
+          T.test "should satisfy annihalation" (fun () ->
+              T.check T.bool (V.annihalation string_of_int) true);
+        ]
+  end
+
+  module Eq
+      (E : Interface.EQ)
+      (A : ARBITRARY with type t := E.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Eq (E)
+
+    let suite name =
+      T.suite
+        (name ^ ".Eq")
+        [
+          Q.property ~name:"should satisfy reflexivity" A.make V.reflexivity;
+          Q.property2 ~name:"should satisfy symmetry" A.make A.make V.symmetry;
+          Q.property3 ~name:"should satisfy transitivity" A.make A.make A.make V.transitivity;
+        ]
+  end
+
+  module Ord
+      (O : Interface.ORD)
+      (A : ARBITRARY with type t := O.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Ord (O)
+
+    let suite name =
+      T.suite
+        (name ^ ".Ord")
+        [
+          Q.property ~name:"should satisfy reflexivity" A.make V.reflexivity;
+          Q.property2 ~name:"should satisfy antisymmetry" A.make A.make V.antisymmetry;
+          Q.property3 ~name:"should satisfy transitivity" A.make A.make A.make V.transitivity;
+        ]
+  end
+
+  module Join_Semilattice
+      (JS : Interface.JOIN_SEMILATTICE)
+      (A : ARBITRARY with type t := JS.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Join_Semilattice (JS)
+
+    let suite name =
+      T.suite
+        (name ^ ".Join_Semilattice")
+        [
+          Q.property3 ~name:"should satisfy associativity" A.make A.make A.make V.associativity;
+          Q.property2 ~name:"should satisfy commutativity" A.make A.make V.commutativity;
+          Q.property ~name:"should satisfy idempotency" A.make V.idempotency;
+        ]
+  end
+
+  module Meet_Semilattice
+      (MS : Interface.MEET_SEMILATTICE)
+      (A : ARBITRARY with type t := MS.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Meet_Semilattice (MS)
+
+    let suite name =
+      T.suite
+        (name ^ ".Meet_Semilattice")
+        [
+          Q.property3 ~name:"should satisfy associativity" A.make A.make A.make V.associativity;
+          Q.property2 ~name:"should satisfy commutativity" A.make A.make V.commutativity;
+          Q.property ~name:"should satisfy idempotency" A.make V.idempotency;
+        ]
+  end
+
+  module Bounded_Join_Semilattice
+      (BJS : Interface.BOUNDED_JOIN_SEMILATTICE)
+      (A : ARBITRARY with type t := BJS.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Bounded_Join_Semilattice (BJS)
+
+    let suite name =
+      T.suite
+        (name ^ ".Bounded_Join_Semilattice")
+        [Q.property ~name:"should satisfy identity" A.make V.identity]
+  end
+
+  module Bounded_Meet_Semilattice
+      (BMS : Interface.BOUNDED_MEET_SEMILATTICE)
+      (A : ARBITRARY with type t := BMS.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Bounded_Meet_Semilattice (BMS)
+
+    let suite name =
+      T.suite
+        (name ^ ".Bounded_Meet_Semilattice")
+        [Q.property ~name:"should satisfy identity" A.make V.identity]
+  end
+
+  module Lattice
+      (L : Interface.LATTICE)
+      (A : ARBITRARY with type t := L.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Lattice (L)
+
+    let suite name =
+      T.suite
+        (name ^ ".Lattice")
+        [Q.property2 ~name:"should satisfy absorption" A.make A.make V.absorption]
+  end
+
+  module Bounded_Lattice
+      (BL : Interface.BOUNDED_LATTICE)
+      (A : ARBITRARY with type t := BL.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Bounded_Lattice (BL)
+
+    let suite name =
+      T.suite
+        (name ^ ".Bounded_Lattice")
+        [Q.property2 ~name:"should satisfy absorption" A.make A.make V.absorption]
+  end
+
+  module Distributive_Lattice
+      (DL : Interface.DISTRIBUTIVE_LATTICE)
+      (A : ARBITRARY with type t := DL.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Distributive_Lattice (DL)
+
+    let suite name =
+      T.suite
+        (name ^ ".Distributive_Lattice")
+        [Q.property3 ~name:"should satisfy distributivity" A.make A.make A.make V.distributivity]
+  end
+
+  module Bounded_Distributive_Lattice
+      (BDL : Interface.BOUNDED_DISTRIBUTIVE_LATTICE)
+      (A : ARBITRARY with type t := BDL.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Bounded_Distributive_Lattice (BDL)
+
+    let suite name =
+      T.suite
+        (name ^ ".Bounded_Distributive_Lattice")
+        [Q.property3 ~name:"should satisfy distributivity" A.make A.make A.make V.distributivity]
+  end
+
+  module Heyting_Algebra
+      (HA : Interface.HEYTING_ALGEBRA)
+      (A : ARBITRARY with type t := HA.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Heyting_Algebra (HA)
+
+    let suite name =
+      T.suite
+        (name ^ ".Heyting_Algebra")
+        [
+          Q.property ~name:"should satisfy pseudocomplement" A.make V.pseudocomplement;
+          Q.property3
+            ~name:"should satisfy relative pseudocomplement"
+            A.make
+            A.make
+            A.make
+            V.relative_pseudocomplement;
+        ]
+  end
+
+  module Involutive_Heyting_Algebra
+      (IHA : Interface.INVOLUTIVE_HEYTING_ALGEBRA)
+      (A : ARBITRARY with type t := IHA.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Involutive_Heyting_Algebra (IHA)
+
+    let suite name =
+      T.suite
+        (name ^ ".Involutive_Heyting_Algebra")
+        [Q.property ~name:"should satisfy involution" A.make V.involution]
+  end
+
+  module Boolean_Algebra
+      (BA : Interface.BOOLEAN_ALGEBRA)
+      (A : ARBITRARY with type t := BA.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Boolean_Algebra (BA)
+
+    let suite name =
+      T.suite
+        (name ^ ".Boolean_Algebra")
+        [Q.property ~name:"should satisfy the law of excluded middle" A.make V.excluded_middle]
+  end
+
+  module Bounded
+      (B : Interface.BOUNDED)
+      (A : ARBITRARY with type t := B.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Bounded (B)
+
+    let suite name =
+      T.suite (name ^ ".Bounded") [Q.property ~name:"should satisfy bounded" A.make V.bounded]
+  end
+
+  module Semiring
+      (S : Interface.SEMIRING)
+      (A : ARBITRARY with type t := S.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Semiring (S)
+
+    let suite name =
+      T.suite
+        (name ^ ".Semiring")
+        [
+          Q.property3
+            ~name:"should satisfy additive associativity"
+            A.make
+            A.make
+            A.make
+            V.additive_associativity;
+          Q.property ~name:"should satisfy additive identity" A.make V.additive_identity;
+          Q.property2 ~name:"should satisfy commutativity" A.make A.make V.commutativity;
+          Q.property3
+            ~name:"should satisfy multiplicative associativity"
+            A.make
+            A.make
+            A.make
+            V.multiplicative_associativity;
+          Q.property ~name:"should satisfy multiplicative identity" A.make V.multiplicative_identity;
+          Q.property3 ~name:"should satisfy distributivity" A.make A.make A.make V.distributivity;
+        ]
+  end
+
+  module Ring
+      (R : Interface.RING)
+      (A : ARBITRARY with type t := R.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Ring (R)
+
+    let suite name =
+      T.suite
+        (name ^ ".Ring")
+        [Q.property ~name:"should satisfy additive inverse" A.make V.additive_inverse]
+  end
+
+  module Commutative_Ring
+      (C : Interface.COMMUTATIVE_RING)
+      (A : ARBITRARY with type t := C.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Commutative_Ring (C)
+
+    let suite name =
+      T.suite
+        (name ^ ".Commutative_Ring")
+        [
+          Q.property2
+            ~name:"should satisfy multiplicative commutativity"
+            A.make
+            A.make
+            V.multiplicative_commutativity;
+        ]
+  end
+
+  module Division_Ring
+      (D : Interface.DIVISION_RING)
+      (A : ARBITRARY with type t := D.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Division_Ring (D)
+
+    let suite name =
+      T.suite
+        (name ^ ".Division_Ring")
+        [
+          T.test "should be a non-zero ring (zero is not one)" (fun () ->
+              T.check T.bool V.non_zero_ring true);
+          Q.property ~name:"should satisfy multiplicative inverse" A.make V.multiplicative_inverse;
+        ]
+  end
+
+  module Euclidean_Ring
+      (E : Interface.EUCLIDEAN_RING)
+      (A : ARBITRARY with type t := E.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Euclidean_Ring (E)
+
+    let suite name =
+      T.suite
+        (name ^ ".Euclidean_Ring")
+        [
+          T.test "should be a non-zero ring (zero is not one)" (fun () ->
+              T.check T.bool V.non_zero_ring true);
+          Q.property2 ~name:"should satisfy integral domain" A.make A.make V.integral_domain;
+          Q.property ~name:"should satisfy non negative degree" A.make V.non_negative_degree;
+          Q.property2 ~name:"should satisfy the properties for remainder" A.make A.make V.remainder;
+          Q.property2 ~name:"should satisfy submultiplicative" A.make A.make V.submultiplicative;
+        ]
+  end
+
+  module Field
+      (F : Interface.FIELD)
+      (A : ARBITRARY with type t := F.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Field (F)
+
+    let suite name =
+      T.suite
+        (name ^ ".Field")
+        [
+          Q.property2
+            ~name:"should satisfy non zero multiplicative inverse"
+            A.make
+            A.make
+            V.non_zero_multiplicative_inverse;
+        ]
+  end
+
+  module Invariant
+      (I : Interface.INVARIANT)
+      (AA : ARBITRARY_A with type 'a t := 'a I.t and type 'a arbitrary := 'a Q.arbitrary) =
+  struct
+    module V = Verify.Invariant (I)
+
+    let suite name =
+      T.suite
+        (name ^ ".Invariant")
+        [
+          Q.property ~name:"should satisfy reflexivity" (AA.make Q.arbitrary_int) V.identity;
+          Q.property
+            ~name:"should satisfy composition"
+            (AA.make Q.arbitrary_int)
+            (V.composition
+               float_of_int
+               int_of_float
+               (( * ) 3 <. int_of_float)
+               (( *. ) 4.0 <. float_of_int));
+        ]
+  end
+end
+
+module Array
+    (Arr : ArrayF.ARRAY)
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = int array and type 'a arbitrary = 'a Q.arbitrary)
+    (AA : ARBITRARY_A with type 'a t = 'a array and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+  module Functor = M.Functor (Arr.Functor) (AA)
+  module Apply = M.Apply (Arr.Applicative) (AA)
+  module Applicative = M.Applicative (Arr.Applicative) (AA)
+  module Monad = M.Monad (Arr.Monad) (AA)
+  module Alt = M.Alt (Arr.Alt) (AA)
+  module Eq = M.Eq (Functors.ArrayF.Int.Eq) (A)
+  module Ord = M.Ord (Functors.ArrayF.Int.Ord) (A)
+  module Invariant = M.Invariant (Arr.Invariant) (AA)
+
+  let zip_with =
+    T.suite
+      "Array.zip_with"
+      [
+        T.test "should zip_with two arrays" (fun () ->
+            T.check (T.array T.int) (Arr.zip_with ( * ) [|1; 2; 3|] [|4; 5; 6|]) [|4; 10; 18|]);
+      ]
+
+  let zip =
+    T.suite
+      "Array.zip"
+      [
+        T.test "should zip two arrays" (fun () ->
+            T.check
+              (T.array (T.tuple T.int T.string))
+              (Arr.zip [|1; 2; 3|] [|"a"; "b"; "c"|])
+              [|1, "a"; 2, "b"; 3, "c"|]);
+      ]
+
+  let foldable =
+    T.suite
+      "Array.Foldable"
+      [
+        T.test "should do a left fold" (fun () ->
+            T.check T.int (Arr.Foldable.fold_left ( + ) 0 [|1; 2; 3; 4; 5|]) 15;
+            T.check T.int (Arr.Foldable.fold_left ( - ) 10 [|3; 2; 1|]) 4);
+        T.test "should do a right fold" (fun () ->
+            T.check T.int (Arr.Foldable.fold_right ( - ) 10 [|3; 2; 1|]) (-8));
+        T.test "should do a map fold (int)" (fun () ->
+            let fold_map = Functors.ArrayF.Int.Additive.Fold_Map.fold_map in
+            T.check T.int (fold_map Function.Category.id [|1; 2; 3|]) 6);
+        T.test "should do a map fold (list)" (fun () ->
+            let fold_map = Functors.ArrayF.List.Fold_Map_Plus.fold_map in
+            T.check
+              (T.list (T.list T.int))
+              (fold_map List.Applicative.pure [|[1; 2; 3]; [4; 5]|])
+              [[1; 2; 3]; [4; 5]]);
+      ]
+
+  let unfoldable =
+    T.suite
+      "Array.Unfoldable"
+      [
+        T.test "should do an unfold" (fun () ->
+            T.check
+              (T.array T.int)
+              (Arr.Unfoldable.unfold (fun x -> if x > 5 then None else Some (x, x + 1)) 0)
+              [|0; 1; 2; 3; 4; 5|]);
+        T.test "should do an unfold" (fun () ->
+            T.check
+              (T.array T.int)
+              (Arr.Unfoldable.unfold (fun x -> if x > 20 then None else Some (x, x + 5)) 0)
+              [|0; 5; 10; 15; 20|]);
+      ]
+
+  let traversable =
+    let traverse, sequence =
+      let open Functors.ArrayF.Option.Traversable in
+      traverse, sequence
+    in
+    T.suite
+      "Array.Traversable"
+      [
+        T.test "should traverse the array" (fun () ->
+            let positive_int x =
+              match x >= 0 with
+              | true -> Some x
+              | false -> None
+            in
+            T.check
+              (T.option (T.array T.int))
+              (traverse positive_int [|1; 2; 3|])
+              (Some [|1; 2; 3|]);
+            T.check (T.option (T.array T.int)) (traverse positive_int [|1; 2; -3|]) None);
+        T.test "should sequence the array" (fun () ->
+            T.check
+              (T.option (T.array T.int))
+              (sequence [|Some 3; Some 4; Some 5|])
+              (Some [|3; 4; 5|]);
+            T.check (T.option (T.array T.int)) (sequence [|Some 3; Some 4; None|]) None);
+      ]
+
+  let show =
+    let module S = Arr.Show (Int.Show) in
+    T.suite
+      "Array.Show"
+      [
+        T.test "should show the array" (fun () ->
+            T.check T.string (S.show [|1; 1; 2; 3; 5; 8; 13|]) "[1, 1, 2, 3, 5, 8, 13]");
+      ]
+
+  let extend =
+    let module V = Verify.Extend (Arr.Extend) in
+    let id = Function.Category.id in
+    let ( <. ) = Function.Infix.( <. ) in
+    let fold = Functors.ArrayF.Int.Additive.Fold_Map.fold_map id in
+    let fold' = Functors.ArrayF.Float.Additive.Fold_Map.fold_map id in
+    T.suite
+      "Array.Extend"
+      [
+        Q.property
+          ~name:"should satisfy associativity"
+          (AA.make_bound Q.arbitrary_int)
+          (V.associativity (string_of_float <. fold') (float_of_int <. fold));
+      ]
+
+  let alt_order =
+    T.suite
+      "Array.Alt.alt"
+      [
+        T.test "should order the arrays correctly" (fun () ->
+            T.check (T.array T.int) (Arr.Alt.alt [|1; 2; 3|] [|4; 5|]) [|1; 2; 3; 4; 5|]);
+      ]
+
+  let suites =
+    [
+      Functor.suite;
+      Apply.suite;
+      Applicative.suite;
+      Monad.suite;
+      Alt.suite;
+      Eq.suite;
+      Ord.suite;
+      Invariant.suite;
+    ]
+    |> ListLabels.map ~f:(fun suite -> suite "Array")
+    |> ListLabels.append [zip_with; zip; foldable; unfoldable; traversable; show; extend; alt_order]
+end
+
+module Bool
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = bool and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+
+  module Conjunctive = struct
+    module Medial_Magma = M.Medial_Magma (Bool.Conjunctive.Medial_Magma) (A)
+    module Semigroup = M.Semigroup (Bool.Conjunctive.Semigroup) (A)
+    module Monoid = M.Monoid (Bool.Conjunctive.Monoid) (A)
+  end
+
+  module Disjunctive = struct
+    module Medial_Magma = M.Medial_Magma (Bool.Disjunctive.Medial_Magma) (A)
+    module Semigroup = M.Semigroup (Bool.Disjunctive.Semigroup) (A)
+    module Monoid = M.Monoid (Bool.Disjunctive.Monoid) (A)
+  end
+
+  module Eq = M.Eq (Bool.Eq) (A)
+  module Ord = M.Ord (Bool.Ord) (A)
+  module Join_Semilattice = M.Join_Semilattice (Bool.Join_Semilattice) (A)
+  module Meet_Semilattice = M.Meet_Semilattice (Bool.Meet_Semilattice) (A)
+  module Bounded_Join_Semilattice = M.Bounded_Join_Semilattice (Bool.Bounded_Join_Semilattice) (A)
+  module Bounded_Meet_Semilattice = M.Bounded_Meet_Semilattice (Bool.Bounded_Meet_Semilattice) (A)
+  module Lattice = M.Lattice (Bool.Lattice) (A)
+  module Bounded_Lattice = M.Bounded_Lattice (Bool.Bounded_Lattice) (A)
+  module Distributive_Lattice = M.Distributive_Lattice (Bool.Distributive_Lattice) (A)
+  module Bounded_Distributive_Lattice =
+    M.Bounded_Distributive_Lattice (Bool.Bounded_Distributive_Lattice) (A)
+  module Heyting_Algebra = M.Heyting_Algebra (Bool.Heyting_Algebra) (A)
+  module Involutive_Heyting_Algebra =
+    M.Involutive_Heyting_Algebra (Bool.Involutive_Heyting_Algebra) (A)
+  module Boolean_Algebra = M.Boolean_Algebra (Bool.Boolean_Algebra) (A)
+
+  let suites =
+    ListLabels.concat
+      [
+        [Conjunctive.Medial_Magma.suite; Conjunctive.Semigroup.suite; Conjunctive.Monoid.suite]
+        |> ListLabels.map ~f:(fun suite -> suite "Bool.Conjunctive");
+        [Disjunctive.Medial_Magma.suite; Disjunctive.Semigroup.suite; Disjunctive.Monoid.suite]
+        |> ListLabels.map ~f:(fun suite -> suite "Bool.Disjunctive");
+        [
+          Eq.suite;
+          Ord.suite;
+          Join_Semilattice.suite;
+          Meet_Semilattice.suite;
+          Bounded_Join_Semilattice.suite;
+          Bounded_Meet_Semilattice.suite;
+          Lattice.suite;
+          Bounded_Lattice.suite;
+          Distributive_Lattice.suite;
+          Bounded_Distributive_Lattice.suite;
+          Heyting_Algebra.suite;
+          Involutive_Heyting_Algebra.suite;
+          Boolean_Algebra.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Bool");
+      ]
+end
+
+module Default (T : TEST) (Q : QUICKCHECK with type t = T.test) = struct
+  module Foldable : Interface.FOLDABLE with type 'a t = 'a list = struct
+    type 'a t = 'a list
+
+    module FM : Default.FOLD_MAP with type 'a t = 'a list = struct
+      type 'a t = 'a list
+
+      module Fold_Map_Any (M : Interface.MONOID_ANY) = struct
+        let fold_map f x = ListLabels.fold_left ~f:(fun acc x -> M.append acc (f x)) ~init:M.empty x
+      end
+
+      module Fold_Map_Plus (P : Interface.PLUS) = struct
+        let fold_map f x = ListLabels.fold_left ~f:(fun acc x -> P.alt acc (f x)) ~init:P.empty x
+      end
+    end
+
+    module Fold_Map = List.Foldable.Fold_Map
+    module Fold_Map_Any = FM.Fold_Map_Any
+    module Fold_Map_Plus = FM.Fold_Map_Plus
+    module F = Default.Fold (FM)
+
+    let fold_left, fold_right = F.fold_left_default, F.fold_right_default
+  end
+
+  module Traversable (A : Interface.APPLICATIVE) = struct
+    module List_Traversable :
+      Interface.TRAVERSABLE with type 'a applicative_t = 'a A.t and type 'a t = 'a list = struct
+      type 'a t = 'a list
+
+      type 'a applicative_t = 'a A.t
+
+      include (List.Functor : Interface.FUNCTOR with type 'a t := 'a t)
+
+      include (List.Foldable : Interface.FOLDABLE with type 'a t := 'a t)
+
+      module I = Infix.Apply (A)
+
+      let sequence xs =
+        let open I in
+        ListLabels.fold_right
+          ~f:(fun acc x -> A.pure (fun y ys -> y :: ys) <*> acc <*> x)
+          ~init:(A.pure [])
+          xs
+
+      module D = Default.Traverse (struct
+        type 'a t = 'a list
+
+        type 'a applicative_t = 'a A.t
+
+        include (List.Functor : Interface.FUNCTOR with type 'a t := 'a t)
+
+        let sequence = sequence
+      end)
+
+      let traverse = D.traverse_default
+    end
+
+    include List_Traversable
+  end
+
+  let foldable =
+    let open Foldable in
+    T.suite
+      "Default.Foldable"
+      [
+        T.test "should do a left fold" (fun () ->
+            T.check T.int (fold_left ( + ) 0 [1; 2; 3; 4; 5]) 15;
+            T.check T.int (fold_left ( - ) 10 [3; 2; 1]) 4);
+      ]
+
+  module Traverse = Traversable (Option.Applicative)
+
+  let traversable =
+    let open Traverse in
+    T.suite
+      "Default.Traversable"
+      [
+        T.test "should traverse the list" (fun () ->
+            let positive_int x =
+              match x >= 0 with
+              | true -> Some x
+              | false -> None
+            in
+            T.check (T.option (T.list T.int)) (traverse positive_int [1; 2; 3]) (Some [1; 2; 3]));
+      ]
+
+  let suites = [foldable; traversable]
+end
+
+module Float
+    (E : Interface.EQ with type t = float)
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = float and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+
+  module Additive = struct
+    module Medial_Magma = M.Compare.Medial_Magma (Float.Additive.Medial_Magma) (E) (A)
+    module Semigroup = M.Semigroup (Float.Additive.Semigroup) (A)
+    module Monoid = M.Monoid (Float.Additive.Monoid) (A)
+    module Quasigroup = M.Quasigroup (Float.Additive.Quasigroup) (A)
+    module Loop = M.Loop (Float.Additive.Loop) (A)
+    module Group = M.Group (Float.Additive.Group) (A)
+    module Abelian_Group = M.Abelian_Group (Float.Additive.Abelian_Group) (A)
+  end
+
+  module Multiplicative = struct
+    module Medial_Magma = M.Compare.Medial_Magma (Float.Multiplicative.Medial_Magma) (E) (A)
+    module Semigroup = M.Semigroup (Float.Multiplicative.Semigroup) (A)
+    module Monoid = M.Monoid (Float.Multiplicative.Monoid) (A)
+    module Quasigroup = M.Compare.Quasigroup (Float.Multiplicative.Quasigroup) (E) (A)
+    module Loop = M.Loop (Float.Multiplicative.Loop) (A)
+  end
+
+  module Subtractive = struct
+    module Medial_Magma = M.Compare.Medial_Magma (Float.Subtractive.Medial_Magma) (E) (A)
+    module Quasigroup = M.Compare.Quasigroup (Float.Subtractive.Quasigroup) (E) (A)
+  end
+
+  module Divisive = struct
+    module Medial_Magma = M.Compare.Medial_Magma (Float.Divisive.Medial_Magma) (E) (A)
+    module Quasigroup = M.Compare.Quasigroup (Float.Divisive.Quasigroup) (E) (A)
+  end
+
+  module Eq = M.Eq (Float.Eq) (A)
+  module Ord = M.Ord (Float.Ord) (A)
+  module Bounded = M.Bounded (Float.Bounded) (A)
+  module Semiring = M.Compare.Semiring (Float.Semiring) (E) (A)
+  module Ring = M.Ring (Float.Ring) (A)
+  module Commutative_Ring = M.Commutative_Ring (Float.Commutative_Ring) (A)
+  module Division_Ring = M.Compare.Division_Ring (Float.Division_Ring) (E) (A)
+  module Euclidean_Ring = M.Compare.Euclidean_Ring (Float.Euclidean_Ring) (E) (A)
+  module Field = M.Field (Float.Field) (A)
+
+  let suites =
+    ListLabels.concat
+      [
+        [
+          Additive.Medial_Magma.suite;
+          Additive.Semigroup.suite;
+          Additive.Monoid.suite;
+          Additive.Quasigroup.suite;
+          Additive.Loop.suite;
+          Additive.Group.suite;
+          Additive.Abelian_Group.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Float.Additive");
+        [
+          Multiplicative.Medial_Magma.suite;
+          Multiplicative.Semigroup.suite;
+          Multiplicative.Monoid.suite;
+          Multiplicative.Quasigroup.suite;
+          Multiplicative.Loop.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Float.Multiplicative");
+        [Subtractive.Medial_Magma.suite; Subtractive.Quasigroup.suite]
+        |> ListLabels.map ~f:(fun suite -> suite "Float.Subtractive");
+        [Divisive.Medial_Magma.suite; Divisive.Quasigroup.suite]
+        |> ListLabels.map ~f:(fun suite -> suite "Float.Divisive");
+        [
+          Eq.suite;
+          Ord.suite;
+          Bounded.suite;
+          Semiring.suite;
+          Ring.suite;
+          Commutative_Ring.suite;
+          Division_Ring.suite;
+          Euclidean_Ring.suite;
+          Field.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Float");
+      ]
+end
+
+module List
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = int list and type 'a arbitrary = 'a Q.arbitrary)
+    (AA : ARBITRARY_A with type 'a t = 'a list and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+  module Functor = M.Functor (List.Functor) (AA)
+  module Apply = M.Apply (List.Applicative) (AA)
+  module Applicative = M.Applicative (List.Applicative) (AA)
+  module Monad = M.Monad (List.Monad) (AA)
+  module Alt = M.Alt (List.Alt) (AA)
+  module Eq = M.Eq (Functors.ListF.Int.Eq) (A)
+
+  let foldable =
+    T.suite
+      "List.Foldable"
+      [
+        T.test "should do a left fold" (fun () ->
+            T.check T.int (List.Foldable.fold_left ( + ) 0 [1; 2; 3; 4; 5]) 15;
+            T.check T.int (List.Foldable.fold_left ( - ) 10 [3; 2; 1]) 4);
+        T.test "should do a right fold" (fun () ->
+            T.check T.int (List.Foldable.fold_right ( - ) 10 [3; 2; 1]) (-8));
+        T.test "should do a map fold (int)" (fun () ->
+            let fold_map = Functors.ListF.Int.Additive.Fold_Map.fold_map in
+            T.check T.int (fold_map Function.Category.id [1; 2; 3]) 6);
+        T.test "should do a map fold (list)" (fun () ->
+            let fold_map = Functors.ListF.List.Fold_Map_Plus.fold_map in
+            T.check
+              (T.list (T.list T.int))
+              (fold_map List.Applicative.pure [[1; 2; 3]; [4; 5]])
+              [[1; 2; 3]; [4; 5]]);
+      ]
+
+  let unfoldable =
+    T.suite
+      "List.Unfoldable"
+      [
+        T.test "should do an unfold" (fun () ->
+            T.check
+              (T.list T.int)
+              (List.Unfoldable.unfold (fun x -> if x > 5 then None else Some (x, x + 1)) 0)
+              [0; 1; 2; 3; 4; 5]);
+        T.test "should do an unfold" (fun () ->
+            T.check
+              (T.list T.int)
+              (List.Unfoldable.unfold (fun x -> if x > 20 then None else Some (x, x + 5)) 0)
+              [0; 5; 10; 15; 20]);
+      ]
+
+  let traversable =
+    let traverse, sequence =
+      let open Functors.ListF.Option.Traversable in
+      traverse, sequence
+    in
+    T.suite
+      "List.Traversable"
+      [
+        T.test "should traverse the list" (fun () ->
+            let positive_int x =
+              match x >= 0 with
+              | true -> Some x
+              | false -> None
+            in
+            T.check (T.option (T.list T.int)) (traverse positive_int [1; 2; 3]) (Some [1; 2; 3]);
+            T.check (T.option (T.list T.int)) (traverse positive_int [1; 2; -3]) None);
+        T.test "should sequence the list" (fun () ->
+            T.check (T.option (T.list T.int)) (sequence [Some 3; Some 4; Some 5]) (Some [3; 4; 5]);
+            T.check (T.option (T.list T.int)) (sequence [Some 3; Some 4; None]) None);
+      ]
+
+  let show =
+    let module S = List.Show (Int.Show) in
+    T.suite
+      "List.Show"
+      [
+        T.test "should show the list" (fun () ->
+            T.check T.string (S.show [1; 1; 2; 3; 5; 8; 13]) "[1, 1, 2, 3, 5, 8, 13]");
+      ]
+
+  let alt_order =
+    T.suite
+      "List.Alt.alt"
+      [
+        T.test "should order the lists correctly" (fun () ->
+            T.check (T.list T.int) (List.Alt.alt [1; 2; 3] [4; 5]) [1; 2; 3; 4; 5]);
+      ]
+
+  let suites =
+    [Functor.suite; Apply.suite; Applicative.suite; Monad.suite; Alt.suite; Eq.suite]
+    |> ListLabels.map ~f:(fun suite -> suite "List")
+    |> ListLabels.append [foldable; unfoldable; traversable; show; alt_order]
+end
+
+module Int
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = int and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+
+  module Additive = struct
+    module Medial_Magma = M.Medial_Magma (Int.Additive.Medial_Magma) (A)
+    module Semigroup = M.Semigroup (Int.Additive.Semigroup) (A)
+    module Monoid = M.Monoid (Int.Additive.Monoid) (A)
+    module Quasigroup = M.Quasigroup (Int.Additive.Quasigroup) (A)
+    module Loop = M.Loop (Int.Additive.Loop) (A)
+    module Group = M.Group (Int.Additive.Group) (A)
+    module Abelian_Group = M.Abelian_Group (Int.Additive.Abelian_Group) (A)
+  end
+
+  module Multiplicative = struct
+    module Medial_Magma = M.Medial_Magma (Int.Multiplicative.Medial_Magma) (A)
+    module Semigroup = M.Semigroup (Int.Multiplicative.Semigroup) (A)
+    module Monoid = M.Monoid (Int.Multiplicative.Monoid) (A)
+    module Quasigroup = M.Quasigroup (Int.Multiplicative.Quasigroup) (A)
+    module Loop = M.Loop (Int.Multiplicative.Loop) (A)
+  end
+
+  module Subtractive = struct
+    module Medial_Magma = M.Medial_Magma (Int.Subtractive.Medial_Magma) (A)
+    module Quasigroup = M.Quasigroup (Int.Subtractive.Quasigroup) (A)
+  end
+
+  module Eq = M.Eq (Int.Eq) (A)
+  module Ord = M.Ord (Int.Ord) (A)
+  module Bounded = M.Bounded (Int.Bounded) (A)
+  module Semiring = M.Semiring (Int.Semiring) (A)
+  module Ring = M.Ring (Int.Ring) (A)
+  module Commutative_Ring = M.Commutative_Ring (Int.Commutative_Ring) (A)
+  module Euclidean_Ring = M.Euclidean_Ring (Int.Euclidean_Ring) (A)
+
+  let suites =
+    ListLabels.concat
+      [
+        [
+          Additive.Medial_Magma.suite;
+          Additive.Semigroup.suite;
+          Additive.Monoid.suite;
+          Additive.Quasigroup.suite;
+          Additive.Loop.suite;
+          Additive.Group.suite;
+          Additive.Abelian_Group.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Int.Additive");
+        [
+          Multiplicative.Medial_Magma.suite;
+          Multiplicative.Semigroup.suite;
+          Multiplicative.Monoid.suite;
+          Multiplicative.Quasigroup.suite;
+          Multiplicative.Loop.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Int.Multiplicative");
+        [Subtractive.Medial_Magma.suite; Subtractive.Quasigroup.suite]
+        |> ListLabels.map ~f:(fun suite -> suite "Int.Subtractive");
+        [
+          Eq.suite;
+          Ord.suite;
+          Bounded.suite;
+          Semiring.suite;
+          Ring.suite;
+          Commutative_Ring.suite;
+          Euclidean_Ring.suite;
+        ]
+        |> ListLabels.map ~f:(fun suite -> suite "Int");
+      ]
+end
+
+module Option
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = int option and type 'a arbitrary = 'a Q.arbitrary)
+    (AA : ARBITRARY_A with type 'a t = 'a option and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+  module Semigroup = M.Semigroup (Functors.OptionF.Int.Additive.Semigroup) (A)
+  module Monoid = M.Monoid (Functors.OptionF.Int.Additive.Monoid) (A)
+  module Functor = M.Functor (Option.Functor) (AA)
+  module Apply = M.Apply (Option.Applicative) (AA)
+  module Applicative = M.Applicative (Option.Applicative) (AA)
+  module Monad = M.Monad (Option.Monad) (AA)
+  module Alt = M.Alt (Option.Alt) (AA)
+  module Plus = M.Plus (Option.Plus) (AA)
+  module Alternative = M.Alternative (Option.Alternative) (AA)
+  module Eq = M.Eq (Functors.OptionF.Int.Eq) (A)
+  module Ord = M.Ord (Functors.OptionF.Int.Ord) (A)
+
+  let infix =
+    T.suite
+      "Option.Infix"
+      [
+        T.test "should apply a default value if it's None" (fun () ->
+            let ( |? ) = Option.Infix.( |? ) in
+            T.check T.string ("foo" |? Some "bar") "bar";
+            T.check T.string ("foo" |? None) "foo");
+      ]
+
+  let foldable =
+    T.suite
+      "Option.Foldable"
+      [
+        T.test "should do a left fold" (fun () ->
+            T.check T.int (Option.Foldable.fold_left ( + ) 0 (Some 1)) 1);
+        T.test "should do a right fold" (fun () ->
+            T.check T.int (Option.Foldable.fold_right ( + ) 0 (Some 1)) 1;
+            T.check T.int (Option.Foldable.fold_right ( + ) 0 None) 0);
+        T.test "should do a map fold (int)" (fun () ->
+            let fold_map =
+              let open Functors.OptionF.Int.Additive.Fold_Map in
+              fold_map
+            in
+            T.check T.int (fold_map (( * ) 2) (Some 3)) 6;
+            T.check T.int (fold_map (( + ) 1) None) 0);
+        T.test "should do a map fold (list)" (fun () ->
+            let fold_map =
+              let open Functors.OptionF.List.Fold_Map_Plus in
+              fold_map
+            in
+            T.check (T.list T.int) (fold_map (fun x -> [x]) (Some 123)) [123]);
+      ]
+
+  let traversable =
+    let traverse, sequence =
+      let open Functors.OptionF.List.Traversable in
+      traverse, sequence
+    in
+    T.suite
+      "Option.Traversable"
+      [
+        T.test "should traverse the list" (fun () ->
+            let positive_int x =
+              match x >= 0 with
+              | true -> [x]
+              | false -> []
+            in
+            T.check (T.list (T.option T.int)) (traverse positive_int (Some 123)) [Some 123]);
+        T.test "should sequence the list" (fun () ->
+            T.check (T.list (T.option T.int)) (sequence (Some [3; 4; 5])) [Some 3; Some 4; Some 5];
+            T.check (T.list (T.option T.int)) (sequence None) [None]);
+      ]
+
+  let suites =
+    [
+      Semigroup.suite;
+      Monoid.suite;
+      Functor.suite;
+      Apply.suite;
+      Applicative.suite;
+      Monad.suite;
+      Alt.suite;
+      Alternative.suite;
+      Plus.suite;
+      Eq.suite;
+      Ord.suite;
+    ]
+    |> ListLabels.map ~f:(fun suite -> suite "Option")
+    |> ListLabels.append [infix; foldable; traversable]
+end
+
+module String
+    (T : TEST)
+    (Q : QUICKCHECK with type t = T.test)
+    (A : ARBITRARY with type t = string and type 'a arbitrary = 'a Q.arbitrary) =
+struct
+  module M = Make (T) (Q)
+  module Semigroup = M.Semigroup (String.Semigroup) (A)
+  module Monoid = M.Monoid (String.Monoid) (A)
+  module Quasigroup = M.Quasigroup (String.Quasigroup) (A)
+  module Loop = M.Loop (String.Loop) (A)
+  module Eq = M.Eq (String.Eq) (A)
+  module Ord = M.Ord (String.Ord) (A)
+
+  let suites =
+    [Semigroup.suite; Monoid.suite; Quasigroup.suite; Loop.suite; Eq.suite; Ord.suite]
+    |> ListLabels.map ~f:(fun suite -> suite "String")
+end
