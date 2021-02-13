@@ -95,7 +95,7 @@ module Extend: {
 };
 module Infix: {
   let (<$>): ('a => 'b, Monad.t('a)) => Monad.t('b);
-  let (<#>): (Monad.t('a), 'a => 'b) => Monad.t('b);
+  let (<@>): (Monad.t('a), 'a => 'b) => Monad.t('b);
   let (<*>): (Monad.t('a => 'b), Monad.t('a)) => Monad.t('b);
   let (>>=): (Monad.t('a), 'a => Monad.t('b)) => Monad.t('b);
   let (=<<): ('a => Monad.t('b), Monad.t('a)) => Monad.t('b);
