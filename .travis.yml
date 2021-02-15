@@ -3,7 +3,11 @@ sudo: false
 services:
   - docker
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-docker.sh
-script: bash -ex ./.travis-docker.sh
+script:
+  - bash -ex ./.travis-docker.sh
+  - opam reinstall -y bisect_ppx
+  - make bisect
+  - bisect-ppx-report send-to Coveralls
 env:
   global:
   - PACKAGE="bastet"

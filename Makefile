@@ -22,7 +22,7 @@ clean: clean-bs clean-native clean-docs clean-coverage
 
 .PHONY: build-bs
 build-bs:
-	bsb -make-world
+	yarn bsb -make-world
 
 .PHONY: build-native
 build-native:
@@ -90,7 +90,7 @@ watch-native:
 
 .PHONY: watch-bs
 watch-bs:
-	bsb -make-world -w
+	yarn bsb -make-world -w
 
 .PHONY: watch-test-bs
 watch-test-bs:
