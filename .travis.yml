@@ -3,11 +3,12 @@ sudo: false
 services:
   - docker
 before_install:
-  - sudo apt-get update && sudo apt-get --reinstall install -qq nodejs npm ocaml opam
+  - sudo apt-get update && sudo apt-get --reinstall install -qq nodejs npm yarnpkg ocaml opam
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-docker.sh
 script:
   - bash -ex ./.travis-docker.sh
-  - opam reinstall -y bisect_ppx
+  - opam init && opam reinstall -y bisect_ppx
+  - yarn
   - make bisect
   - bisect-ppx-report send-to Coveralls
 env:
