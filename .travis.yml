@@ -8,7 +8,7 @@ before_install:
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-docker.sh
 script:
   - bash -ex ./.travis-docker.sh
-  - opam init -a && opam reinstall -y bisect_ppx
+  - opam init -a && opam reinstall -y dune bisect_ppx
   - yarn
   - make bisect
   - bisect-ppx-report send-to Coveralls
