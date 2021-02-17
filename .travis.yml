@@ -20,6 +20,7 @@ env:
   global:
   - PACKAGE="bastet"
   - PINS="bastet:."
+  - OPAMJOBS=4
   matrix:
   - DISTRO="debian-stable" OCAML_VERSION="4.08"
   - DISTRO="fedora" OCAML_VERSION="4.08"
