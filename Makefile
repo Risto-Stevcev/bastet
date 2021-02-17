@@ -116,12 +116,12 @@ remove-switch:
 dev-tools:
 	opam install -y merlin ocamlformat utop
 
-.PHONY: create-4.06-switch
-create-4.06-switch:
-	opam switch create -y . 4.06.1 -t -d
+.PHONY: create-4.08-switch
+create-4.08-switch:
+	opam switch create -y . 4.08.1 -t -d
 
-.PHONY: 4.06-switch
-4.06-switch: remove-switch create-4.06-switch dev-tools
+.PHONY: 4.08-switch
+4.08-switch: remove-switch create-4.08-switch dev-tools
 	eval $(opam env)
 
 .PHONY: create-default-switch
