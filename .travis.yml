@@ -11,6 +11,8 @@ script:
   - bash -ex ./.travis-docker.sh
   - opam init -a
   - eval `opam config env` 
+  - opam switch create 4.11.1
+  - eval `opam env`
   - make create-default-switch
   - yarn
   - make bisect-bs
