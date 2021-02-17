@@ -21,8 +21,8 @@ env:
   - PACKAGE="bastet"
   - PINS="bastet:."
   matrix:
-  - DISTRO="debian-stable" OCAML_VERSION="4.06"
-  - DISTRO="fedora" OCAML_VERSION="4.06"
-  - DISTRO="ubuntu-lts" OCAML_VERSION="4.06"
-  - DISTRO="alpine" OCAML_VERSION="4.06"
-  - DISTRO="debian-stable" OCAML_VERSION="4.12"
+  - DISTRO="debian-stable" OCAML_VERSION="4.08"
+  - DISTRO="fedora" OCAML_VERSION="4.08"
+  - DISTRO="ubuntu-lts" OCAML_VERSION="4.08"
+  - DISTRO="alpine" OCAML_VERSION="4.08"
+  - DISTRO="debian-stable" OCAML_VERSION="4.11"
