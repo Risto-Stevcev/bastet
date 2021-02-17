@@ -10,10 +10,10 @@ script:
   - bash -ex ./.travis-docker.sh
   - opam init -a
   - eval `opam config env` 
-  - opam reinstall -y dune bisect_ppx
+  - opam reinstall -y bisect_ppx
   - eval `opam env`
   - yarn
-  - make bisect
+  - make bisect-bs
   - bisect-ppx-report send-to Coveralls
 env:
   global:

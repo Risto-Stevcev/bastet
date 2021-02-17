@@ -65,6 +65,10 @@ test-native: build-native
 .PHONY: test
 test: test-bs test-native
 
+.PHONY: bisect-bs
+bisect-bs:
+	BISECT_ENABLE=yes make test-bs
+
 .PHONY: bisect
 bisect:
 	BISECT_ENABLE=yes make test
