@@ -9,8 +9,7 @@ homepage: "https://github.com/Risto-Stevcev/bastet"
 doc: "https://risto-stevcev.github.io/bastet"
 bug-reports: "https://github.com/Risto-Stevcev/bastet/issues"
 depends: [
-  "ocaml" {>= "4.06.1"}
-  "reason" {>= "3.6.0"}
+  ("ocaml" {>= "4.08"} | ("ocaml" {< "4.08~~"} & "ocamlfind-secondary"))
   "alcotest" {>= "1.0.1" & with-test}
   "qcheck" {>= "0.13" & with-test}
   "qcheck-alcotest" {>= "0.13" & with-test}
@@ -19,6 +18,8 @@ depends: [
   "odoc" {>= "1.5.0" & with-doc}
   "mustache" {>= "3.1.0" & with-doc}
   "dune" {>= "2.0.1"}
+  "base-unix"
+  "base-threads"
 ]
 build: [
   ["dune" "subst"] {pinned}
