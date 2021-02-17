@@ -18,12 +18,12 @@ script:
   - bisect-ppx-report send-to Coveralls
 env:
   global:
-  - PACKAGE="bastet"
-  - PINS="bastet:."
-  - OPAMJOBS=4
+    - PACKAGE="bastet"
+    - PINS="bastet:."
+    - OPAMJOBS=4
   matrix:
-  - DISTRO="debian-stable" OCAML_VERSION="4.08"
-  - DISTRO="fedora" OCAML_VERSION="4.08"
-  - DISTRO="ubuntu-lts" OCAML_VERSION="4.08"
-  - DISTRO="alpine" OCAML_VERSION="4.08"
-  - DISTRO="debian-stable" OCAML_VERSION="4.11"
+    - DISTRO="debian-stable" OCAML_VERSION="4.08"
+      #- DISTRO="fedora" OCAML_VERSION="4.08"
+    - DISTRO="ubuntu-lts" OCAML_VERSION="4.08"
+      #- DISTRO="alpine" OCAML_VERSION="4.08"
+    - DISTRO="debian-stable" OCAML_VERSION="4.11"
