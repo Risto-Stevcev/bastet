@@ -3,7 +3,7 @@ sudo: false
 services:
   - docker
 before_install:
-  - sudo add-apt-repository ppa:avsm/ppa
+  - sudo add-apt-repository -y ppa:avsm/ppa
   - sudo apt-get update && sudo apt-get --reinstall install -qq nodejs npm ocaml opam
   - sudo npm install --global yarn
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-docker.sh
