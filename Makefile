@@ -77,16 +77,18 @@ bisect:
 bisect-html: bisect
 	opam exec -- bisect-ppx-report html
 
+# NOTE: the git property in the json file needs to be set to show coverage status
 .PHONY: coveralls-json
 coveralls-json: bisect
 	opam exec -- bisect-ppx-report coveralls --repo-token ${COVERALLS_TOKEN} coverage.json
 
-.PHONY: coveralls-send
-coveralls-send:
+# Useful for sending report to coveralls outside of CI
+.PHONY: coveralls-send-api
+coveralls-send-api:
 	curl -L -F json_file=@./coverage.json https://coveralls.io/api/v1/jobs
 
 .PHONY: coveralls-api
-coveralls-api: coveralls-json coveralls-send
+coveralls-api: coveralls-json coveralls-send-api
 
 .PHONY: coveralls
 coveralls:
