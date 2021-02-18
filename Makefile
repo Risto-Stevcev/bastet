@@ -1,4 +1,4 @@
-all: build
+all: clean default-switch build copy-docs
 
 .PHONY: clean-bs
 clean-bs:
@@ -36,7 +36,7 @@ fmt:
 	opam exec -- dune build @fmt --auto-promote
 
 .PHONY: docs-template
-docs-template: test-native
+docs-template:
 	cat bastet/src/index.mld.template | \
 		sed -e 's/{{:/{ {:/g' | \
 		opam exec -- dune exec examples/docs_template.exe | \
@@ -114,7 +114,7 @@ utop:
 
 .PHONY: remove-switch
 remove-switch:
-	opam switch remove -y .
+	opam switch remove -y . || true
 
 .PHONY: dev-tools
 dev-tools:
