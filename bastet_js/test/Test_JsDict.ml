@@ -59,19 +59,9 @@ describe "Dict" (fun () ->
         it "should sequence the dict" (fun () ->
             expect
               (T.sequence
-                 (Dict.unsafe_from_object
-                    [%bs.obj
-                      {
-                        a = Some 123 [@explicit_arity];
-                        b = Some 456 [@explicit_arity];
-                        c = Some 789 [@explicit_arity];
-                      }]))
-            |> to_be
-                 (Some (Dict.unsafe_from_object [%bs.obj { a = 123; b = 456; c = 789 }])
-                 [@explicit_arity]);
+                 (Dict.unsafe_from_object [%bs.obj { a = Some 123; b = Some 456; c = Some 789 }]))
+            |> to_be (Some (Dict.unsafe_from_object [%bs.obj { a = 123; b = 456; c = 789 }]));
             expect
               (T.sequence
-                 (Dict.unsafe_from_object
-                    [%bs.obj
-                      { a = Some 123 [@explicit_arity]; b = None; c = Some 789 [@explicit_arity] }]))
+                 (Dict.unsafe_from_object [%bs.obj { a = Some 123; b = None; c = Some 789 }]))
             |> to_be None)))

@@ -9,8 +9,7 @@ type 'a endo = Endo of ('a -> 'a)
 module Magma : MAGMA_ANY with type 'a t = 'a endo = struct
   type 'a t = 'a endo
 
-  let append ((Endo f)[@explicit_arity]) ((Endo g)[@explicit_arity]) =
-    (Endo (f <. g) [@explicit_arity])
+  let append (Endo f) (Endo g) = Endo (f <. g)
 end
 
 module Semigroup : SEMIGROUP_ANY with type 'a t = 'a endo = struct
@@ -20,7 +19,7 @@ end
 module Monoid : MONOID_ANY with type 'a t = 'a endo = struct
   include Semigroup
 
-  let empty = (Endo id [@explicit_arity])
+  let empty = Endo id
 end
 
 module Infix = struct

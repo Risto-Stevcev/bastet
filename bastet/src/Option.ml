@@ -5,14 +5,14 @@ let ( <. ) = Function.Infix.( <. )
 let maybe =
   (fun ~f ~default opt ->
      match opt with
-     | ((Some a)[@explicit_arity]) -> f a
+     | Some a -> f a
      | None -> default
     : f:('a -> 'b) -> default:'b -> 'a option -> 'b)
 
 let getWithDefault a x =
   match x with
   | None -> a
-  | ((Some x)[@explicit_arity]) -> x
+  | Some x -> x
 
 module type MAGMA_F = functor (M : MAGMA) -> MAGMA with type t = M.t option
 
@@ -38,7 +38,7 @@ module Functor : FUNCTOR with type 'a t = 'a option = struct
 
   let map f a =
     match a with
-    | ((Some a')[@explicit_arity]) -> Some (f a') [@explicit_arity]
+    | Some a' -> Some (f a')
     | None -> None
 end
 
@@ -47,14 +47,14 @@ module Apply : APPLY with type 'a t = 'a option = struct
 
   let apply fn_opt a =
     match fn_opt with
-    | ((Some f)[@explicit_arity]) -> map f a
+    | Some f -> map f a
     | None -> None
 end
 
 module Applicative : APPLICATIVE with type 'a t = 'a option = struct
   include Apply
 
-  let pure a = (Some a [@explicit_arity])
+  let pure a = Some a
 end
 
 module Monad : MONAD with type 'a t = 'a option = struct
@@ -62,7 +62,7 @@ module Monad : MONAD with type 'a t = 'a option = struct
 
   let flat_map x f =
     match x with
-    | ((Some x')[@explicit_arity]) -> f x'
+    | Some x' -> f x'
     | None -> None
 end
 
@@ -75,9 +75,8 @@ functor
 
     let append a b =
       match a, b with
-      | ((Some a)[@explicit_arity]), ((Some b)[@explicit_arity]) ->
-          Some (M.append a b) [@explicit_arity]
-      | ((Some a)[@explicit_arity]), _ | _, ((Some a)[@explicit_arity]) -> Some a [@explicit_arity]
+      | Some a, Some b -> Some (M.append a b)
+      | Some a, _ | _, Some a -> Some a
       | _ -> None
   end
 
@@ -118,7 +117,7 @@ module Alt : ALT with type 'a t = 'a option = struct
 
   let alt a b =
     match a, b with
-    | ((Some a)[@explicit_arity]), _ -> Some a [@explicit_arity]
+    | Some a, _ -> Some a
     | None, a -> a
 end
 
@@ -163,10 +162,9 @@ module Traversable (A : APPLICATIVE) = struct
 
   include (Foldable : FOLDABLE with type 'a t := 'a t)
 
-  let traverse f x =
-    maybe ~f:(A.map (fun a -> (Some a [@explicit_arity])) <. f) ~default:(A.pure None) x
+  let traverse f x = maybe ~f:(A.map (fun a -> Some a) <. f) ~default:(A.pure None) x
 
-  and sequence x = maybe ~f:(A.map (fun a -> (Some a [@explicit_arity]))) ~default:(A.pure None) x
+  and sequence x = maybe ~f:(A.map (fun a -> Some a)) ~default:(A.pure None) x
 end
 
 module Eq : EQ_F =
@@ -178,7 +176,7 @@ functor
 
     let eq xs ys =
       match xs, ys with
-      | ((Some a)[@explicit_arity]), ((Some b)[@explicit_arity]) -> E.eq a b
+      | Some a, Some b -> E.eq a b
       | None, None -> true
       | _ -> false
   end
@@ -192,7 +190,7 @@ functor
 
     let compare a b =
       match a, b with
-      | ((Some a')[@explicit_arity]), ((Some b')[@explicit_arity]) -> O.compare a' b'
+      | Some a', Some b' -> O.compare a' b'
       | None, None -> `equal_to
       | None, Some _ -> `less_than
       | Some _, None -> `greater_than
@@ -207,7 +205,7 @@ functor
 
     let show a =
       match a with
-      | ((Some a')[@explicit_arity]) -> "Some(" ^ S.show a' ^ ")"
+      | Some a' -> "Some(" ^ S.show a' ^ ")"
       | None -> "None"
   end
 

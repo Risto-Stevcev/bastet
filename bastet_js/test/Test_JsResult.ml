@@ -197,18 +197,16 @@ let arb_result =
      smap
        (fun e ->
          match e with
-         | ((Types.Left l)[@explicit_arity]) -> Error l [@explicit_arity]
-         | ((Types.Right r)[@explicit_arity]) -> Ok r [@explicit_arity])
+         | Types.Left l -> Error l
+         | Types.Right r -> Ok r)
        (fun e ->
          match e with
-         | ((Ok r)[@explicit_arity]) -> Types.Right r [@explicit_arity]
-         | ((Error l)[@explicit_arity]) -> Types.Left l [@explicit_arity])
+         | Ok r -> Types.Right r
+         | Error l -> Types.Left l)
        ~newShow:(fun a ->
          match a with
-         | ((Ok a')[@explicit_arity]) ->
-             "Ok(" ^ (Js.Json.stringifyAny a' |> Js.Option.getWithDefault "") ^ ")"
-         | ((Error a')[@explicit_arity]) ->
-             "Error(" ^ (Js.Json.stringifyAny a' |> Js.Option.getWithDefault "") ^ ")")
+         | Ok a' -> "Ok(" ^ (Js.Json.stringifyAny a' |> Js.Option.getWithDefault "") ^ ")"
+         | Error a' -> "Error(" ^ (Js.Json.stringifyAny a' |> Js.Option.getWithDefault "") ^ ")")
        (arb_either arb_error arb_ok)
     : 'a arbitrary -> 'b arbitrary -> ('a, 'b) Belt.Result.t arbitrary)
 
@@ -262,10 +260,7 @@ describe "Result" (fun () ->
     describe "Apply" (fun () ->
         let module V = Verify.Apply (Functors.ResultF.String.Apply) in
         property1 "should satisfy associative composition" (arb_result arb_nat arb_string) (fun n ->
-            V.associative_composition
-              (Ok (( ^ ) "!") [@explicit_arity])
-              (Ok string_of_int [@explicit_arity])
-              n));
+            V.associative_composition (Ok (( ^ ) "!")) (Ok string_of_int) n));
     describe "Applicative" (fun () ->
         let module V = Verify.Applicative (Functors.ResultF.String.Applicative) in
         property1 "should satisfy identity" (arb_result arb_nat arb_string) V.identity;
@@ -273,10 +268,7 @@ describe "Result" (fun () ->
           "should satisfy homomorphism"
           (arb_result arb_nat arb_string)
           (V.homomorphism (Functors.ResultF.String.Functor.map string_of_int));
-        property1
-          "should satisfy interchange"
-          arb_nat
-          (V.interchange (Ok string_of_int [@explicit_arity])));
+        property1 "should satisfy interchange" arb_nat (V.interchange (Ok string_of_int)));
     describe "Monad" (fun () ->
         let module V = Verify.Monad (Functors.ResultF.String.Monad) in
         let pure = Functors.ResultF.String.Applicative.pure in
@@ -308,38 +300,30 @@ describe "Result" (fun () ->
              (Result.result float_of_int (const Float.Additive.Monoid.empty))));
     describe "Show" (fun () ->
         it "should show the either value" (fun () ->
-            expect (Functors.ResultF.Bool.Int.Show.show (Ok true [@explicit_arity])) |> to_be "true";
-            expect (Functors.ResultF.Bool.Int.Show.show (Error 123 [@explicit_arity]))
-            |> to_be "123"));
+            expect (Functors.ResultF.Bool.Int.Show.show (Ok true)) |> to_be "true";
+            expect (Functors.ResultF.Bool.Int.Show.show (Error 123)) |> to_be "123"));
     describe "Eq" (fun () ->
         it "should compare two either values for equality" (fun () ->
             let module E = Result.Eq (Int.Eq) (Int.Eq) in
             let eq = Functors.ResultF.Float.Int.Eq.eq in
-            expect (eq (Error 123 [@explicit_arity]) (Error 123 [@explicit_arity])) |> to_be true;
-            expect (eq (Error 123 [@explicit_arity]) (Error 456 [@explicit_arity])) |> to_be false;
-            expect (eq (Ok 12.3 [@explicit_arity]) (Ok 12.3 [@explicit_arity])) |> to_be true;
-            expect (eq (Ok 12.3 [@explicit_arity]) (Ok 45.6 [@explicit_arity])) |> to_be false;
-            expect (eq (Error 123 [@explicit_arity]) (Ok 45.6 [@explicit_arity])) |> to_be false;
-            expect (E.eq (Error 123 [@explicit_arity]) (Ok 123 [@explicit_arity])) |> to_be false;
-            expect (E.eq (Ok 123 [@explicit_arity]) (Error 123 [@explicit_arity])) |> to_be false));
+            expect (eq (Error 123) (Error 123)) |> to_be true;
+            expect (eq (Error 123) (Error 456)) |> to_be false;
+            expect (eq (Ok 12.3) (Ok 12.3)) |> to_be true;
+            expect (eq (Ok 12.3) (Ok 45.6)) |> to_be false;
+            expect (eq (Error 123) (Ok 45.6)) |> to_be false;
+            expect (E.eq (Error 123) (Ok 123)) |> to_be false;
+            expect (E.eq (Ok 123) (Error 123)) |> to_be false));
     describe "Ord" (fun () ->
         it "should compare two either values for equality" (fun () ->
             let module E = Result.Ord (Int.Ord) (Int.Ord) in
             let compare = Functors.ResultF.Float.Int.Ord.compare in
-            expect (compare (Error 123 [@explicit_arity]) (Error 123 [@explicit_arity]))
-            |> to_be `equal_to;
-            expect (compare (Error 123 [@explicit_arity]) (Error 456 [@explicit_arity]))
-            |> to_be `less_than;
-            expect (compare (Ok 12.3 [@explicit_arity]) (Ok 12.3 [@explicit_arity]))
-            |> to_be `equal_to;
-            expect (compare (Ok 12.3 [@explicit_arity]) (Ok 45.6 [@explicit_arity]))
-            |> to_be `less_than;
-            expect (compare (Error 123 [@explicit_arity]) (Ok 45.6 [@explicit_arity]))
-            |> to_be `less_than;
-            expect (E.compare (Error 123 [@explicit_arity]) (Ok 123 [@explicit_arity]))
-            |> to_be `less_than;
-            expect (E.compare (Ok 123 [@explicit_arity]) (Error 123 [@explicit_arity]))
-            |> to_be `greater_than));
+            expect (compare (Error 123) (Error 123)) |> to_be `equal_to;
+            expect (compare (Error 123) (Error 456)) |> to_be `less_than;
+            expect (compare (Ok 12.3) (Ok 12.3)) |> to_be `equal_to;
+            expect (compare (Ok 12.3) (Ok 45.6)) |> to_be `less_than;
+            expect (compare (Error 123) (Ok 45.6)) |> to_be `less_than;
+            expect (E.compare (Error 123) (Ok 123)) |> to_be `less_than;
+            expect (E.compare (Ok 123) (Error 123)) |> to_be `greater_than));
     describe "Bounded" (fun () ->
         let arb_float' = arb_float Float.Bounded.bottom Float.Bounded.top in
         let module V = Verify.Bounded (Result.Bounded (Int.Bounded) (Float.Bounded)) in
@@ -475,20 +459,16 @@ describe "Result" (fun () ->
           (arb_result arb_bool Toggle.arb_toggle)
           V.excluded_middle);
     describe "Result_Utilities" (fun () ->
-        let errResult =
-          ((Belt.Result.Error "ERROR" [@explicit_arity]) : (int, string) Belt.Result.t)
-        in
-        let okResult = ((Belt.Result.Ok 4 [@explicit_arity]) : (int, string) Belt.Result.t) in
-        let someFloat = (Some 5.0 [@explicit_arity]) in
+        let errResult = (Belt.Result.Error "ERROR" : (int, string) Belt.Result.t) in
+        let okResult = (Belt.Result.Ok 4 : (int, string) Belt.Result.t) in
+        let someFloat = Some 5.0 in
         describe "Hush" (fun () ->
             it "should convert Error result to None" (fun () ->
                 expect (Result.hush errResult) |> to_be None);
             it "should convert Success result to Some" (fun () ->
-                expect (Result.hush okResult) |> to_be (Some 4 [@explicit_arity])));
+                expect (Result.hush okResult) |> to_be (Some 4)));
         describe "Note" (fun () ->
             it "should convert None to Error result" (fun () ->
-                expect (Result.note "ERROR" None)
-                |> to_be (Belt.Result.Error "ERROR" [@explicit_arity]));
+                expect (Result.note "ERROR" None) |> to_be (Belt.Result.Error "ERROR"));
             it "should convert Some to Ok result" (fun () ->
-                expect (Result.note "ERROR" someFloat)
-                |> to_be (Belt.Result.Ok 5.0 [@explicit_arity])))))
+                expect (Result.note "ERROR" someFloat) |> to_be (Belt.Result.Ok 5.0)))))

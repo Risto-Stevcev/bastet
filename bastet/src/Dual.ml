@@ -25,8 +25,7 @@ functor
   struct
     type t = M.t dual
 
-    let append ((Dual a)[@explicit_arity]) ((Dual b)[@explicit_arity]) =
-      (Dual (M.append b a) [@explicit_arity])
+    let append (Dual a) (Dual b) = Dual (M.append b a)
   end
 
 module Semigroup : SEMIGROUP_F =
@@ -44,27 +43,27 @@ functor
   struct
     include Semigroup (M)
 
-    let empty = (Dual M.empty [@explicit_arity])
+    let empty = Dual M.empty
   end
 
 module Functor : FUNCTOR with type 'a t = 'a dual = struct
   type 'a t = 'a dual
 
-  let map f ((Dual a)[@explicit_arity]) = (Dual (f a) [@explicit_arity])
+  let map f (Dual a) = Dual (f a)
 end
 
 module Applicative : APPLICATIVE with type 'a t = 'a dual = struct
   include Functor
 
-  let apply ((Dual f)[@explicit_arity]) ((Dual a)[@explicit_arity]) = (Dual (f a) [@explicit_arity])
+  let apply (Dual f) (Dual a) = Dual (f a)
 
-  let pure a = (Dual a [@explicit_arity])
+  let pure a = Dual a
 end
 
 module Monad : MONAD with type 'a t = 'a dual = struct
   include Applicative
 
-  let flat_map ((Dual a)[@explicit_arity]) f = f a
+  let flat_map (Dual a) f = f a
 end
 
 module Magma_Any : MAGMA_ANY_F =
@@ -74,8 +73,7 @@ functor
   struct
     type 'a t = 'a M.t dual
 
-    let append ((Dual a)[@explicit_arity]) ((Dual b)[@explicit_arity]) =
-      (Dual (M.append b a) [@explicit_arity])
+    let append (Dual a) (Dual b) = Dual (M.append b a)
   end
 
 module Semigroup_Any : SEMIGROUP_ANY_F =
@@ -93,18 +91,18 @@ functor
   struct
     include Semigroup_Any (M)
 
-    let empty = (Dual M.empty [@explicit_arity])
+    let empty = Dual M.empty
   end
 
 module Foldable : FOLDABLE with type 'a t = 'a dual = struct
   type 'a t = 'a dual
 
-  let fold_left f init ((Dual x)[@explicit_arity]) = f init x
+  let fold_left f init (Dual x) = f init x
 
-  and fold_right f init ((Dual x)[@explicit_arity]) = f x init
+  and fold_right f init (Dual x) = f x init
 
   module Fold = struct
-    let fold_map f ((Dual x)[@explicit_arity]) = f x
+    let fold_map f (Dual x) = f x
   end
 
   module Fold_Map (M : MONOID) = struct
@@ -138,12 +136,12 @@ functor
     let traverse f x =
       let open I in
       match x with
-      | ((Dual x')[@explicit_arity]) -> (fun x -> (Dual x [@explicit_arity])) <$> f x'
+      | Dual x' -> (fun x -> Dual x) <$> f x'
 
     let sequence x =
       let open I in
       match x with
-      | ((Dual x')[@explicit_arity]) -> (fun x -> (Dual x [@explicit_arity])) <$> x'
+      | Dual x' -> (fun x -> Dual x) <$> x'
   end
 
 module Infix = struct

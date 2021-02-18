@@ -64,17 +64,13 @@ module Fold (F : FOLD_MAP) = struct
   module Endo_Fold_Map = F.Fold_Map_Any (Endo.Monoid)
 
   let fold_left_default f init xs =
-    let ((Dual.Dual ((Endo.Endo r)[@explicit_arity]))[@explicit_arity]) =
-      Dual_Fold_Map.fold_map
-        ((fun x -> (Dual.Dual (Endo.Endo x [@explicit_arity]) [@explicit_arity])) <. Function.flip f)
-        xs
+    let (Dual.Dual (Endo.Endo r)) =
+      Dual_Fold_Map.fold_map ((fun x -> Dual.Dual (Endo.Endo x)) <. Function.flip f) xs
     in
     r init
 
   and fold_right_default f init xs =
-    let ((Endo.Endo r)[@explicit_arity]) =
-      Endo_Fold_Map.fold_map ((fun x -> (Endo.Endo x [@explicit_arity])) <. f) xs
-    in
+    let (Endo.Endo r) = Endo_Fold_Map.fold_map ((fun x -> Endo.Endo x) <. f) xs in
     r init
 end
 

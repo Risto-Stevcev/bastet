@@ -7,8 +7,8 @@ let flip, const =
 let result =
   (fun f g a ->
      match f, g, a with
-     | f, _, ((Ok a')[@explicit_arity]) -> f a'
-     | _, g, ((Error a')[@explicit_arity]) -> g a'
+     | f, _, Ok a' -> f a'
+     | _, g, Error a' -> g a'
     : ('a -> 'c) -> ('b -> 'c) -> ('a, 'b) result -> 'c)
 
 module type MAGMA_F = functor (T : TYPE) (M : MAGMA) -> MAGMA with type t = (M.t, T.t) result
@@ -58,11 +58,10 @@ functor
 
     let append a b =
       match a, b with
-      | ((Ok a')[@explicit_arity]), ((Ok b')[@explicit_arity]) ->
-          Ok (M.append a' b') [@explicit_arity]
-      | _, ((Ok b')[@explicit_arity]) -> Ok b' [@explicit_arity]
-      | ((Ok a')[@explicit_arity]), _ -> Ok a' [@explicit_arity]
-      | ((Error a')[@explicit_arity]), _ -> Error a' [@explicit_arity]
+      | Ok a', Ok b' -> Ok (M.append a' b')
+      | _, Ok b' -> Ok b'
+      | Ok a', _ -> Ok a'
+      | Error a', _ -> Error a'
   end
 
 module Medial_Magma : MEDIAL_MAGMA_F =
@@ -92,8 +91,8 @@ functor
 
     let map f a =
       match a with
-      | ((Ok r)[@explicit_arity]) -> Ok (f r) [@explicit_arity]
-      | ((Error l)[@explicit_arity]) -> Error l [@explicit_arity]
+      | Ok r -> Ok (f r)
+      | Error l -> Error l
   end
 
 module Bifunctor : BIFUNCTOR with type ('a, 'b) t = ('a, 'b) result = struct
@@ -101,8 +100,8 @@ module Bifunctor : BIFUNCTOR with type ('a, 'b) t = ('a, 'b) result = struct
 
   let bimap f g a =
     match a with
-    | ((Ok a')[@explicit_arity]) -> Ok (f a') [@explicit_arity]
-    | ((Error a')[@explicit_arity]) -> Error (g a') [@explicit_arity]
+    | Ok a' -> Ok (f a')
+    | Error a' -> Error (g a')
 end
 
 module Apply : APPLY_F =
@@ -114,8 +113,8 @@ functor
 
     let apply f a =
       match f, a with
-      | ((Ok f')[@explicit_arity]), a' -> map f' a'
-      | ((Error f')[@explicit_arity]), _ -> Error f' [@explicit_arity]
+      | Ok f', a' -> map f' a'
+      | Error f', _ -> Error f'
   end
 
 module Applicative : APPLICATIVE_F =
@@ -125,7 +124,7 @@ functor
   struct
     include Apply (T)
 
-    let pure a = (Ok a [@explicit_arity])
+    let pure a = Ok a
   end
 
 module Monad : MONAD_F =
@@ -137,8 +136,8 @@ functor
 
     let flat_map a f =
       match a with
-      | ((Ok a')[@explicit_arity]) -> f a'
-      | ((Error a')[@explicit_arity]) -> Error a' [@explicit_arity]
+      | Ok a' -> f a'
+      | Error a' -> Error a'
   end
 
 module Alt : ALT_F =
@@ -163,8 +162,8 @@ functor
 
     let extend f a =
       match f, a with
-      | _, ((Error a')[@explicit_arity]) -> Error a' [@explicit_arity]
-      | f', a' -> Ok (f' a') [@explicit_arity]
+      | _, Error a' -> Error a'
+      | f', a' -> Ok (f' a')
   end
 
 module Show : SHOW_F =
@@ -188,8 +187,8 @@ functor
 
     let eq a b =
       match a, b with
-      | ((Ok a')[@explicit_arity]), ((Ok b')[@explicit_arity]) -> Ok.eq a' b'
-      | ((Error a')[@explicit_arity]), ((Error b')[@explicit_arity]) -> Error.eq a' b'
+      | Ok a', Ok b' -> Ok.eq a' b'
+      | Error a', Error b' -> Error.eq a' b'
       | _ -> false
   end
 
@@ -203,8 +202,8 @@ functor
 
     let compare a b =
       match a, b with
-      | ((Ok a')[@explicit_arity]), ((Ok b')[@explicit_arity]) -> Ok.compare a' b'
-      | ((Error a')[@explicit_arity]), ((Error b')[@explicit_arity]) -> Error.compare a' b'
+      | Ok a', Ok b' -> Ok.compare a' b'
+      | Error a', Error b' -> Error.compare a' b'
       | Error _, Ok _ -> `less_than
       | Ok _, Error _ -> `greater_than
   end
@@ -217,9 +216,9 @@ functor
   struct
     include Ord (Ok) (Error)
 
-    let top = (Ok Ok.top [@explicit_arity])
+    let top = Ok Ok.top
 
-    let bottom = (Error Error.bottom [@explicit_arity])
+    let bottom = Error Error.bottom
   end
 
 module Many_Valued_Logic = struct
@@ -285,11 +284,9 @@ module Many_Valued_Logic = struct
 
       let join a b =
         match a, b with
-        | ((Ok a')[@explicit_arity]), ((Ok b')[@explicit_arity]) ->
-            Ok (Ok.join a' b') [@explicit_arity]
-        | ((Ok a')[@explicit_arity]), _ | _, ((Ok a')[@explicit_arity]) -> Ok a' [@explicit_arity]
-        | ((Error a')[@explicit_arity]), ((Error b')[@explicit_arity]) ->
-            Error (Error.join a' b') [@explicit_arity]
+        | Ok a', Ok b' -> Ok (Ok.join a' b')
+        | Ok a', _ | _, Ok a' -> Ok a'
+        | Error a', Error b' -> Error (Error.join a' b')
     end
 
   module Meet_Semilattice : MEET_SEMILATTICE_F =
@@ -302,12 +299,9 @@ module Many_Valued_Logic = struct
 
       let meet a b =
         match a, b with
-        | ((Ok a')[@explicit_arity]), ((Ok b')[@explicit_arity]) ->
-            Ok (Ok.meet a' b') [@explicit_arity]
-        | ((Error a')[@explicit_arity]), ((Error b')[@explicit_arity]) ->
-            Error (Error.meet a' b') [@explicit_arity]
-        | ((Error a')[@explicit_arity]), _ | _, ((Error a')[@explicit_arity]) ->
-            Error a' [@explicit_arity]
+        | Ok a', Ok b' -> Ok (Ok.meet a' b')
+        | Error a', Error b' -> Error (Error.meet a' b')
+        | Error a', _ | _, Error a' -> Error a'
     end
 
   module Bounded_Join_Semilattice : BOUNDED_JOIN_SEMILATTICE_F =
@@ -318,7 +312,7 @@ module Many_Valued_Logic = struct
     struct
       include Join_Semilattice (Ok) (Error)
 
-      let bottom = (Error Error.bottom [@explicit_arity])
+      let bottom = Error Error.bottom
     end
 
   module Bounded_Meet_Semilattice : BOUNDED_MEET_SEMILATTICE_F =
@@ -329,7 +323,7 @@ module Many_Valued_Logic = struct
     struct
       include Meet_Semilattice (Ok) (Error)
 
-      let top = (Ok Ok.top [@explicit_arity])
+      let top = Ok Ok.top
     end
 
   module Lattice (Ok : LATTICE) (Error : LATTICE) = struct
@@ -369,10 +363,10 @@ module Many_Valued_Logic = struct
 
         let not a =
           match a with
-          | ((Ok a')[@explicit_arity]) when a' = Ok.top -> Error Error.bottom [@explicit_arity]
-          | ((Ok a')[@explicit_arity]) when a' = Ok.bottom -> Error Error.top [@explicit_arity]
-          | ((Error a')[@explicit_arity]) when a' = Error.top -> Ok Ok.bottom [@explicit_arity]
-          | ((Error a')[@explicit_arity]) when a' = Error.bottom -> Ok Ok.top [@explicit_arity]
+          | Ok a' when a' = Ok.top -> Error Error.bottom
+          | Ok a' when a' = Ok.bottom -> Error Error.top
+          | Error a' when a' = Error.top -> Ok Ok.bottom
+          | Error a' when a' = Error.bottom -> Ok Ok.top
           | a' -> a'
 
         let implies a b = join (not a) b
@@ -399,32 +393,32 @@ module Many_Valued_Logic = struct
 
       let fold_left f initial a =
         match a with
-        | ((Ok a')[@explicit_arity]) -> f initial a'
+        | Ok a' -> f initial a'
         | Error _ -> initial
 
       and fold_right f initial a =
         match a with
-        | ((Ok a')[@explicit_arity]) -> f a' initial
+        | Ok a' -> f a' initial
         | Error _ -> initial
 
       module Fold_Map (M : MONOID) = struct
         let fold_map f a =
           match a with
-          | ((Ok a')[@explicit_arity]) -> f a'
+          | Ok a' -> f a'
           | Error _ -> M.empty
       end
 
       module Fold_Map_Plus (P : PLUS) = struct
         let fold_map f a =
           match a with
-          | ((Ok a')[@explicit_arity]) -> f a'
+          | Ok a' -> f a'
           | Error _ -> P.empty
       end
 
       module Fold_Map_Any (M : MONOID_ANY) = struct
         let fold_map f a =
           match a with
-          | ((Ok a')[@explicit_arity]) -> f a'
+          | Ok a' -> f a'
           | Error _ -> M.empty
       end
     end
@@ -434,13 +428,13 @@ module Many_Valued_Logic = struct
 
     let bifold_left f g initial a =
       match a with
-      | ((Ok a')[@explicit_arity]) -> f initial a'
-      | ((Error a')[@explicit_arity]) -> g initial a'
+      | Ok a' -> f initial a'
+      | Error a' -> g initial a'
 
     and bifold_right f g initial a =
       match a with
-      | ((Ok a')[@explicit_arity]) -> f a' initial
-      | ((Error a')[@explicit_arity]) -> g a' initial
+      | Ok a' -> f a' initial
+      | Error a' -> g a' initial
 
     module Fold_Map (M : MONOID) = struct
       let fold_map = result
@@ -473,13 +467,13 @@ module Many_Valued_Logic = struct
 
       let traverse f a =
         match a with
-        | ((Ok a')[@explicit_arity]) -> A.map E.pure (f a')
-        | ((Error a')[@explicit_arity]) -> A.pure (Error a' [@explicit_arity])
+        | Ok a' -> A.map E.pure (f a')
+        | Error a' -> A.pure (Error a')
 
       and sequence a =
         match a with
-        | ((Ok a')[@explicit_arity]) -> A.map E.pure a'
-        | ((Error a')[@explicit_arity]) -> A.pure (Error a' [@explicit_arity])
+        | Ok a' -> A.map E.pure a'
+        | Error a' -> A.pure (Error a')
     end
 
   module Bitraversable : BITRAVERSABLE_F =
@@ -497,13 +491,13 @@ module Many_Valued_Logic = struct
 
       let bitraverse f g a =
         match a with
-        | ((Ok a')[@explicit_arity]) -> A.map (fun x -> (Ok x [@explicit_arity])) (f a')
-        | ((Error a')[@explicit_arity]) -> A.map (fun x -> (Error x [@explicit_arity])) (g a')
+        | Ok a' -> A.map (fun x -> Ok x) (f a')
+        | Error a' -> A.map (fun x -> Error x) (g a')
 
       and bisequence a =
         match a with
-        | ((Ok a')[@explicit_arity]) -> A.map (fun x -> (Ok x [@explicit_arity])) a'
-        | ((Error a')[@explicit_arity]) -> A.map (fun x -> (Error x [@explicit_arity])) a'
+        | Ok a' -> A.map (fun x -> Ok x) a'
+        | Error a' -> A.map (fun x -> Error x) a'
     end
 
   module Infix = struct
@@ -512,25 +506,20 @@ module Many_Valued_Logic = struct
 
   module Choose (A : ALT) = struct
     let choose =
-      (fun a b ->
-         A.alt
-           (A.map (fun x -> (Ok x [@explicit_arity])) a)
-           (A.map (fun x -> (Error x [@explicit_arity])) b)
+      (fun a b -> A.alt (A.map (fun x -> Ok x) a) (A.map (fun x -> Error x) b)
         : 'a A.t -> 'b A.t -> ('a, 'b) result A.t)
   end
 
   module Unsafe = struct
     let from_ok a =
       match a with
-      | ((Ok a')[@explicit_arity]) -> a'
-      | _ ->
-          raise (Invalid_argument "You passed in an `Error` value to `from_ok`" [@explicit_arity])
+      | Ok a' -> a'
+      | _ -> raise (Invalid_argument "You passed in an `Error` value to `from_ok`")
 
     and from_error a =
       match a with
-      | ((Error a')[@explicit_arity]) -> a'
-      | _ ->
-          raise (Invalid_argument "You passed in an `Ok` value to `from_error`" [@explicit_arity])
+      | Error a' -> a'
+      | _ -> raise (Invalid_argument "You passed in an `Ok` value to `from_error`")
   end
 
   let is_ok a = result (const true) (const false) a
@@ -538,10 +527,7 @@ module Many_Valued_Logic = struct
   and is_error a = result (const false) (const true) a
 
   and note =
-    (fun default ->
-       Option.maybe
-         ~f:(fun x -> (Ok x [@explicit_arity]))
-         ~default:(Error default [@explicit_arity])
+    (fun default -> Option.maybe ~f:(fun x -> Ok x) ~default:(Error default)
       : 'err -> 'a option -> ('a, 'err) result)
 
   and hush =

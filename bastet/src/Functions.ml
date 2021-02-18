@@ -203,8 +203,8 @@ module Foldable (F : FOLDABLE) = struct
     let surround_map =
       (fun ~delimiter f fa ->
          let open I in
-         let joined a = (Endo.Endo (fun m -> delimiter <:> f a <:> m) [@explicit_arity]) in
-         let ((Endo.Endo fn)[@explicit_arity]) = FM.fold_map joined fa in
+         let joined a = Endo.Endo (fun m -> delimiter <:> f a <:> m) in
+         let (Endo.Endo fn) = FM.fold_map joined fa in
          fn delimiter
         : delimiter:S.t -> ('a -> S.t) -> 'a F.t -> S.t)
 
