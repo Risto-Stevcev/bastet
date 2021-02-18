@@ -1,0 +1,49 @@
+name: Main workflow
+
+on:
+  push:
+    branches: ['master']
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        ocaml-version:
+          - 4.11.0
+          - 4.10.1
+          - 4.09.1
+          - 4.08.1
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - run: npm install -g yarn
+
+      - run: yarn
+
+      - run: opam pin add bastet.dev . --no-action
+
+      - run: opam depext bastet --yes --with-doc --with-test
+
+      - run: opam install . --deps-only --with-doc --with-test
+
+      - run: make bisect
+
+      - run: make coveralls

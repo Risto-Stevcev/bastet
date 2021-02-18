@@ -2,11 +2,11 @@ all: build
 
 .PHONY: clean-bs
 clean-bs:
-	bsb -clean-world
+	yarn bsb -clean-world
 
 .PHONY: clean-native
 clean-native:
-	dune clean
+	opam exec -- dune clean
 
 .PHONY: clean-docs
 clean-docs:
@@ -26,25 +26,25 @@ build-bs:
 
 .PHONY: build-native
 build-native:
-	dune build @all
+	opam exec -- dune build @all
 
 .PHONY: build
 build: build-bs build-native
 
 .PHONY: fmt
 fmt:
-	dune build @fmt --auto-promote
+	opam exec -- dune build @fmt --auto-promote
 
 .PHONY: docs-template
 docs-template: test-native
 	cat bastet/src/index.mld.template | \
 		sed -e 's/{{:/{ {:/g' | \
-		dune exec examples/docs_template.exe | \
+		opam exec -- dune exec examples/docs_template.exe | \
 		sed -e 's/{ {:/{{:/g' > bastet/src/index.mld
 
 .PHONY: docs
 docs: clean-docs docs-template
-	dune build @doc
+	opam exec -- dune build @doc
 
 .PHONY: copy-docs
 copy-docs: docs
@@ -60,7 +60,7 @@ test-bs: build-bs
 
 .PHONY: test-native
 test-native: build-native
-	dune runtest --no-buffer
+	opam exec -- dune runtest --no-buffer
 
 .PHONY: test
 test: test-bs test-native
@@ -75,22 +75,26 @@ bisect:
 
 .PHONY: bisect-html
 bisect-html: bisect
-	bisect-ppx-report html
+	opam exec -- bisect-ppx-report html
 
 .PHONY: coveralls-json
 coveralls-json: bisect
-	bisect-ppx-report coveralls --repo-token ${COVERALLS_TOKEN} coverage.json
+	opam exec -- bisect-ppx-report coveralls --repo-token ${COVERALLS_TOKEN} coverage.json
 
 .PHONY: coveralls-send
 coveralls-send:
 	curl -L -F json_file=@./coverage.json https://coveralls.io/api/v1/jobs
 
+.PHONY: coveralls-api
+coveralls-api: coveralls-json coveralls-send
+
 .PHONY: coveralls
-coveralls: coveralls-json coveralls-send
+coveralls:
+	opam exec -- bisect-ppx-report send-to Coveralls
 
 .PHONY: watch-native
 watch-native:
-	dune build @all -w
+	opam exec -- dune build @all -w
 
 .PHONY: watch-bs
 watch-bs:
@@ -102,11 +106,11 @@ watch-test-bs:
 
 .PHONY: watch-test-native
 watch-test:
-	dune runtest --no-buffer -w
+	opam exec -- dune runtest --no-buffer -w
 
 .PHONY: utop
 utop:
-	dune utop .
+	opam exec -- dune utop .
 
 .PHONY: remove-switch
 remove-switch:
