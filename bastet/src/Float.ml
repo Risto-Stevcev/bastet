@@ -1,5 +1,10 @@
 open Interface
 
+(** Note: `float` is not a fully law abiding member of Additive.Semigroup,
+    Multiplicative.Semigroup, Semiring, Division_Ring, and Euclidean_Ring, and any
+    abstractions dependent on these, due to potential arithmetic overflows and
+    floating point precision issues *)
+
 let approximately_equal =
   (fun ~tolerance a b -> abs_float (a -. b) <= tolerance
     : tolerance:float -> float -> float -> bool)

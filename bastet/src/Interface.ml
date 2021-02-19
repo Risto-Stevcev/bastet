@@ -1,3 +1,7 @@
+(** {e Note}:
+    Any data structure implementing one of these interfaces must also satisfy the corresponding laws in
+    the corresponding {!Verify} module. *)
+
 module type TYPE = sig
   type t
 end
@@ -27,6 +31,8 @@ module type SEMIGROUP_ANY = sig
 end
 
 module type MONOID = sig
+  (** A {!MONOID} only needs to be commutative with the {!empty} element. *)
+
   include SEMIGROUP
 
   val empty : t
@@ -43,6 +49,8 @@ module type QUASIGROUP = sig
 end
 
 module type MEDIAL_QUASIGROUP = sig
+  (** Every {!MEDIAL_QUASIGROUP} is isotopic to an {!ABELIAN_GROUP}. *)
+
   include MEDIAL_MAGMA
 end
 
@@ -51,18 +59,24 @@ module type QUASIGROUP_ANY = sig
 end
 
 module type LOOP = sig
+  (** A {!LOOP} only needs to be commutative with the {!empty} element. *)
+
   include QUASIGROUP
 
   val empty : t
 end
 
 module type LOOP_ANY = sig
+  (** A {!LOOP_ANY} only needs to be commutative with the {!empty} element. *)
+
   include QUASIGROUP_ANY
 
   val empty : 'a t
 end
 
 module type GROUP = sig
+  (** Include {i only} either {!LOOP} or {!MONOID}. *)
+
   include LOOP
 
   include MONOID with type t := t
@@ -71,6 +85,8 @@ module type GROUP = sig
 end
 
 module type GROUP_ANY = sig
+  (** Include {i only} either {!LOOP_ANY} or {!MONOID_ANY}. *)
+
   include LOOP_ANY
 
   include MONOID_ANY with type 'a t := 'a t
@@ -78,6 +94,7 @@ module type GROUP_ANY = sig
   val inverse : 'a t -> 'a t
 end
 
+(** Every {!GROUP} is a {!LOOP}. *)
 module type GROUP_LOOP = functor (G : GROUP) -> LOOP
 
 module type GROUP_LOOP_ANY = functor (G : GROUP_ANY) -> LOOP_ANY

@@ -6,6 +6,10 @@ let ( <. ) =
   let open Function.Infix in
   ( <. )
 
+(** Note: Promises are not actually Monads because you can't have
+    Js.Promise.t(Js.Promise.t('a))
+    Even though it's a valid bucklescript signature *)
+
 module ComparePromise = struct
   type 'a t = 'a Js.Promise.t
 
@@ -43,28 +47,4 @@ describe "Promise" (fun () ->
         async_property1
           "should satisfy homomorphism"
           arb_nat
-          (Obj.magic <. V.homomorphism string_of_int));
-    describe "Monad (unlawful)" (fun () ->
-        let module V = Verify.Compare.Monad (Promise.Monad) (ComparePromise) in
-        let module Fn = Functions.Monad (Promise.Monad) in
-        let pure = Promise.Applicative.pure in
-        async_property1
-          "should satisfy associativity"
-          arb_nat
-          (Obj.magic <. V.associativity (pure <. string_of_int) (pure <. ( ^ ) "!") <. promise);
-        async_property1
-          "should satisfy identity"
-          arb_nat
-          (Obj.magic <. V.identity (pure <. string_of_int));
-        async_property1 "will *seemingly* properly flatten (not correct)" arb_nat (fun n ->
-            let open Promise.Infix in
-            Fn.flatten (pure (pure n)) >>= fun flattened_n -> pure (flattened_n = n));
-        async_property1
-          "promises are not actually nested despite the type signature"
-          arb_nat
-          (fun n ->
-            let open Promise.Infix in
-            pure (pure n)
-            >>= (fun result -> pure (result >>= (pure <. Function.const false)))
-            >>= Function.Category.id
-            |> Js.Promise.catch (pure <. Function.const true))))
+          (Obj.magic <. V.homomorphism string_of_int)))

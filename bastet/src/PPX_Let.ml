@@ -1,5 +1,8 @@
+(** This is a helper module to integrate `bs-abstract` with `ppx_let` *)
+
 open Interface
 
+(** The module structure that `ppx_let` expects to be in scope *)
 module type PPX_LET = sig
   type 'a t
 
@@ -16,6 +19,7 @@ module type PPX_LET = sig
   end
 end
 
+(** Makes the `ppx_let` module from a monad *)
 module Make (M : MONAD) = struct
   module A = Functions.Apply (M)
 

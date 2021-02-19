@@ -1,3 +1,5 @@
+(** Result is the equivalent of Either in Haskell for Ocaml *)
+
 open Interface
 
 let flip, const =
@@ -222,6 +224,11 @@ functor
   end
 
 module Many_Valued_Logic = struct
+  (** Many valued logics in general have to relax certain constraints in order to
+      be heyting or boolean algebras, such as:
+      - The reflexivity conditions of equivalence and implication (may be quasi-reflexive)
+      - The law of excluded middle *)
+
   module type EQ_F = functor (Ok : TYPE) (Error : TYPE) -> EQ with type t = (Ok.t, Error.t) result
 
   module type ORD_F = functor (Ok : TYPE) (Error : TYPE) -> ORD with type t = (Ok.t, Error.t) result

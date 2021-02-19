@@ -6,6 +6,7 @@ module ArbitraryInt : Test.ARBITRARY with type t = int and type 'a arbitrary = '
 
   type nonrec 'a arbitrary = 'a arbitrary
 
+  (* These bounds ensure that there are no arithmetic overflows *)
   let make =
     arb_int
       (Js.Math.pow_int ~base:Int.Bounded.bottom ~exp:(1 / 4))

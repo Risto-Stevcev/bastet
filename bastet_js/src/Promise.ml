@@ -2,6 +2,10 @@ open Interface
 
 let ( <. ) = Function.Infix.( <. )
 
+(** Note: Promises are not actually Monads because you can't have `'a Js.Promise.t Js.Promise.t`
+    Even though it's a valid bucklescript signature. Promises auto-flatten in this case.
+    See the unit tests. *)
+
 module Functor : FUNCTOR with type 'a t = 'a Js.Promise.t = struct
   type 'a t = 'a Js.Promise.t
 
@@ -19,14 +23,4 @@ module Applicative : APPLICATIVE with type 'a t = 'a Js.Promise.t = struct
   include Apply
 
   let pure = Js.Promise.resolve
-end
-
-module Monad : MONAD with type 'a t = 'a Js.Promise.t = struct
-  include Applicative
-
-  let flat_map a f = Js.Promise.then_ f a
-end
-
-module Infix = struct
-  include Infix.Monad (Monad)
 end

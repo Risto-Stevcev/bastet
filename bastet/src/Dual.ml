@@ -1,5 +1,6 @@
 open Interface
 
+(** A data structure representing the dual of a monoid *)
 type 'a dual = Dual of 'a
 
 module type MAGMA_F = functor (M : MAGMA) -> MAGMA with type t = M.t dual

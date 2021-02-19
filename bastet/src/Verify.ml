@@ -1,5 +1,6 @@
 open Interface
 
+(** Provides functors to verify that instances are lawful. *)
 module Compare = struct
   module Medial_Magma (M : MEDIAL_MAGMA) (E : EQ with type t = M.t) = struct
     module I = Infix.Magma (M)
@@ -104,37 +105,37 @@ module Compare = struct
   module Group (G : GROUP) (E : EQ with type t = G.t) = struct
     module I = Infix.Magma (G)
 
+    (** via {!Interface.MONOID} *)
     let invertibility =
       (fun a ->
          let open I in
          E.eq (G.inverse a <:> a) G.empty && E.eq (a <:> G.inverse a) G.empty
         : G.t -> bool)
-      [@@ocaml.doc " via {!Interface.MONOID} "]
 
+    (** via {!Interface.LOOP} *)
     let associativity =
       (fun a b c ->
          let open I in
          E.eq (a <:> (b <:> c)) (a <:> (b <:> c))
         : G.t -> G.t -> G.t -> bool)
-      [@@ocaml.doc " via {!Interface.LOOP} "]
   end
 
   module Group_Any (G : GROUP_ANY) (E : EQ1 with type 'a t = 'a G.t) = struct
     module I = Infix.Magma_Any (G)
 
+    (** via {!Interface.MONOID} *)
     let invertibility =
       (fun a ->
          let open I in
          E.eq (G.inverse a <:> a) G.empty && E.eq (a <:> G.inverse a) G.empty
         : 'a G.t -> bool)
-      [@@ocaml.doc " via {!Interface.MONOID} "]
 
+    (** via {!Interface.LOOP} *)
     let associativity =
       (fun a b c ->
          let open I in
          E.eq (a <:> (b <:> c)) (a <:> (b <:> c))
         : 'a G.t -> 'a G.t -> 'a G.t -> bool)
-      [@@ocaml.doc " via {!Interface.LOOP} "]
   end
 
   module Abelian_Group (A : ABELIAN_GROUP) (E : EQ with type t = A.t) = struct
@@ -588,8 +589,8 @@ module Compare = struct
         : ('e -> 'b) -> ('f -> 'd) -> ('b -> 'a) -> ('d -> 'c) -> ('a, 'c) B.t -> bool)
   end
 end
-[@@ocaml.doc " Provides functors to verify that instances are lawful. "]
 
+(** Default {!Verify} functors. Uses {!Pervasives.( == )} for comparison. *)
 module Medial_Magma (M : MEDIAL_MAGMA) = struct
   include
     Compare.Medial_Magma
@@ -600,7 +601,6 @@ module Medial_Magma (M : MEDIAL_MAGMA) = struct
         let eq = ( = )
       end)
 end
-[@@ocaml.doc " Default {!Verify} functors. Uses {!Pervasives.( == )} for comparison. "]
 
 module Semigroup (S : SEMIGROUP) = struct
   include

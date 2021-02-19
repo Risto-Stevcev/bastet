@@ -1,5 +1,9 @@
 open Interface
 
+(** Note: `int` is not a fully law abiding member of Additive.Semigroup,
+    Multiplicative.Semigroup and Semiring, and any abstractions dependent on these,
+    due to potential arithmetic overflows *)
+
 module Additive = struct
   module Magma : MAGMA with type t = int = struct
     type t = int

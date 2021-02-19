@@ -1,3 +1,5 @@
+(** This module provides default implementations for interfaces *)
+
 let ( <. ) = Function.Infix.( <. )
 
 module type FOLD = sig

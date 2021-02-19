@@ -1,3 +1,6 @@
+(** This module provdes [Js.Array]-sepcific implementations for those who want things to compile into
+    clean javascript code. You can still use {!Array} on the JS side if this doesn't matter to you. *)
+
 module A = ArrayF.Make (struct
   let length = Js.Array.length
 
@@ -20,11 +23,5 @@ module A = ArrayF.Make (struct
 
   let slice = Js.Array.slice
 end)
-[@@ocaml.doc
-  "\n\
-  \ This module provdes [Js.Array]-sepcific implementations for those who want things to compile \
-   into\n\
-  \ clean javascript code. You can still use {!Array} on the JS side if this doesn't matter to you.\n\
-  \ "]
 
 include A

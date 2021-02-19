@@ -1,3 +1,7 @@
+(** * * * * * * * * * * * * * * *
+ * Common instantiated functors *
+ * * * * * * * * * * * * * * * **)
+ 
 module OcamlAbstractInt = Int
 module OcamlAbstractBool = Bool
 module OcamlAbstractString = String

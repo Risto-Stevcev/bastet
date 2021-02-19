@@ -36,6 +36,9 @@ jobs:
 
       - run: npm install -g yarn
 
+      # Install esy for Windows test
+      - run: npm install -g esy
+
       - run: yarn
 
       - run: opam pin add bastet.dev . --no-action

@@ -1,3 +1,5 @@
+(** These helpers provide generative tests for implementations. *)
+
 module type TEST = sig
   type test
 
@@ -25,7 +27,6 @@ module type TEST = sig
 
   val suite : string -> test list -> test suite
 end
-[@@ocaml.doc "\n These helpers provide generative tests for implementations.\n "]
 
 module type ARBITRARY = sig
   type t
@@ -36,9 +37,9 @@ module type ARBITRARY = sig
 end
 
 module type ARBITRARY_A = sig
+  (** Generic helper to make an [arbitrary(t('a))] type from a given [arbitrary('a)] type. *)
+
   type 'a t
-  [@@ocaml.doc
-    " Generic helper to make an [arbitrary(t('a))] type from a given [arbitrary('a)] type. "]
 
   type 'a arbitrary
 
@@ -48,12 +49,10 @@ module type ARBITRARY_A = sig
 end
 
 module type QUICKCHECK = sig
+  (** This module type is required to create the generative tests. Provide the framework-specific
+      implementations here (ie: qcheck, jsverify,etc). *)
+
   type t
-  [@@ocaml.doc
-    "\n\
-    \  This module type is required to create the generative tests. Provide the framework-specific\n\
-    \  implementations here (ie: qcheck, jsverify,etc).\n\
-    \  "]
 
   type 'a arbitrary
 

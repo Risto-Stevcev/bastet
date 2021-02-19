@@ -4,6 +4,7 @@ let id = Function.Category.id
 
 let ( <. ) = Function.Infix.( <. )
 
+(** A data structure representing the monoid of endomorphisms under composition (a => a) *)
 type 'a endo = Endo of ('a -> 'a)
 
 module Magma : MAGMA_ANY with type 'a t = 'a endo = struct
