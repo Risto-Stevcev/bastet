@@ -30,25 +30,52 @@ jobs:
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
+      - name: Install Bastet
+        run: |
+          opam pin add bastet.dev . --no-action
+          opam depext bastet --yes --with-doc --with-test
+          opam install . --deps-only --with-doc --with-test
+
+  coverage:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ocaml-version:
+          - 4.11.0
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
       - uses: actions/setup-node@v2
         with:
           node-version: '12'
 
-      - run: npm install -g yarn
+      - name: Install Yarn
+        run: npm install -g yarn
 
-      # Install esy for Windows test
-      - run: npm install -g esy
+      - name: Install NPM dependencies
+        run: yarn
 
-      - run: yarn
+      - name: Install Bastet
+        run: |
+          opam pin add bastet.dev . --no-action
+          opam depext bastet --yes --with-doc --with-test
+          opam install . --deps-only --with-doc --with-test
 
-      - run: opam pin add bastet.dev . --no-action
-
-      - run: opam depext bastet --yes --with-doc --with-test
-
-      - run: opam install . --deps-only --with-doc --with-test
-
-      - run: make bisect
-
-      - run: make coveralls
+      - name: Create and deploy code coverage
+        run: |
+          make bisect
+          make coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
