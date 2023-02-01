@@ -1,4 +1,4 @@
-(lang dune 2.0.1)
+(lang dune 2.0)
 (name bastet)
 (source (github Risto-Stevcev/bastet))
 (license BSD-3-Clause)
